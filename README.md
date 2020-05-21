@@ -6,6 +6,13 @@ M3E5 is a Discord bot that implements an chatbot and an home assistant. The chat
 I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 itead I want to creat a special unique Bot with tons of unique features.<br>
 Like a real I and a home assistant like Alexa.
 
+# Things that are working right now
+
+- Chatbot 
+  - currently trainning but I'm halfway through it
+- Home assistant
+  - AI integration 
+
 # Planned features
 
 I guess too much but I wil just work my way through all of them :D
@@ -24,6 +31,7 @@ I guess too much but I wil just work my way through all of them :D
   - Recording meetings ( Voice recording to an mp3 file)
   - Home assistant integration
   - Custom voice channels 
+  - poke admins/moderators via Telegram or Email if they aren't online
 - Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
@@ -48,13 +56,6 @@ I guess too much but I wil just work my way through all of them :D
   - disabling some features
   - integration of the nmt AI
   
-# Things that are working right now
-
-- Chatbot 
-  - currently trainning but I'm halfway through it
-- Home assistant
-  - AI integration 
-
 # Home assistant
 
 For this part I'm using a modified version of this [assistant](https://github.com/ggeop/Python-ai-assistant).<br> 
