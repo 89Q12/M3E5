@@ -35,6 +35,20 @@ I guess too much but I wil just work my way through all of them :D
   - Seamless ai bridge 
   - Disabling a few commands that aren't needed e.g. play a song on youtube, because this gets handeld by the bot
   
+  # TODO
+  
+  - The whole discord bot
+    - Every feature from the bot list above
+    - AI integration
+    - home assistant integration
+  - Refactoring the nmt code base
+    - inferencemode 
+    - using multiple models 
+  - Building the home assistant inegration on the assistant side 
+    - rewriting main.py from the assistant 
+    - disabling some features
+    - integration of the nmt AI
+  
 # Things that are working right now
 
 - Chat bot 
