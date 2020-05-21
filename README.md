@@ -73,4 +73,4 @@ Cute or? isn't it
 
 ## For examples please click [here](https://github.com/ggeop/Python-ai-assistant)
 
-Because I don't want to steal any credits or so xD
+Because I don't want to steal any credits or so and I'm lazyxD
