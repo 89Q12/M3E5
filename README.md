@@ -1,5 +1,5 @@
 # M3E5
-M3E5 is a Discord bot that implements an chat bot and an home assistant. The chat bot is based on Google's nmt AI, it's a bit hacky but it works.
+M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.
 
 # Why the name?
 
@@ -24,7 +24,7 @@ I guess too much but I wil just work my way through all of them :D
   - Recording meetings ( Voice recording to an mp3 file)
   - Home assistant integration
   - Custom voice channels 
-- Chat bot features
+- Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
   - Home assistant bridge
@@ -50,7 +50,7 @@ I guess too much but I wil just work my way through all of them :D
   
 # Things that are working right now
 
-- Chat bot 
+- Chatbot 
   - currently trainning but I'm halfway through it
 - Home assistant
   - AI integration 
@@ -62,7 +62,7 @@ All credits for the assistant goes to [ggeop](https://github.com/ggeop).
 
 The assistant uses nltk, that means that if you write " what time is it" it will understand that you're asking for the current time :D
 
-# Chat bot
+# Chatbot
 
 As I stated early I'm using Google's nmt but a modifed version by [daniel-kukiela](https://github.com/daniel-kukiela), the repo can be found [here](https://github.com/daniel-kukiela/nmt-chatbot).
 All credits for the chat bot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
