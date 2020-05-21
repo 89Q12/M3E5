@@ -7,7 +7,10 @@ I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 itead I w
 Like a real I and a home assistant like Alexa.
 
 # Things that are working right now
-
+- Discord bot base
+  - basic commands
+  - folder structur
+  - db connection
 - Chatbot 
   - currently trainning but I'm halfway through it
 - Home assistant
