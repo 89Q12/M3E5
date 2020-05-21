@@ -15,11 +15,6 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.author.id != client.user.id:
-        if is_command(message):
-            print(main(message))
-        else:
-            pass
 
 
 
