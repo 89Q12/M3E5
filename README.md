@@ -1,5 +1,5 @@
 # M3E5
-M3E5 is a Discord bot that implements a AI chat bot and a personal assistant. 
+M3E5 is a Discord bot that implements a AI chat bot and a home assistant. 
 The chat bot is based on Google's nmt AI, its a bit hacky but quite fun.
 
 # Why the name?
