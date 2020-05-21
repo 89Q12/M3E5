@@ -3,7 +3,7 @@ M3E5 is a Discord bot that implements an chatbot and an home assistant. The chat
 
 # Why the name?
 
-I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 itead I want to creat a special unique Bot with tons of unique features.<br>
+I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique Bot with tons of unique features.<br>
 Like a real I and a home assistant like Alexa.
 
 # Things that are working right now
