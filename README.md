@@ -65,14 +65,14 @@ The assistant uses nltk, that means that if you write " what time is it" it will
 # Chatbot
 
 As I stated early I'm using Google's nmt but a modifed version by [daniel-kukiela](https://github.com/daniel-kukiela), the repo can be found [here](https://github.com/daniel-kukiela/nmt-chatbot).
-All credits for the chat bot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
+All credits for the chatbot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
 
 # Examples
 
 Below you will find some examples, more will follow.
 
 
-## Here are some examples of the chat bot:
+## Here are some examples of the chatbot:
 Question: Can you sing me a song?
 Answer: I'll post it.
 
