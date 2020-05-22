@@ -8,7 +8,9 @@ client = commands.Bot(command_prefix='.')
 extensions = ["modules.test.test",
               "modules.db.db",
               "modules.listener.listener",
-              "modules.commands.moderation.moderation_commands"]
+              "modules.commands.moderation.moderation_commands",
+              "modules.commands.commandhandler"
+              ]
 
 
 if __name__ == "__main__":

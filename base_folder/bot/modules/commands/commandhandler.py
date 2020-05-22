@@ -7,7 +7,7 @@ class Commands(commands.Cog):
         self.bot = bot
 
     @commands.command(brief="Test")
-    async def hello(self, ctx):
+    async def Hey(self, ctx):
         await ctx.send("Hi")
 
 

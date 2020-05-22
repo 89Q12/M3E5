@@ -3,13 +3,9 @@ from discord.ext import commands
 from modules.db.db_management import create_settings, edit_settings
 
 
-class Commands(commands.Cog):
+class moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(brief="Test")
-    async def hi(self, ctx):
-        await ctx.send("Hi")
 
     @commands.command(pass_context=True)
     async def set_standard_role(self, ctx, arg):
@@ -32,4 +28,4 @@ class Commands(commands.Cog):
         await ctx.send("{} is now the mod role".format(arg))
 
 def setup(bot):
-    bot.add_cog(Commands(bot))
+    bot.add_cog(moderation(bot))
