@@ -11,6 +11,10 @@ Like a real AI and an home assistant like Alexa.
   - basic commands
   - folder structur
   - db connection
+  - Auto roles
+  - set default role
+  - Join and leave messages
+  - reading/writing to database
 - Chatbot 
   - currently trainning but I'm halfway through it
 - Home assistant
