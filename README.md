@@ -12,7 +12,7 @@ Like a real AI and an home assistant like Alexa.
   - folder structur
   - db connection
   - Auto roles
-  - set default role
+  - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
 - Chatbot 
