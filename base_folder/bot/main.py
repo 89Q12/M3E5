@@ -6,7 +6,9 @@ from config.config import token, logging
 
 client = commands.Bot(command_prefix='.')
 extensions = ["modules.test.test",
-              "modules.db.db"]
+              "modules.db.db",
+              "modules.listener.listener",
+              "modules.commands.moderation.moderation_commands"]
 
 
 if __name__ == "__main__":
