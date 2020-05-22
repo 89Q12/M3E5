@@ -19,4 +19,3 @@ if __name__ == "__main__":
             print('Failed to load extension {}\n{}'.format(extension, exc))
     client.run(token())
 
-#client.run('NjY0MTc3MDI4MTE5MDAzMTM2.XsZ_bg.oyr7jMdr-IBh5nsaKvO-pvvUnu0')
