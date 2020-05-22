@@ -21,6 +21,7 @@ Like a real AI and an home assistant like Alexa.
 I guess too much but I wil just work my way through all of them :D
 
 - Discord features
+  - Multi server bot but for now it will be single server only so you have to change some things
   - Moderation features e.g. muting people etc
   - Auto roles
   - Custom commands
