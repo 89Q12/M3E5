@@ -1,17 +1,27 @@
 # M3E5
-M3E5 is a Discord bot that implements a AI chat bot and a personal assistant. 
-The chat bot is based on Google's nmt AI, its a bit hacky but quite fun.
+M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.
 
 # Why the name?
 
-I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 itead I want to creat a special unique Bot with tons of unique features.<br>
-Like a real I and a home assistant like Alexa.
+I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique Bot with tons of unique features.<br>
+Like a real AI and an home assistant like Alexa.
+
+# Things that are working right now
+- Discord bot base
+  - basic commands
+  - folder structur
+  - db connection
+- Chatbot 
+  - currently trainning but I'm halfway through it
+- Home assistant
+  - AI integration 
 
 # Planned features
 
 I guess too much but I wil just work my way through all of them :D
 
 - Discord features
+  - Multi server bot but for now it will be single server only so you have to change some things
   - Moderation features e.g. muting people etc
   - Auto roles
   - Custom commands
@@ -25,7 +35,8 @@ I guess too much but I wil just work my way through all of them :D
   - Recording meetings ( Voice recording to an mp3 file)
   - Home assistant integration
   - Custom voice channels 
-- Chat bot features
+  - poke admins/moderators via Telegram or Email if they aren't online
+- Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
   - Home assistant bridge
@@ -35,13 +46,20 @@ I guess too much but I wil just work my way through all of them :D
   - Seamless ai bridge 
   - Disabling a few commands that aren't needed e.g. play a song on youtube, because this gets handeld by the bot
   
-# Things that are working right now
-
-- Chat bot 
-  - currently trainning but I'm halfway through it
-- Home assistant
-  - AI integration 
-
+# TODO
+  
+- The whole discord bot
+  - Every feature from the bot list above
+  - AI integration
+  - home assistant integration
+- Refactoring the nmt code base
+  - inferencemode 
+  - using multiple models 
+- Building the home assistant inegration on the assistant side 
+  - rewriting main.py from the assistant 
+  - disabling some features
+  - integration of the nmt AI
+  
 # Home assistant
 
 For this part I'm using a modified version of this [assistant](https://github.com/ggeop/Python-ai-assistant).<br> 
@@ -49,17 +67,17 @@ All credits for the assistant goes to [ggeop](https://github.com/ggeop).
 
 The assistant uses nltk, that means that if you write " what time is it" it will understand that you're asking for the current time :D
 
-# Chat bot
+# Chatbot
 
 As I stated early I'm using Google's nmt but a modifed version by [daniel-kukiela](https://github.com/daniel-kukiela), the repo can be found [here](https://github.com/daniel-kukiela/nmt-chatbot).
-All credits for the chat bot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
+All credits for the chatbot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
 
 # Examples
 
 Below you will find some examples, more will follow.
 
 
-## Here are some examples of the chat bot:
+## Here are some examples of the chatbot:
 Question: Can you sing me a song?
 Answer: I'll post it.
 
