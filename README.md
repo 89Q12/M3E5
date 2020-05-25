@@ -13,6 +13,7 @@ Like a real AI and an home assistant like Alexa.
     - unban
     - kick
     - clear amount e.g. 100 messages
+    - mute/unmute
   - folder structure
   - db connection
   - Auto roles
