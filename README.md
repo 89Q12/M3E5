@@ -15,6 +15,7 @@ Like a real AI and an home assistant like Alexa.
   - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
+  - loading/unloading/reloading cogs is now working if you have the dev role
 - Chatbot 
   - currently trainning but I'm halfway through it
 - Home assistant
