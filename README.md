@@ -9,7 +9,7 @@ Like a real AI and an home assistant like Alexa.
 # Things that are working right now
 - Discord bot base
   - basic commands
-  - folder structur
+  - folder structure
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
