@@ -9,6 +9,10 @@ Like a real AI and an home assistant like Alexa.
 # Things that are working right now
 - Discord bot base
   - basic commands
+    - Ban
+    - unban
+    - kick
+    - clear amount e.g. 100 messages
   - folder structure
   - db connection
   - Auto roles
