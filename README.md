@@ -17,6 +17,7 @@ Like a real AI and an home assistant like Alexa.
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
   - giving someone a role e.g. .give_role @someone @some_role
+  - levelsystem is now working(text based)
 - Chatbot 
   - currently trainning but I'm halfway through it
 - Home assistant
