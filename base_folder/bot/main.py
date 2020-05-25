@@ -9,7 +9,9 @@ extensions = ["modules.test.test",
               "modules.db.db",
               "modules.listener.listener",
               "modules.commands.moderation.moderation_commands",
-              "modules.commands.commandhandler"
+              "modules.commands.fun.fun",
+              "modules.commands.dev",
+              "modules.listener.levelsystem"
               ]
 
 

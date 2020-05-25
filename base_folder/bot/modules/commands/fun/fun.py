@@ -2,16 +2,14 @@ import discord
 from discord.ext import commands
 
 
-class Commands(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+class Fun(commands.Cog):
+    def __init__(self, client):
+        self.client = client
 
     @commands.command(brief="Test")
     async def Hey(self, ctx):
         await ctx.send("Hi")
 
 
-
-
-def setup(bot):
-    bot.add_cog(Commands(bot))
+def setup(client):
+    client.add_cog(Fun(client))

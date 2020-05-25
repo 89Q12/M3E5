@@ -17,9 +17,9 @@ def check_for_guild_db(id, name):
             conn.close()
             return True
         else:
-            create_db(id, name)
+            create_db(name)
     except Exception as e:
-        create_db(id, name)
+        create_db(name)
         print("Error: " + str(e))
 
 
@@ -29,7 +29,11 @@ def create_db(guild_name):
                         "id"	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
                         "userid"	INTEGER UNIQUE,
                         "username"	TEXT,
-                        "guildid"	INTEGER
+                        "guildid"	INTEGER,
+                        "text_xp"   INTEGER,
+                        "text_lvl"  INTEGER,
+                        "voice_xp"  INTEGER,
+                        "voice_lvl"  INTEGER
                     );'''
 
     # create tables with the attrs of create_tables
@@ -49,12 +53,12 @@ async def rename_table(guild_name, settings=None):
     if settings is None:
         try:
             c.execute("DROP TABLE " + guild_name + "_old;")
+            create_db(guild_name)
         except sqlite3.OperationalError as e:
             c.execute("ALTER TABLE " + guild_name + " RENAME TO " + guild_name + "_old;")
             conn.commit()
             create_db(guild_name)
     return
-
 
 
 def is_user_indb(user, userid, guild_name, guildid):
@@ -99,6 +103,7 @@ async def roles_from_db(guildname):
     c.close()
     return message
 
+
 def create_settings(guildname):
     conn = connector()
     c = conn.cursor()
@@ -130,6 +135,40 @@ async def get_settings(guildname, fieldname="standard_role_id"):
     roleid = c.fetchone()
     c.close()
     return roleid[0]
+
+
+async def update_xp_text(guildname, userid, amount):
+    conn = connector()
+    c = conn.cursor()
+    c.execute("UPDATE " + guildname + " SET text_xp = " + str(amount) + " WHERE userid = " + str(userid) + ";")
+    conn.commit()
+    c.close()
+
+
+async def get_text_xp(guildname, userid):
+    conn = connector()
+    c = conn.cursor()
+    c.execute("SELECT text_xp FROM " + guildname + " WHERE userid =  " + str(userid) + ";")
+    roleid = c.fetchone()
+    c.close()
+    return roleid[0]
+
+
+async def get_lvl_text(guildname, userid):
+    conn = connector()
+    c = conn.cursor()
+    c.execute("SELECT text_lvl FROM " + guildname + " WHERE userid =  " + str(userid) + ";")
+    roleid = c.fetchone()
+    c.close()
+    return roleid[0]
+
+
+async def update_text_lvl(guildname, userid, amount=1):
+    conn = connector()
+    c = conn.cursor()
+    c.execute("UPDATE " + guildname + " SET text_lvl = " + str(amount) + " WHERE userid = " + str(userid))
+    conn.commit()
+    c.close()
 
 
 '''
