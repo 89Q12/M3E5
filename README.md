@@ -9,12 +9,14 @@ Like a real AI and an home assistant like Alexa.
 # Things that are working right now
 - Discord bot base
   - basic commands
-  - folder structur
+  - folder structure
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
+  - loading/unloading/reloading cogs is now working if you have the dev role
+  - giving someone a role e.g. .give_role @someone @some_role
 - Chatbot 
   - currently trainning but I'm halfway through it
 - Home assistant
