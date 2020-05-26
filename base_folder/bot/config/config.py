@@ -2,7 +2,7 @@ import logging
 
 
 def token():
-    return "Token"
+    return ""
 
 
 logger = logging.getLogger('discord')

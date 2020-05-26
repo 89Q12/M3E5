@@ -8,7 +8,8 @@ client = commands.Bot(command_prefix='.')
 extensions = ["modules.test.test",
               "modules.db.db",
               "modules.listener.listener",
-              "modules.commands.moderation.moderation_commands",
+              "modules.commands.moderation.moderation_mods",
+              "modules.commands.moderation.moderation_admin",
               "modules.commands.fun.fun",
               "modules.commands.dev",
               "modules.listener.levelsystem"

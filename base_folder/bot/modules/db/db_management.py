@@ -112,14 +112,15 @@ def create_settings(guildname):
                         "standard_role_id"	INTEGER,
                         "admin_role_id"	TEXT,
                         "mod_role_id"	TEXT,
-                        "dev_role_id"	TEXT
+                        "dev_role_id"	TEXT,
+                        "imgwelcome"	TEXT
                     );'''
     c.execute(create_table)
     conn.commit()
     c.close()
 
 
-async def edit_settings(guildname, roleid, fieldname="standard_role_id"):
+async def edit_settings_role(guildname, roleid, fieldname="standard_role_id"):
     conn = connector()
     c = conn.cursor()
     create_settings(guildname)
@@ -128,7 +129,16 @@ async def edit_settings(guildname, roleid, fieldname="standard_role_id"):
     c.close()
 
 
-async def get_settings(guildname, fieldname="standard_role_id"):
+async def edit_settings_img(guildname, img="False"):
+    conn = connector()
+    c = conn.cursor()
+    create_settings(guildname)
+    c.execute("UPDATE settings_" + guildname + " SET  imgwelcome= " + str(img) + " WHERE id = 1")
+    conn.commit()
+    c.close()
+
+
+async def get_settings_role(guildname, fieldname="standard_role_id"):
     conn = connector()
     c = conn.cursor()
     c.execute("SELECT " + fieldname + " FROM settings_" + guildname + " GROUP BY " + fieldname + ";")
@@ -151,7 +161,10 @@ async def get_text_xp(guildname, userid):
     c.execute("SELECT text_xp FROM " + guildname + " WHERE userid =  " + str(userid) + ";")
     roleid = c.fetchone()
     c.close()
-    return roleid[0]
+    if roleid is None:
+        return None
+    else:
+        return roleid[0]
 
 
 async def get_lvl_text(guildname, userid):
@@ -160,7 +173,10 @@ async def get_lvl_text(guildname, userid):
     c.execute("SELECT text_lvl FROM " + guildname + " WHERE userid =  " + str(userid) + ";")
     roleid = c.fetchone()
     c.close()
-    return roleid[0]
+    if roleid is None:
+        return None
+    else:
+        return roleid[0]
 
 
 async def update_text_lvl(guildname, userid, amount=1):
