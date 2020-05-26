@@ -101,6 +101,6 @@ Answer: <3
 
 Cute or? isn't it
 
-## For examples please click [here](https://github.com/ggeop/Python-ai-assistant)
+## For examples of the home assistant please click [here](https://github.com/ggeop/Python-ai-assistant)
 
 Because I don't want to steal any credits or so and I'm lazyxD
