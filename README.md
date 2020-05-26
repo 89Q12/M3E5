@@ -57,6 +57,10 @@ I guess it's too much but I will just work my way through all of them :D
   - Seamless ai bridge 
   - Disabling a few commands that aren't needed e.g. play a song on youtube, because this gets handeld by the bot
   
+ # Install instructions 
+ 
+ I will add them as soon as I have time to make an docker img
+ 
 # TODO
   
 - The whole discord bot
