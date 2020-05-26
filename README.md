@@ -63,6 +63,7 @@ I guess too much but I wil just work my way through all of them :D
   - Every feature from the bot list above
   - AI integration
   - home assistant integration
+  - Tempban
 - Refactoring the nmt code base
   - inferencemode 
   - using multiple models 
