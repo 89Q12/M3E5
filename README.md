@@ -30,6 +30,10 @@ Like a real AI and an home assistant like Alexa.
 - Home assistant
   - AI integration 
 
+# Critical bugs
+
+- Permission checks are currently broken 
+
 # Planned features
 
 I guess it's too much but I will just work my way through all of them :D
