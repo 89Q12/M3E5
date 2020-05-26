@@ -3,41 +3,42 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 import discord, os, aiohttp
 from io import BytesIO
 import textwrap
-import rethinkdb as r
 import base64
+from config.Permissions import is_dev
+'''
+MIT License
 
+Copyright (c) 2018-2019 https://github.com/hibikidesu/
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
 
 class IMGWelcome(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-    async def __is_enabled(self, guild: int):
-        if await r.table("imgwelcome").get(str(guild)).run(self.bot.r_conn):
-            return True
-        else:
-            return False
-
-    @commands.group()
-    @commands.cooldown(1, 3, commands.BucketType.user)
-    @commands.has_permissions(administrator=True)
-    async def imgwelcome(self, ctx):
-        if ctx.invoked_subcommand is None:
-            return await ctx.send_help(ctx.command)
-
+    '''
     @imgwelcome.command(name="toggle")
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcomer"""
-        if await self.__is_enabled(ctx.guild.id):
-            await r.table("imgwelcome").get(str(ctx.guild.id)).delete().run(self.bot.r_conn)
-            await ctx.send("Disabled imgwelcoming")
-        else:
-            await r.table("imgwelcome").insert({
-                "id": str(ctx.guild.id),
-                "channel": str(ctx.channel.id),
-                "content": "V2VsY29tZSB1c2VyIHRvIHNlcnZlciE="
-            }).run(self.bot.r_conn)
-            await ctx.send("Enabled imgwelcoming")
+
 
     @imgwelcome.command(name="img")
     async def imgwelcome_img(self, ctx):
@@ -113,31 +114,30 @@ class IMGWelcome(commands.Cog):
         if member is None:
             member = ctx.message.author
         await self.on_member_join(member)
-
+    '''
     def _circle_border(self, circle_img_size: tuple):
         border_size = []
         for i in range(len(circle_img_size)):
             border_size.append(circle_img_size[0] + 8)
         return tuple(border_size)
 
+    async def setimage(self, member):
+        try:
+            img = Image.open(f"data/imgwelcome/{member.guild.id}.png").convert("RGBA").resize((500, 150))
+            bg = Image.new("RGBA", (500, 150), (0, 0, 0, 0))
+            bg.alpha_composite(img, (0, 0))
+            bg.save(f"data/imgwelcome/{member.guild.id}.png")
+            await member.send("Set image!")
+        except Exception as e:
+            await member.send("Failed to set image... `{}`".format(e))
+
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
+        #await self.setimage(member)
 
-        try:
-            if await r.table("autorole").get(str(guild.id)).run(self.bot.r_conn):
-                data = await r.table("autorole").get(str(guild.id)).run(self.bot.r_conn)
-                role = discord.utils.get(guild.roles, id=int(data["role"]))
-                await member.add_roles(role, reason="Autorole")
-        except:
-            pass
-
-        if not await self.__is_enabled(guild.id):
-            return
-
-        data = await r.table("imgwelcome").get(str(guild.id)).run(self.bot.r_conn)
-
-        channel = self.bot.get_channel(int(data["channel"]))
+        #channel = self.bot.get_channel(int(594993305914179597))
+        channel = member.guild.system_channel
         if not channel:
             return
         await channel.trigger_typing()
@@ -146,6 +146,8 @@ class IMGWelcome(commands.Cog):
             background = Image.open(f"data/imgwelcome/{guild.id}.png").convert("RGBA")
         else:
             background = Image.open("data/imgwelcome/transparent.png")
+
+
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(str(member.avatar_url_as(format="png"))) as res:
@@ -170,8 +172,8 @@ class IMGWelcome(commands.Cog):
         draw_circle = ImageDraw.Draw(circle)
         draw_circle.ellipse([0, 0, 512, 512], fill=(255, 255, 255, 180), outline=(255, 255, 255, 250))
         circle_border_size = self._circle_border((128, 128))
-        circle = circle.resize((circle_border_size), Image.ANTIALIAS)
-        circle_mask = mask.resize((circle_border_size), Image.ANTIALIAS)
+        circle = circle.resize(circle_border_size, Image.ANTIALIAS)
+        circle_mask = mask.resize(circle_border_size, Image.ANTIALIAS)
         circle_pos = (7 + int((136 - circle_border_size[0]) / 2))
         border_pos = (11 + int((136 - circle_border_size[0]) / 2))
         drawtwo = ImageDraw.Draw(welcome_picture)
@@ -231,7 +233,7 @@ class IMGWelcome(commands.Cog):
         welcome_picture.save("data/welcome.png")
 
         try:
-            content = ((base64.b64decode(str(data["content"]).encode("utf8"))).decode("utf8")).replace("user", clean_text(member.name)).replace("server", guild.name)
+            content = str("Welcome {0.mention} to {1}!").format(member, guild.name)
         except:
             content = "Welcome {} to {}!".format(member.name, guild.name)
 

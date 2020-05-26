@@ -14,7 +14,7 @@ class ModerationAdmin(commands.Cog):
     @commands.guild_only()
     @is_admin()
     async def set_standard_role(self, ctx, arg):
-        await edit_settings_role(ctx.guild.name, str(arg).replace('@', '').replace('<', '').replace('>', '').replace('&', ''))
+        await edit_settings_role(ctx.guild.name, str(arg).replace('@', '').replace('<', '').replace('>', '').replace('&', ''), " standard_role_id")
         await ctx.send("{} is now the standard role".format(arg))
 
     @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
@@ -40,10 +40,11 @@ class ModerationAdmin(commands.Cog):
 
     @commands.command(pass_context=True, brief="gives a member a role( @role, @member)")
     @commands.guild_only()
-    @is_admin()
+    @is_mod()
     async def give_role(self, ctx, member: discord.Member, role: discord.Role):
         await ctx.send(f"Giving the role {role.mention} to {member.mention}")
         await member.add_roles(role)
+
 
     @commands.command(pass_context=True,brief="bans a givien member")
     @commands.guild_only()

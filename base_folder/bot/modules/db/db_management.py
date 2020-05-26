@@ -113,7 +113,10 @@ def create_settings(guildname):
                         "admin_role_id"	TEXT,
                         "mod_role_id"	TEXT,
                         "dev_role_id"	TEXT,
-                        "imgwelcome"	TEXT
+                        "imgwelcome"	TEXT,
+                        "imgwelcome_text"	TEXT,
+                        "welcome_channel"	INTEGER,
+                        "leave_channel"	INTEGER
                     );'''
     c.execute(create_table)
     conn.commit()
@@ -138,10 +141,37 @@ async def edit_settings_img(guildname, img="False"):
     c.close()
 
 
-async def get_settings_role(guildname, fieldname="standard_role_id"):
+async def edit_settings_img_text(guildname, img="Welcome {0.mention} to {1}!"):
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT " + fieldname + " FROM settings_" + guildname + " GROUP BY " + fieldname + ";")
+    create_settings(guildname)
+    c.execute("UPDATE settings_" + guildname + " SET  imgwelcome_text= " + str(img) + " WHERE id = 1")
+    conn.commit()
+    c.close()
+
+
+async def edit_settings_welcome(guildname, channelid):
+    conn = connector()
+    c = conn.cursor()
+    create_settings(guildname)
+    c.execute("UPDATE settings_" + guildname + " SET leave_channel = " + channelid + " WHERE id = 1")
+    conn.commit()
+    c.close()
+
+
+async def edit_settings_leave(guildname, channelid):
+    conn = connector()
+    c = conn.cursor()
+    create_settings(guildname)
+    c.execute("UPDATE settings_" + guildname + " SET welcome_channel = " + channelid + " WHERE id = 1")
+    conn.commit()
+    c.close()
+
+
+async def get_settings_role(guildname, fieldname):
+    conn = connector()
+    c = conn.cursor()
+    c.execute("SELECT " + fieldname + " FROM settings_" + guildname + " WHERE id = 1 ;")
     roleid = c.fetchone()
     c.close()
     return roleid[0]
