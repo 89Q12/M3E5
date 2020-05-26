@@ -3,7 +3,7 @@ M3E5 is a Discord bot that implements an chatbot and an home assistant. The chat
 
 # Why the name?
 
-I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique Bot with tons of unique features.<br>
+I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique bot with tons of unique features.<br>
 Like a real AI and an home assistant like Alexa.
 
 # Things that are working right now
@@ -29,7 +29,7 @@ Like a real AI and an home assistant like Alexa.
 
 # Planned features
 
-I guess too much but I wil just work my way through all of them :D
+I guess it's too much but I will just work my way through all of them :D
 
 - Discord features
   - Multi server bot but for now it will be single server only so you have to change some things
@@ -75,18 +75,18 @@ I guess too much but I wil just work my way through all of them :D
 # Home assistant
 
 For this part I'm using a modified version of this [assistant](https://github.com/ggeop/Python-ai-assistant).<br> 
-All credits for the assistant goes to [ggeop](https://github.com/ggeop).
+All credits for the home assistant goes to [ggeop](https://github.com/ggeop).
 
-The assistant uses nltk, that means that if you write " what time is it" it will understand that you're asking for the current time :D
+The assistant uses nltk, that means that if you write "what time is it" it will understand that you're asking for the current time :D
 
 # Chatbot
 
-As I stated early I'm using Google's nmt but a modifed version by [daniel-kukiela](https://github.com/daniel-kukiela), the repo can be found [here](https://github.com/daniel-kukiela/nmt-chatbot).
+As I stated earlier I'm using Google's nmt but a modified version by [daniel-kukiela](https://github.com/daniel-kukiela), the repo can be found [here](https://github.com/daniel-kukiela/nmt-chatbot).
 All credits for the chatbot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
 
 # Examples
 
-Below you will find some examples, more will follow.
+Below you will find some examples.
 
 
 ## Here are some examples of the chatbot:
@@ -103,4 +103,4 @@ Cute or? isn't it
 
 ## For examples of the home assistant please click [here](https://github.com/ggeop/Python-ai-assistant)
 
-Because I don't want to steal any credits or so and I'm lazyxD
+Because I don't want to steal any credits or so and I'm lazy xD
