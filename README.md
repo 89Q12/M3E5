@@ -15,6 +15,8 @@ Like a real AI and an home assistant like Alexa.
     - clear amount e.g. 100 messages
     - mute/unmute
     - giving someone a role e.g. .give_role @someone @some_role
+    - info about a role: how many users the role have and permissions
+    - Tempban
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
@@ -67,7 +69,6 @@ I guess it's too much but I will just work my way through all of them :D
   - Every feature from the bot list above
   - AI integration
   - home assistant integration
-  - Tempban
 - Refactoring the nmt code base
   - inferencemode 
   - using multiple models 
