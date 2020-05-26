@@ -14,14 +14,13 @@ Like a real AI and an home assistant like Alexa.
     - kick
     - clear amount e.g. 100 messages
     - mute/unmute
-  - folder structure
+    - giving someone a role e.g. .give_role @someone @some_role
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
-  - giving someone a role e.g. .give_role @someone @some_role
   - levelsystem is now working(text based)
 - Chatbot 
   - currently trainning but I'm halfway through it
