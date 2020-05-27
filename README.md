@@ -18,6 +18,7 @@ Like a real AI and an home assistant like Alexa.
     - giving someone a role e.g. .give_role @someone @some_role
     - info about a role: how many users the role have and permissions
     - Tempban
+  - Welcome image(uncompleted)
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
