@@ -33,7 +33,7 @@ Like a real AI and an home assistant like Alexa.
 
 # Critical bugs
 
-- No critical bugs found
+- On guild is a bit buggy on the database side minor changes needed
 
 # Planned features
 
