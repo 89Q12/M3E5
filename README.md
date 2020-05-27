@@ -69,6 +69,20 @@ I guess it's too much but I will just work my way through all of them :D
  
  I will add them as soon as I have time to make an docker img
  
+ ### run instructions
+ 
+ Clone the repo and install requirements. 
+ In the config you need paste your bot token, then you can run main.py. 
+ Invite your bot to your server and run the commands to initialize the bot and the database.
+ Run the commands in the following order:
+ - .builddb
+ - .roles_in_db
+ - .set_standard_role @role
+ - .set_dev  @role
+ - .set_mod  @role
+ - .set_admin  @role
+ - open the bot.db and edit the settings_{guild.id} table and set your welcome and leave channel
+ 
 # TODO
   
 - The whole discord bot
