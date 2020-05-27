@@ -99,9 +99,18 @@ async def roles_from_db(guildname):
     conn = connector()
     c = conn.cursor()
     c.execute("SELECT name, roleid FROM roles_" + guildname + " WHERE id > 1;")
-    message = c.fetchall()
+    roles = c.fetchall()
     c.close()
-    return message
+    return roles
+
+
+async def get_role(guildname, roleid):
+    conn = connector()
+    c = conn.cursor()
+    c.execute("SELECT name FROM roles_" + guildname + " WHERE roleid =" + roleid + " ;")
+    role_name = c.fetchone()
+    c.close()
+    return role_name[0]
 
 
 def create_settings(guildname):
