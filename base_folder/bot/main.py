@@ -6,13 +6,13 @@ from config.config import token, logging
 
 client = commands.Bot(command_prefix='.')
 extensions = ["modules.test.test",
-              "modules.db.db",
               "modules.listener.listener",
+              "modules.listener.levelsystem",
               "modules.commands.moderation.moderation_mods",
               "modules.commands.moderation.moderation_admin",
               "modules.commands.fun.fun",
               "modules.commands.dev",
-              "modules.listener.levelsystem"
+              "modules.imgwelcome.imgwelcome"
               ]
 
 

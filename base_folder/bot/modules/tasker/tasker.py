@@ -12,7 +12,7 @@ async def runtasks(client):
 
 
 async def debun(time, ctx, member: str = "",):
-    await asyncio.sleep(time*6)
+    await asyncio.sleep(time*600)
     reason = "You have been unbanned. Time is over. Please behave"
     if member == "":
         await ctx.send("Please specify username as text")
@@ -24,3 +24,12 @@ async def debun(time, ctx, member: str = "",):
             await ctx.send(f"User {member} was unbanned")
             return
     await ctx.send("User was not found in ban list.")
+
+
+async def demute(time, ctx,  member: discord.Member = None):
+    await asyncio.sleep(time * 600)
+    try:
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted"))  # removes muted role
+        await ctx.send(f"{member.mention} has been unmuted")
+    except Exception as e:
+        await ctx.send(f"{member.mention} already unmuted or {member.mention} was never muted")

@@ -5,6 +5,7 @@ from io import BytesIO
 import textwrap
 import base64
 from config.Permissions import is_dev
+from modules.db.db_management import get_welcome_channel
 '''
 MIT License
 
@@ -137,7 +138,8 @@ class IMGWelcome(commands.Cog):
         #await self.setimage(member)
 
         #channel = self.bot.get_channel(int(594993305914179597))
-        channel = member.guild.system_channel
+        channel_id = await get_welcome_channel(member.guild.id)
+        channel = member.guild.get_channel(channel_id)
         if not channel:
             return
         await channel.trigger_typing()
@@ -146,8 +148,6 @@ class IMGWelcome(commands.Cog):
             background = Image.open(f"data/imgwelcome/{guild.id}.png").convert("RGBA")
         else:
             background = Image.open("data/imgwelcome/transparent.png")
-
-
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(str(member.avatar_url_as(format="png"))) as res:
