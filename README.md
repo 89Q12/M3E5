@@ -72,8 +72,8 @@ I guess it's too much but I will just work my way through all of them :D
  ### run instructions
  
  Clone the repo and install requirements. 
- In the config you need paste your bot token, then you can run main.py. 
- Invite your bot to your server and run the commands to initialize the bot and the database.
+ In the config you need to paste your bot token, then you can run main.py. 
+ Invite your bot to your server and run the following commands to initialize the bot and the database.
  Run the commands in the following order:
  - .builddb
  - .roles_in_db
@@ -82,6 +82,8 @@ I guess it's too much but I will just work my way through all of them :D
  - .set_mod  @role
  - .set_admin  @role
  - open the bot.db and edit the settings_{guild.id} table and set your welcome and leave channel
+ 
+ If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
  
 # TODO
   
