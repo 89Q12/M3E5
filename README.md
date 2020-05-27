@@ -32,7 +32,7 @@ Like a real AI and an home assistant like Alexa.
 
 # Critical bugs
 
-- Permission checks are currently broken 
+- No critical bugs found
 
 # Planned features
 
