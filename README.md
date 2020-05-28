@@ -94,8 +94,7 @@ I guess it's too much but I will just work my way through all of them :D
   
 - The whole discord bot
   - Every feature from the bot list above
-  - AI integration
-  - home assistant integration
+  - Switching to mysql from sqlite3, making the bot non portable but more stable
 - Refactoring the nmt code base
   - inferencemode 
   - using multiple models 
