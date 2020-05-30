@@ -76,7 +76,7 @@ I guess it's too much but I will just work my way through all of them :D
  
  ### run instructions
  
- Clone the repo and install requirements. 
+ Clone the repo and install requirements and setup a mysql server with the database file I uploaded. 
  In the config you need to paste your bot token, then you can run main.py. 
  Invite your bot to your server and run the following commands to initialize the bot and the database.
  Run the commands in the following order:
