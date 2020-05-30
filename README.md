@@ -18,13 +18,18 @@ Like a real AI and an home assistant like Alexa.
     - giving someone a role e.g. .give_role @someone @some_role
     - info about a role: how many users the role have and permissions
     - Tempban
-  - Welcome image(uncompleted)
+    - tempmute
+    - warn 
+    - infractions
+    - clear infractions
+  - Welcome image
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
+  - permissionsystem
   - levelsystem is now working(text based)
 - Chatbot 
   - currently trainning but I'm halfway through it
@@ -89,8 +94,7 @@ I guess it's too much but I will just work my way through all of them :D
   
 - The whole discord bot
   - Every feature from the bot list above
-  - AI integration
-  - home assistant integration
+  - Switching to mysql from sqlite3, making the bot non portable but more stable
 - Refactoring the nmt code base
   - inferencemode 
   - using multiple models 
