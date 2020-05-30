@@ -1,4 +1,6 @@
 from config.config import sql
+import base64
+
 '''
 Connection settings and other unused functions
 '''
@@ -15,12 +17,12 @@ Initialize the tables
 '''
 
 
-def initialize_all(guild_id):
-    initialize_guilds(guild_id)
-    initialize_settings(guild_id)
+async def initialize_all(guild_id):
+    await initialize_guilds(guild_id)
+    await initialize_settings(guild_id)
 
 
-def initialize_guilds(guild_id):
+async def initialize_guilds(guild_id):
     conn = connector()
     c = conn.cursor()
     c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
@@ -28,7 +30,7 @@ def initialize_guilds(guild_id):
     c.close()
 
 
-def initialize_settings(guild_id):
+async def initialize_settings(guild_id):
     conn = connector()
     c = conn.cursor()
     c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
@@ -40,52 +42,95 @@ def initialize_settings(guild_id):
 General per guild settings
 '''
 
+
+async def is_user_indb(user, user_id, guild_id):
+    # Checks if a given user is in the db else writes it in the db
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
+              f"VALUES ('{str(user)} ', '{str(user_id)}', '{str(guild_id)}')")
+    conn.commit()
+    conn.close()
+
+
+async def on_error(guild_id, error):
+    conn = connector()
+    c = conn.cursor()
+    error = (base64.b64encode(str(error).encode("utf8"))).decode("utf8")
+    c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', '{error}')")
+    conn.commit()
+    c.close()
+
+
+async def insert_message(guild_id, user_id, message, time):
+    conn = connector()
+    c = conn.cursor()
+    message = (base64.b64encode(str(message).encode("utf8"))).decode("utf8")
+    c.execute(f"INSERT into messages (guild_id, user_id, message, time) "
+              f"VALUES ('{guild_id}', '{user_id}', '{message}', '{time}')")
+    conn.commit()
+    c.close()
+
+
+def get_prefix(guild_id):
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"SELECT prefix FROM settings WHERE guild_id={str(guild_id)}")
+    prefix = c.fetchone()
+    return prefix[0]
+
+
+async def set_prefix(guild_id, prefix):
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET prefix ='{prefix}' WHERE guild_id = {guild_id}")
+    conn.commit()
+    c.close()
+
 '''
-Role settings and check for user
+Role settings 
 '''
 
 
-def roles_to_db(guild_id, role_name, role_id):
+async def roles_to_db(guild_id, role_name, role_id):
     # Checks if a given role is in the db else writes it in the db
     conn = connector()
     c = conn.cursor()
-    c.execute(f"SELECT * FROM roles WHERE role_id={str(role_id)} and guild_id={str(guild_id)}")
+    c.execute(f"SELECT role_id FROM roles WHERE role_id={str(role_id)} and guild_id={str(guild_id)}")
     sql = c.fetchone()
     if sql:
         return True
     else:
-        c.execute(f"INSERT INTO roles (guild_id, role_name, role_id) VALUES ('{guild_id}', '{str(role_name)}', '{str(role_id)}')")
+        c.execute(f"INSERT INTO roles (guild_id, role_name, role_id) "
+                  f"VALUES ('{guild_id}', '{str(role_name)}', '{str(role_id)}')")
         conn.commit()
         c.close()
-
-
-def is_user_indb(user, user_id, guild_id):
-    # Checks if a given user is in the db else writes it in the db
-    conn = connector()
-    c = conn.cursor()
-    sql = f"INSERT INTO user_info (username, user_id, guild_id) " \
-          f"VALUES ('{str(user)} ', '{str(user_id)}', '{str(guild_id)}')"
-    c.execute(sql)
-    conn.commit()
-    conn.close()
 
 
 async def roles_from_db(guild_id):
     # returns a tuple with all role name's and id's
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT name, roleid FROM roles_" + str(guild_id) + " WHERE id > 1;")
+    c.execute(f"SELECT role_id, role_name FROM roles WHERE guild_id={str(guild_id)}")
     roles = c.fetchall()
     c.close()
     return roles
+
+
+async def remove_role(guild_id, role_id):
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"DELETE FROM roles WHERE role_id = {role_id} and guild_id = {guild_id}")
+    conn.commit()
+    c.close()
 
 
 async def edit_settings_role(guild_id, role_id, field_name):
     # Let's you set roles e.g. mod role
     conn = connector()
     c = conn.cursor()
-    c.execute(f"INSERT INTO settings (guild_id,{field_name}) VALUES ({guild_id},{role_id})"
-              f"ON DUPLICATE KEY UPDATE {field_name}={role_id}")
+    c.execute(f"INSERT INTO settings (guild_id,{field_name}) VALUES ('{guild_id}','{role_id}')"
+              f"ON DUPLICATE KEY UPDATE {field_name}='{role_id}'")
     conn.commit()
     c.close()
 
@@ -170,7 +215,7 @@ async def get_leave_channel(guild_id):
     # returns the leave channel
     conn = connector()
     c = conn.cursor()
-    c.execute(f"SELECT leave_channel FROM settings WHERE guild_id={str(guild_id)}")
+    c.execute(f"SELECT leave_channel FROM settings WHERE guild_id={str(guild_id)} LIMIT = 1")
     leave_channel = c.fetchone()
     if leave_channel is None:
         return "you need to set a channel first"

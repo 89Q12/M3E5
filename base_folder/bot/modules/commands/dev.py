@@ -43,13 +43,13 @@ class Dev(commands.Cog):
     @guild_owner()
     async def builddb(self, ctx):
         try:
-            initialize_all(ctx.guild.id)
+            await initialize_all(ctx.guild.id)
         except Exception:
             print("rip")
         for user in ctx.guild.members:
-            is_user_indb(user.name, user.id, ctx.guild.id)
+            await is_user_indb(user.name, user.id, ctx.guild.id)
         for i in ctx.guild.roles:
-            roles_to_db(ctx.guild.id, i.name, i.id)
+            await roles_to_db(ctx.guild.id, i.name, i.id)
         await ctx.send("I'm done my master {0.mention} <3".format(ctx.author))
 
     @builddb.error
@@ -61,15 +61,15 @@ class Dev(commands.Cog):
     @is_dev()
     async def roles_in_db(self, ctx):
         for i in ctx.guild.roles:
-            roles_to_db(ctx.guild.id, i.name, i.id)
+            await roles_to_db(ctx.guild.id, i.name, i.id)
         await ctx.send("I'm done my master {0.mention} <3".format(ctx.author))
 
     @commands.command(pass_context=True, brief="shows all roles")
     @is_dev()
-    async def show_roles(self, member):
-        guild_id = member.guild.id
+    async def show_roles(self, ctx):
+        guild_id = ctx.guild.id
         roles = await roles_from_db(guild_id)
-        await member.send(str(roles) + f" {member.mention}")
+        await ctx.send(str(roles) + f" {ctx.author.mention}")
 
     @commands.command(pass_context=True, brief="sets standard rule set_standard_role @role")
     @commands.guild_only()

@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from modules.db.db_management import update_xp_text, get_text_xp,\
     get_lvl_text, update_text_lvl, \
-    edit_settings_levelsystem, get_levelsystem
+    edit_settings_levelsystem, get_levelsystem, insert_message
 
 
 async def update_data(ctx):
@@ -60,7 +60,7 @@ class Levelsystem(commands.Cog):
             lvl_start = await get_lvl_text(ctx.guild.id, ctx.author.id)
         if lvl_start < lvl_end:
             await update_text_lvl(ctx.guild.id, ctx.author.id, lvl_end)
-            await channel.send("{0.mention} reached level {1} and has now {2} xp".format(ctx.author, lvl_end, xp))
+            await channel.send(f"{ctx.author.mention} reached level {ctx.author} and has now {lvl_end, xp} xp")
 
 
 def setup(client):
