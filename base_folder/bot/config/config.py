@@ -3,6 +3,19 @@ import logging
 
 def token():
     return ""
+    
+def sql():
+    mydb = mysql.connector.connect(
+      host="",
+      user="",
+      passwd="
+      database='M3E5',
+    )
+    return mydb
+    
+    
+def prefix():
+    return "-"
 
 
 logger = logging.getLogger('discord')

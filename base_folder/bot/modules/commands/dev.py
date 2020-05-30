@@ -1,14 +1,15 @@
 import discord
 from discord.ext import commands
-from config.Permissions import is_dev
-from modules.db.db_management import is_user_indb, check_for_guild_db, roles_to_db, roles_from_db
+from config.Permissions import is_dev, guild_owner
+from modules.db.db_management import is_user_indb, roles_to_db, roles_from_db, initialize_all, edit_settings_role
+
 
 class Dev(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     @commands.command(pass_context=True, brief="unloads a module")
-    @commands.check_any(is_dev(), commands.is_owner())
+    @is_dev()
     async def unload(self, ctx, cog: str):
         try:
             self.client.unload_extension(cog)
@@ -18,7 +19,7 @@ class Dev(commands.Cog):
         await ctx.send("Cog unloaded")
 
     @commands.command(pass_context=True, brief="loads a module")
-    @commands.check_any(is_dev(), commands.is_owner())
+    @is_dev()
     async def load(self, ctx, cog: str):
         try:
             self.client.load_extension(cog)
@@ -28,7 +29,7 @@ class Dev(commands.Cog):
         await ctx.send("Cog loaded")
 
     @commands.command(pass_context=True, brief="reloads a module")
-    @commands.check_any(is_dev(), commands.is_owner())
+    @is_dev()
     async def reload(self, ctx, cog: str):
         try:
             self.client.unload_extension(cog)
@@ -39,9 +40,12 @@ class Dev(commands.Cog):
         await ctx.send("Cog reloaded")
 
     @commands.command(pass_context=True, brief="builds the database")
-    @commands.is_owner()
+    @guild_owner()
     async def builddb(self, ctx):
-        check_for_guild_db(ctx.guild.id)
+        try:
+            initialize_all(ctx.guild.id)
+        except Exception:
+            print("rip")
         for user in ctx.guild.members:
             is_user_indb(user.name, user.id, ctx.guild.id)
         for i in ctx.guild.roles:
@@ -54,18 +58,46 @@ class Dev(commands.Cog):
             await ctx.send(error)
 
     @commands.command(pass_context=True, brief="Writes all roles in the db")
-    @commands.check_any(is_dev(), commands.is_owner())
+    @is_dev()
     async def roles_in_db(self, ctx):
         for i in ctx.guild.roles:
             roles_to_db(ctx.guild.id, i.name, i.id)
         await ctx.send("I'm done my master {0.mention} <3".format(ctx.author))
 
     @commands.command(pass_context=True, brief="shows all roles")
-    @commands.check_any(is_dev(), commands.is_owner())
+    @is_dev()
     async def show_roles(self, member):
         guild_id = member.guild.id
         roles = await roles_from_db(guild_id)
-        await member.send(str(roles) + "  {0.mention}".format(member.author))
+        await member.send(str(roles) + f" {member.mention}")
+
+    @commands.command(pass_context=True, brief="sets standard rule set_standard_role @role")
+    @commands.guild_only()
+    @guild_owner()
+    async def set_standard_role(self, ctx, role: discord.Role = None):
+        await edit_settings_role(ctx.guild.id, role.id, "standard_role_id")
+        await ctx.send(f"{role.mention} is now the standard role")
+
+    @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
+    @commands.guild_only()
+    @guild_owner()
+    async def set_admin(self, ctx, role: discord.Role = None):
+        await edit_settings_role(ctx.guild.id, role.id, "admin_role_id")
+        await ctx.send(f"{role.mention} is now the admin role")
+
+    @commands.command(pass_context=True, brief="sets dev rule set_dev @role")
+    @commands.guild_only()
+    @guild_owner()
+    async def set_dev(self, ctx, role: discord.Role = None):
+        await edit_settings_role(ctx.guild.id, role.id, "dev_role_id")
+        await ctx.send(f"{role.mention} is now the dev role")
+
+    @commands.command(pass_context=True, brief="sets mod rule set_mod @role")
+    @commands.guild_only()
+    @guild_owner()
+    async def set_mod(self, ctx, role: discord.Role = None):
+        await edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
+        await ctx.send(f"{role.mention} is now the mod role")
 
 
 def setup(client):

@@ -4,8 +4,11 @@ import discord, os, aiohttp
 from io import BytesIO
 import textwrap
 import base64
-from config.Permissions import is_dev
-from modules.db.db_management import get_welcome_channel
+from config.Permissions import *
+from modules.db.db_management import get_welcome_channel, get_img, \
+    edit_settings_img, edit_settings_img_text, get_img_text
+
+
 '''
 MIT License
 
@@ -30,16 +33,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
-class IMGWelcome(commands.Cog):
 
+class IMGWelcome(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    '''
+    async def __is_enabled(self, guild: int):
+        if int(await get_img(guild)) == 1:
+            return True
+        else:
+            return False
+
+    @commands.group()
+    @commands.has_permissions(administrator=True)
+    async def imgwelcome(self, ctx):
+        # Base command
+        if ctx.invoked_subcommand is None:
+            return await ctx.send_help(ctx.command)
+
     @imgwelcome.command(name="toggle")
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcomer"""
-
+        toggle = int(await get_img(ctx.guild.id))
+        if 0 == toggle:
+            await edit_settings_img(ctx.guild.id, 1)
+            await ctx.send("Welcome image is now enabled")
+        else:
+            await edit_settings_img(ctx.guild.id, 0)
+            await ctx.send("Welcome image is now disabled")
 
     @imgwelcome.command(name="img")
     async def imgwelcome_img(self, ctx):
@@ -97,25 +118,9 @@ class IMGWelcome(commands.Cog):
             return await ctx.send("Enable imgwelcoming with n!imgwelcome toggle")
 
         text = (base64.b64encode(text.encode("utf8"))).decode("utf8")
-        await r.table("imgwelcome").get(str(ctx.guild.id)).update({"content": text}).run(self.bot.r_conn)
+        await edit_settings_img_text(ctx.guild.id, text)
         await ctx.send("Updated text!")
 
-    @imgwelcome.command(name="channel")
-    async def imgwelcome_channel(self, ctx, channel: discord.TextChannel):
-        """Select a channel to use for imgwelcoming, can be a channel mention or the exact name of it"""
-        if not await self.__is_enabled(ctx.guild.id):
-            return await ctx.send("Enable imgwelcoming with n!imgwelcome toggle")
-
-        await r.table("imgwelcome").get(str(ctx.guild.id)).update({"channel": str(channel.id)}).run(self.bot.r_conn)
-        await ctx.send("Updated to {}".format(channel.name))
-
-    @commands.command(hidden=True)
-    @commands.is_owner()
-    async def imggen(self, ctx, member: discord.Member = None):
-        if member is None:
-            member = ctx.message.author
-        await self.on_member_join(member)
-    '''
     def _circle_border(self, circle_img_size: tuple):
         border_size = []
         for i in range(len(circle_img_size)):
@@ -135,9 +140,9 @@ class IMGWelcome(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
-        #await self.setimage(member)
-
-        #channel = self.bot.get_channel(int(594993305914179597))
+        # await self.setimage(member)
+        # gets the channel, member and creates the image and sends it to the channel
+        # channel = self.bot.get_channel(int(594993305914179597))
         channel_id = await get_welcome_channel(member.guild.id)
         channel = member.guild.get_channel(channel_id)
         if not channel:
@@ -233,7 +238,9 @@ class IMGWelcome(commands.Cog):
         welcome_picture.save("data/welcome.png")
 
         try:
-            content = str("Welcome {0.mention} to {1}!").format(member, guild.name)
+            content = ((base64.b64decode(str(await get_img_text(guild.id)).encode("utf8"))).decode("utf8"))\
+                .replace("user", member.mention)\
+                .replace("server", guild.name)
         except:
             content = "Welcome {} to {}!".format(member.name, guild.name)
 

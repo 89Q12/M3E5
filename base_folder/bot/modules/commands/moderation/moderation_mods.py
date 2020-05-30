@@ -5,6 +5,7 @@ from config.Permissions import is_mod
 from modules.tasker.tasker import demute
 from modules.db.db_management import get_warns, edit_warns
 
+
 class ModerationMod(commands.Cog):
     def __init__(self, client):
         self.client = client

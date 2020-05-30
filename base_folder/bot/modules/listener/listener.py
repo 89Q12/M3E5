@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from modules.db.db_management import is_user_indb, get_settings_role, get_leave_channel, get_role
+from config.config import prefix
 
 
 class Listener(commands.Cog):
@@ -24,8 +25,8 @@ class Listener(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, ex):
-        print(ex)
-        await ctx.send("Please check with !help the usage of this command or talk to your dev or admin.")
+        print(ex, ctx.guild.id)
+        await ctx.send(f"Please check with {prefix()} help the usage of this command or talk to your dev or admin.")
 
 
 def setup(client):

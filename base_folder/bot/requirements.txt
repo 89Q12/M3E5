@@ -1,0 +1,5 @@
+discord~=1.0.1
+asyncio~=3.4.3
+aiohttp~=3.6.2
+pillow~=7.1.2
+mysql-connector-python~=8.0.20

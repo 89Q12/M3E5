@@ -1,175 +1,77 @@
-import discord
-from discord.ext import commands
-import sqlite3
-
+from config.config import sql
 '''
 Connection settings and other unused functions
 '''
 
 
 def connector():
-    conn = sqlite3.connect('bot.db')
+    # creates a connection to the bot database
+    conn = sql()
     return conn
 
 
-async def rename_table(guild_id, settings=None):
-    conn = connector()
-    c = conn.cursor()
-    if settings is None:
-        try:
-            c.execute("DROP TABLE name_" + str(guild_id) + "_old;")
-            create_db(guild_id)
-        except sqlite3.OperationalError as e:
-            c.execute("ALTER TABLE name_" + str(guild_id) + " RENAME TO name_" + str(guild_id) + "_old;")
-            conn.commit()
-            create_db(guild_id)
-    return
-
-
 '''
-Creating tables, checking if a given table exists
+Initialize the tables
 '''
 
 
-def check_for_guild_db(guild_id):
-    conn = connector()
-    try:
-        conn.execute("SELECT * FROM name_" + str(guild_id) + " ;")
-        if conn is not None:
-            conn.commit()
-            conn.close()
-        else:
-            create_db(guild_id)
-    except sqlite3.OperationalError as e:
-        create_db(guild_id)
-    try:
-        conn = connector()
-        conn.execute("SELECT * FROM roles_" + str(guild_id) + " ;")
-        if conn is not None:
-            conn.commit()
-            conn.close()
-        else:
-            create_roles(guild_id)
-    except sqlite3.OperationalError as e:
-        create_roles(guild_id)
-    try:
-        conn = connector()
-        conn.execute("SELECT * FROM settings_" + str(guild_id) + " ;")
-        if conn is not None:
-            conn.commit()
-            conn.close()
-        else:
-            create_settings(guild_id)
-    except sqlite3.OperationalError as e:
-        create_settings(guild_id)
+def initialize_all(guild_id):
+    initialize_guilds(guild_id)
+    initialize_settings(guild_id)
 
 
-def create_db(guild_id):
-    conn = connector()
-    create_main_table = '''create table if not exists "name_''' + str(guild_id) + '''" (
-                        "id"	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-                        "userid"	INTEGER UNIQUE,
-                        "username"	TEXT,
-                        "guildid"	INTEGER,
-                        "warnings"  INTEGER,
-                        "text_xp"   INTEGER,
-                        "text_lvl"  INTEGER,
-                        "voice_xp"  INTEGER,
-                        "voice_lvl"  INTEGER
-                    );'''
-
-    # create tables with the attrs of create_tables
-    if conn is not None:
-        conn.execute(create_main_table)
-        conn.commit()
-        conn.close()
-        return True
-    else:
-        print("Error! cannot create the database connection.")
-        return False
-
-
-def create_settings(guild_id):
+def initialize_guilds(guild_id):
     conn = connector()
     c = conn.cursor()
-    create_settings_table = '''create table if not exists "settings_''' + str(guild_id) + '''" (
-                        "id"	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-                        "standard_role_id"	INTEGER,
-                        "admin_role_id"	TEXT,
-                        "mod_role_id"	TEXT,
-                        "dev_role_id"	TEXT,
-                        "imgwelcome"	TEXT,
-                        "imgwelcome_text"	TEXT,
-                        "welcome_channel"	INTEGER,
-                        "leave_channel"	INTEGER 
-                    );'''
-    c.execute(create_settings_table)
+    c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
     conn.commit()
     c.close()
 
 
-def create_roles(guild_id):
+def initialize_settings(guild_id):
     conn = connector()
     c = conn.cursor()
-    create_table2 = '''create table if not exists "roles_''' + str(guild_id) + '''" (
-                        "id"	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-                        "name"	TEXT,
-                        "roleid"	INTEGER
-                    );'''
-    c.execute(create_table2)
-    conn.commit()
-
-
-'''
-reading/ writing to db e.g. users and roles
-'''
-
-
-def random_settings(guild_id):
-    conn = connector()
-    c = conn.cursor()
-    c.execute("INSERT INTO settings_" + str(guild_id) + " (mod_role_id) VALUES ('test')")
+    c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
     conn.commit()
     c.close()
+
+
+'''
+General per guild settings
+'''
+
+'''
+Role settings and check for user
+'''
 
 
 def roles_to_db(guild_id, role_name, role_id):
+    # Checks if a given role is in the db else writes it in the db
     conn = connector()
     c = conn.cursor()
-    '''
-    Checks if a given else writes it in the db
-    '''
-    c.execute("SELECT * FROM 'roles_" + str(guild_id) + "' WHERE roleid=?", (str(role_id),))
+    c.execute(f"SELECT * FROM roles WHERE role_id={str(role_id)} and guild_id={str(guild_id)}")
     sql = c.fetchone()
     if sql:
         return True
     else:
-        c.execute("INSERT INTO roles_" + str(guild_id)
-                  + " (name, roleid) VALUES ('"
-                  + str(role_name)
-                  + "', '{0}')".format(str(role_id)))
+        c.execute(f"INSERT INTO roles (guild_id, role_name, role_id) VALUES ('{guild_id}', '{str(role_name)}', '{str(role_id)}')")
         conn.commit()
         c.close()
 
 
 def is_user_indb(user, user_id, guild_id):
+    # Checks if a given user is in the db else writes it in the db
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT * FROM name_" + str(guild_id) + " WHERE userid=" + str(user_id) + ";")
-    sql = c.fetchone()
-    if sql:
-        return
-    else:
-        sql = "INSERT INTO name_" + str(guild_id) +\
-              " (username, userid, guildid) VALUES" \
-              " ('" + str(user) + "', '" + str(user_id)\
-              + "', '" + str(guild_id) + "')"
-        c.execute(sql)
-        conn.commit()
-        conn.close()
+    sql = f"INSERT INTO user_info (username, user_id, guild_id) " \
+          f"VALUES ('{str(user)} ', '{str(user_id)}', '{str(guild_id)}')"
+    c.execute(sql)
+    conn.commit()
+    conn.close()
 
 
 async def roles_from_db(guild_id):
+    # returns a tuple with all role name's and id's
     conn = connector()
     c = conn.cursor()
     c.execute("SELECT name, roleid FROM roles_" + str(guild_id) + " WHERE id > 1;")
@@ -178,88 +80,72 @@ async def roles_from_db(guild_id):
     return roles
 
 
-async def edit_settings_role(guild_id, role_id, field_name="standard_role_id"):
+async def edit_settings_role(guild_id, role_id, field_name):
+    # Let's you set roles e.g. mod role
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT id FROM settings_" + str(guild_id))
-    if c.fetchone() is None:
-        c.close()
-        random_settings(guild_id)
-        conn = connector()
-        c = conn.cursor()
-        c.execute("UPDATE settings_" + str(guild_id) + " SET " + str(field_name) + " = " + str(role_id) + " WHERE id=1")
-        conn.commit()
-        c.close()
-    else:
-        conn = connector()
-        c = conn.cursor()
-        c.execute("UPDATE settings_" + str(guild_id) + " SET " + str(field_name) + " = " + str(role_id) + " WHERE id=1")
-        conn.commit()
-        c.close()
-
-
-async def edit_settings_img(guild_id, img="False"):
-    conn = connector()
-    c = conn.cursor()
-    c.execute("UPDATE settings_" + str(guild_id) + " SET  imgwelcome= " + str(img) + " WHERE id = 1")
+    c.execute(f"INSERT INTO settings (guild_id,{field_name}) VALUES ({guild_id},{role_id})"
+              f"ON DUPLICATE KEY UPDATE {field_name}={role_id}")
     conn.commit()
     c.close()
 
 
-async def edit_settings_img_text(guild_id, img="Welcome {0.mention} to {1}!"):
-    conn = connector()
-    c = conn.cursor()
-    c.execute("UPDATE settings_" + str(guild_id) + " SET  imgwelcome_text= " + str(img) + " WHERE id = 1")
-    conn.commit()
-    c.close()
+'''
+end of roles settings
 
-
-async def edit_settings_welcome(guild_id, channel_id):
-    conn = connector()
-    c = conn.cursor()
-    c.execute("UPDATE settings_" + str(guild_id) + " SET leave_channel = " + str(channel_id) + " WHERE id = 1")
-    conn.commit()
-    c.close()
+Channel settings and warning settings
+'''
 
 
 async def edit_settings_leave(guild_id, channel_id):
+    # sets the leave_channel to the given channel id
     conn = connector()
     c = conn.cursor()
-    c.execute("UPDATE settings_" + str(guild_id) + " SET welcome_channel = " + str(channel_id) + " WHERE id = 1")
+    c.execute(f"UPDATE settings SET leave_channel ={str(channel_id)} "
+              f"WHERE guild_id = {guild_id}")
     conn.commit()
     c.close()
 
 
 async def edit_warns(guild_id, user_id, amount):
+    # sets warn with given amount
     conn = connector()
     c = conn.cursor()
-    c.execute("UPDATE name_" + str(guild_id) + " SET warnings = " + str(amount) + " WHERE userid = " + str(user_id))
+    c.execute(f"UPDATE user_info SET warnings={str(amount)} WHERE user_id="
+              f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
 
 
 async def get_role(guild_id, role_id):
+    #  returns a role name when a role id is given
+    # errors out when role id is none bruh
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT name FROM roles_" + str(guild_id) + " WHERE roleid =" + str(role_id) + " ;")
+    c.execute(f"SELECT role_name FROM roles WHERE role_id={str(role_id)} "
+              f"and guild_id ={guild_id};")
     role_name = c.fetchone()
     c.close()
     return role_name[0]
 
 
 async def get_settings_role(guild_id, field_name):
+    #  returns a role name
+    # errors out when  field_name is none bruh
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT " + str(field_name) + " FROM settings_" + str(guild_id) + " WHERE id = 1 ;")
-    roleid = c.fetchone()
+    c.execute(f"SELECT {str(field_name)} FROM settings WHERE guild_id={str(guild_id)}")
+    role_id = c.fetchone()
     c.close()
-    return roleid[0]
+    return role_id[0]
 
 
 async def get_warns(guild_id, user_id):
+    # returns the number of warnings a user has
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT warnings FROM name_" + str(guild_id) + " WHERE userid =" + str(user_id) + ";")
+    c.execute("SELECT warnings FROM user_info WHERE user_id="
+              f"{str(user_id)} and guild_id={str(guild_id)}")
     warnings = c.fetchone()
     c.close()
     if warnings is None:
@@ -269,9 +155,10 @@ async def get_warns(guild_id, user_id):
 
 
 async def get_welcome_channel(guild_id):
+    # returns the  welcome channel
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT welcome_channel FROM settings_" + str(guild_id))
+    c.execute(f"SELECT welcome_channel FROM settings WHERE guild_id={str(guild_id)}")
     welcome_channel = c.fetchone()
     if welcome_channel is None:
         return "you need to set a channel first"
@@ -280,9 +167,10 @@ async def get_welcome_channel(guild_id):
 
 
 async def get_leave_channel(guild_id):
+    # returns the leave channel
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT leave_channel FROM settings_" + str(guild_id))
+    c.execute(f"SELECT leave_channel FROM settings WHERE guild_id={str(guild_id)}")
     leave_channel = c.fetchone()
     if leave_channel is None:
         return "you need to set a channel first"
@@ -291,36 +179,90 @@ async def get_leave_channel(guild_id):
 
 
 '''
-Levelsystem 
+end of channel and warning settings
+
+Welcomeimg
+'''
+
+
+async def edit_settings_img(guild_id, img):
+    # Unused for now but it will be used for the welcome image function
+    # sets the column imgwelcome to 1/enabled or 0/disabled
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET imgwelcome_toggle={str(img)} WHERE guild_id={str(guild_id)}")
+    conn.commit()
+    c.close()
+
+
+async def edit_settings_img_text(guild_id, img="Welcome {0.mention} to {1}!"):
+    # Unused for now but it will be used for the welcome image function
+    # sets the message text in the column imgwelcome_text to what ever you enter
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET imgwelcome_text={str(img)} WHERE guild_id={str(guild_id)}")
+    conn.commit()
+    c.close()
+
+
+async def edit_settings_welcome(guild_id, channel_id):
+    # sets the welcome_channel to the given channel id
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET welcome_channel={str(channel_id)} WHERE guild_id = {guild_id}")
+    conn.commit()
+    c.close()
+
+
+async def get_img(guild_id):
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"SELECT imgwelcome_toggle FROM settings WHERE guild_id={str(guild_id)};")
+    img = c.fetchone()
+    return img[0]
+
+
+async def get_img_text(guild_id):
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"SELECT imgwelcome_text FROM settings WHERE guild_id={str(guild_id)};")
+    text = c.fetchone()
+    return text[0]
+
+
+'''
+End of general settings
+
+Level system 
 '''
 
 
 async def update_xp_text(guild_id, user_id, amount):
+    # updates the xp amount for a given user
     conn = connector()
     c = conn.cursor()
-    c.execute("UPDATE name_" + str(guild_id) + " SET text_xp = " + str(amount) + " WHERE userid = " + str(user_id) + ";")
+    c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} and guild_id={str(guild_id)};")
     conn.commit()
     c.close()
 
 
 async def get_text_xp(guild_id, user_id):
+    # returns the xp amount for a given user
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT text_xp FROM name_" + str(guild_id) + " WHERE userid =  " + str(user_id) + ";")
+    c.execute("SELECT text_xp FROM user_info WHERE user_id="
+              f"{str(user_id)} and guild_id={str(guild_id)}")
     xp = c.fetchone()
-    c.close()
-    if xp is None:
-        return None
-    else:
-        return xp[0]
+    return xp[0]
 
 
 async def get_lvl_text(guild_id, user_id):
+    # returns the text lvl  amount for a given user
     conn = connector()
     c = conn.cursor()
-    c.execute("SELECT text_lvl FROM name_" + str(guild_id) + " WHERE userid =  " + str(user_id) + ";")
+    c.execute("SELECT text_lvl FROM user_info WHERE user_id="
+              f"{str(user_id)} and guild_id={str(guild_id)}")
     lvl = c.fetchone()
-    c.close()
     if lvl is None:
         return None
     else:
@@ -328,18 +270,40 @@ async def get_lvl_text(guild_id, user_id):
 
 
 async def update_text_lvl(guild_id, user_id, amount=1):
+    # updates the text lvl for a given user
     conn = connector()
     c = conn.cursor()
-    c.execute("UPDATE name_" + str(guild_id) + " SET text_lvl = " + str(amount) + " WHERE userid = " + str(user_id))
+    c.execute(f"UPDATE user_info SET text_lvl = {str(amount)}  WHERE user_id ="
+              f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
 
+
+async def edit_settings_levelsystem(guild_id, toggler):
+    # Unused for now but it will be used for the welcome image function
+    # sets the column level system to 1/enabled or 0/disabled
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET levelsystem_toggle= {str(toggler)} WHERE guild_id={guild_id}")
+    conn.commit()
+    c.close()
+    return True
+
+
+async def get_levelsystem(guild_id):
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"SELECT levelsystem_toggle FROM settings WHERE guild_id =  {str(guild_id)};")
+    img = c.fetchone()
+    c.close()
+    return img[0]
+
 '''
+End of level system settings
+
 Test area
 '''
 
-'''
+
 if __name__ == "__main__":
-    test = await get_settings("EA19B_und_bekannte", "standard_role_id")
-    print(type(test))
-'''
+    initialize_all(715131657107144724)

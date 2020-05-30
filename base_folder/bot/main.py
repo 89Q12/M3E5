@@ -1,10 +1,10 @@
 import time
 import discord
 from discord.ext import commands
-from config.config import token, logging
+from config.config import token, logging, prefix
 
 
-client = commands.Bot(command_prefix='.')
+client = commands.Bot(command_prefix=prefix())
 extensions = ["modules.test.test",
               "modules.listener.listener",
               "modules.listener.levelsystem",

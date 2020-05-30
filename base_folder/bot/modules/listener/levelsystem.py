@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
-from modules.db.db_management import update_xp_text, get_text_xp, get_lvl_text, update_text_lvl
+from modules.db.db_management import update_xp_text, get_text_xp,\
+    get_lvl_text, update_text_lvl, \
+    edit_settings_levelsystem, get_levelsystem
 
 
 async def update_data(ctx):
@@ -14,15 +16,41 @@ async def update_data(ctx):
         await update_xp_text(ctx.guild.id, ctx.author.id, amount)
 
 
+async def is_enabled(guild: int):
+    if int(await get_levelsystem(guild)) == 1:
+        return True
+    else:
+        return False
+
+
 class Levelsystem(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    @commands.group(pass_context=True)
+    async def levelsystem(self, ctx):
+        # Base command
+        if ctx.invoked_subcommand is None:
+            return await ctx.send_help(ctx.command)
+
+    @levelsystem.command(name="toggle")
+    async def levelsystem_toggle(self, ctx):
+        # Toggle on/off the level system
+        toggle = int(await get_levelsystem(ctx.guild.id))
+        if 0 == toggle:
+            await edit_settings_levelsystem(ctx.guild.id, 1)
+            await ctx.send("Level system is now enabled")
+        else:
+            await edit_settings_levelsystem(ctx.guild.id, 0)
+            await ctx.send("Level system is now disabled")
+
     @commands.Cog.listener()
     async def on_message(self, ctx):
+        channel = ctx.guild.system_channel
         if ctx.author.id == self.client.user.id:
             return
-        channel = ctx.guild.system_channel
+        if not await is_enabled(ctx.guild.id):
+            return
         await update_data(ctx)
         xp = await get_text_xp(ctx.guild.id, ctx.author.id)
         lvl_start = await get_lvl_text(ctx.guild.id, ctx.author.id)

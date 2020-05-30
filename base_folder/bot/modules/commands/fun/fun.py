@@ -6,7 +6,7 @@ class Fun(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(brief="Test")
+    @commands.command(aliases=["hi", "Hi", "Hello", "hey"], brief="Test")
     async def Hey(self, ctx):
         await ctx.send("Hi")
 
