@@ -8,7 +8,7 @@ Like a real AI and an home assistant like Alexa.
 
 # Things that are working right now
 - Discord bot base
-  - the current prefix is "-" per guild prefix is in work 
+  - the standard prefix is - but with it's changealbe with -prefix arg 
   - basic commands
     - Ban
     - unban
