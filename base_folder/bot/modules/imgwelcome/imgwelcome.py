@@ -1,11 +1,11 @@
-from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-import discord, os, aiohttp
+import discord
+import os, aiohttp
 from io import BytesIO
 import textwrap
 import base64
 from config.Permissions import *
-from modules.db.db_management import get_welcome_channel, get_img, \
+from modules.base.db.db_management import get_welcome_channel, get_img, \
     edit_settings_img, edit_settings_img_text, get_img_text
 
 
@@ -44,7 +44,7 @@ class IMGWelcome(commands.Cog):
         else:
             return False
 
-    @commands.group()
+    @commands.group(brief="imgwelcom toggle/text/img")
     @commands.has_permissions(administrator=True)
     async def imgwelcome(self, ctx):
         # Base command
@@ -55,6 +55,7 @@ class IMGWelcome(commands.Cog):
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcomer"""
         toggle = int(await get_img(ctx.guild.id))
+        await ctx.channel.purge(limit=1)
         if 0 == toggle:
             await edit_settings_img(ctx.guild.id, 1)
             await ctx.send("Welcome image is now enabled")
@@ -65,6 +66,7 @@ class IMGWelcome(commands.Cog):
     @imgwelcome.command(name="img")
     async def imgwelcome_img(self, ctx):
         """Set the image"""
+        await ctx.channel.purge(limit=1)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("Enable imgwelcoming with n!imgwelcome toggle")
 
@@ -86,7 +88,7 @@ class IMGWelcome(commands.Cog):
         if len(msg.attachments) >= 1:
             attachment = str(msg.attachments[0].url).rpartition(".")[2]
             if attachment.lower() not in ["png", "jpg", "jpeg", "gif"]:
-                return await ctx.send("Not a valid image type <:bakaa:432914537608380419>")
+                return await ctx.send("Not a valid image type <>")
             if os.path.exists(f"data/imgwelcome/{ctx.guild.id}.png"):
                 os.remove(f"data/imgwelcome/{ctx.guild.id}.png")
             try:

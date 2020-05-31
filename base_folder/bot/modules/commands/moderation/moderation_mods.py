@@ -3,7 +3,7 @@ from discord.ext import commands
 import discord.utils
 from config.Permissions import is_mod
 from modules.tasker.tasker import demute
-from modules.db.db_management import get_warns, edit_warns
+from modules.base.db.db_management import get_warns, edit_warns
 
 
 class ModerationMod(commands.Cog):
@@ -14,6 +14,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     @commands.check_any(is_mod(), commands.is_owner())
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
+        await ctx.channel.purge(limit=1)
         if member is not None:
             await ctx.guild.kick(member, reason=reason)
         else:
@@ -23,6 +24,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     @commands.check_any(is_mod(), commands.is_owner())
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
+        await ctx.channel.purge(limit=1)
         if member == "":
             await ctx.send("Please specify username as text")
             return
@@ -46,6 +48,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=2):
+        await ctx.channel.purge(limit=1)
         role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
         if not role:  # checks if there is muted role
             try:  # creates muted role
@@ -67,6 +70,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=2):
+        await ctx.channel.purge(limit=1)
         role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
         if not role:  # checks if there is muted role
             try:  # creates muted role
@@ -87,6 +91,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def slowmode(self, ctx, seconds: int=0):
+        await ctx.channel.purge(limit=1)
         if seconds > 120:
             return await ctx.send(":no_entry: Amount can't be over 120 seconds")
         if seconds is 0:
@@ -107,6 +112,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def roleInfo(self, ctx, role: discord.Role=None):
+        await ctx.channel.purge(limit=1)
         counter = 0
         for user in self.client.get_all_members():
             for i in user.roles:
@@ -119,6 +125,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def unmute(self, ctx,  member: discord.Member = None):
+        await ctx.channel.purge(limit=1)
         """Unmutes a muted user"""
         try:
             await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted")) # removes muted role
@@ -130,6 +137,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def warn(self, ctx, member: discord.Member = None):
+        await ctx.channel.purge(limit=1)
         warnings = await get_warns(ctx.guild.id, member.id)
         amount = 0
         if warnings is None:
@@ -145,6 +153,7 @@ class ModerationMod(commands.Cog):
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def infractions(self, ctx, member: discord.Member = None):
+        await ctx.channel.purge(limit=1)
         warnings = await get_warns(ctx.guild.id, member.id)
         await ctx.send(f"{member} Has {warnings} infractions!")
 

@@ -8,6 +8,7 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=["hi", "Hi", "Hello", "hey"], brief="Test")
     async def Hey(self, ctx):
+        await ctx.channel.purge(limit=1)
         await ctx.send("Hi")
 
 

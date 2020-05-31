@@ -1,9 +1,8 @@
-import discord
 from discord.ext import commands
-from modules.db.db_management import edit_warns, get_warns, set_prefix
+from modules.base.db.db_management import edit_warns, get_warns, set_prefix
 import discord.utils
 from config.Permissions import is_admin
-from modules.tasker.tasker import debun
+from modules.tasker.tasker import deban
 
 
 class ModerationAdmin(commands.Cog):
@@ -14,6 +13,7 @@ class ModerationAdmin(commands.Cog):
     @commands.guild_only()
     @is_admin()
     async def give_role(self, ctx, member: discord.Member, role: discord.Role):
+        await ctx.channel.purge(limit=1)
         await ctx.send(f"Giving the role {role.mention} to {member.mention}")
         await member.add_roles(role)
 
@@ -21,19 +21,21 @@ class ModerationAdmin(commands.Cog):
     @commands.guild_only()
     @is_admin()
     async def ban(self, ctx, member: discord.Member = None, reason: str = "Because you are naughty. We banned you."):
+        await ctx.channel.purge(limit=1)
         if member is not None:
             await ctx.guild.ban(member, reason=reason)
         else:
             await ctx.send("Please specify user to Ban via mention")
 
-    @commands.command(pass_context=True,brief="bans a given member for a time ( in hours). .ban @member time e.g. 2 ")
+    @commands.command(pass_context=True,brief="bans a given member for a time ( in hours), ban @member time e.g. 2 ")
     @commands.guild_only()
     @is_admin()
     async def tempban(self, ctx, member: discord.Member = None, time=2):
+        await ctx.channel.purge(limit=1)
         reason = f"Because you are naughty. We banned you. For {time} hours"
         if member is not None:
             await ctx.guild.ban(member, reason=reason)
-            await debun(time, ctx, member.name)
+            await deban(time, ctx, member.name)
         else:
             await ctx.send("Please specify user to Ban via mention")
 
@@ -41,6 +43,7 @@ class ModerationAdmin(commands.Cog):
     @commands.guild_only()
     @is_admin()
     async def clear_infractions(self, ctx, member: discord.Member = None):
+        await ctx.channel.purge(limit=1)
         warnings = await get_warns(ctx.guild.id, member.id)
         await edit_warns(ctx.guild.id, member.id, 0)
         await ctx.send(f"{member} Had {warnings} infractions but now {member} has 0 ")
@@ -48,6 +51,7 @@ class ModerationAdmin(commands.Cog):
     @commands.command(pass_context=True)
     @is_admin()
     async def prefix(self, ctx, arg):
+        await ctx.channel.purge(limit=1)
         await set_prefix(ctx.guild.id, arg)
         await ctx.send(arg + "is now the prefix")
 

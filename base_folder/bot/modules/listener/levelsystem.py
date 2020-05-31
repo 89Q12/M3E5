@@ -1,8 +1,7 @@
-import discord
 from discord.ext import commands
-from modules.db.db_management import update_xp_text, get_text_xp,\
+from modules.base.db.db_management import update_xp_text, get_text_xp,\
     get_lvl_text, update_text_lvl, \
-    edit_settings_levelsystem, get_levelsystem, insert_message
+    edit_settings_levelsystem, get_levelsystem
 
 
 async def update_data(ctx):
@@ -36,6 +35,7 @@ class Levelsystem(commands.Cog):
     @levelsystem.command(name="toggle")
     async def levelsystem_toggle(self, ctx):
         # Toggle on/off the level system
+        await ctx.channel.purge(limit=1)
         toggle = int(await get_levelsystem(ctx.guild.id))
         if 0 == toggle:
             await edit_settings_levelsystem(ctx.guild.id, 1)

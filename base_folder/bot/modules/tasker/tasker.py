@@ -11,7 +11,7 @@ async def runtasks(client):
 '''
 
 
-async def debun(time, ctx, member: str = "",):
+async def deban(time, ctx, member: str = "",):
     await asyncio.sleep(time*600)
     reason = "You have been unbanned. Time is over. Please behave"
     if member == "":
