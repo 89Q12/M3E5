@@ -34,8 +34,6 @@ Like a real AI and an home assistant like Alexa.
   - levelsystem is now working(text based)
 - Chatbot 
   - currently trainning but I'm halfway through it
-- Home assistant
-  - AI integration 
 
 # Critical bugs
 
