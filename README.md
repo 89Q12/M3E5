@@ -89,19 +89,6 @@ I guess it's too much but I will just work my way through all of them :D
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
  
-# TODO
-  
-- The whole discord bot
-  - Every feature from the bot list above
-  - Switching to mysql from sqlite3, making the bot non portable but more stable
-- Refactoring the nmt code base
-  - inferencemode 
-  - using multiple models 
-- Building the home assistant inegration on the assistant side 
-  - rewriting main.py from the assistant 
-  - disabling some features
-  - integration of the nmt AI
-  
 # Home assistant
 
 For this part I'm using a modified version of this [assistant](https://github.com/ggeop/Python-ai-assistant).<br> 
