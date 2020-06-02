@@ -5,14 +5,14 @@ from discord.embeds import EmptyEmbed
 
 
 def token():
-    return "NjY0MTc3MDI4MTE5MDAzMTM2.XseKww.MbC2lqXe2blItuQwFH75d1wuPr0"
+    return ""
 
 
 def sql():
     mydb = mysql.connector.connect(
-      host="45.83.107.127",
-      user="zofi",
-      passwd="brdfat65mc",
+      host="",
+      user="",
+      passwd="",
       database='M3E5')
     return mydb
 
