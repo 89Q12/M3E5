@@ -360,4 +360,4 @@ Test area
 
 if __name__ == "__main__":
     # initialize_all(715131657107144724)
-    is_user_indb("plutphil", 488127851128815625, 715131657107144724)
+    is_user_indb()
