@@ -18,8 +18,8 @@ Like a real AI and an home assistant like Alexa.
     - mute/unmute
     - giving someone a role e.g. .give_role @someone @some_role
     - info about a role: how many users the role have and permissions
-    - Tempban
-    - tempmute
+    - Tempban  but not great implemented
+    - Tempmute but not great implemented
     - warn 
     - infractions
     - clear infractions
@@ -107,6 +107,7 @@ Below you will find some examples.
 
 
 ## Here are some examples of the chatbot:
+
 Question: Can you sing me a song?
 Answer: I'll post it.
 
@@ -115,6 +116,9 @@ Answer: I'm so confused.
 
 Question: <3<br>
 Answer: <3
+
+Question: i have to get an invite to grab some food from the fridge
+Answer: I'll go ahead and get it.
 
 Cute or? isn't it
 

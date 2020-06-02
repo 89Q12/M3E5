@@ -1,6 +1,6 @@
 from discord.ext import commands
-from config.config import token
-from modules.base.db_management import get_prefix
+from base_folder.bot.config.config import token
+from base_folder.bot.modules.base.db_management import get_prefix
 
 
 def prefix(bot, ctx):

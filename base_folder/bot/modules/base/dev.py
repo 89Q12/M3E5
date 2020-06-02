@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from config.Permissions import is_dev, guild_owner
-from modules.base.db_management import is_user_indb, roles_to_db, roles_from_db, \
+from base_folder.bot.config.Permissions import is_dev, guild_owner
+from base_folder.bot.modules.base.db_management import is_user_indb, roles_to_db, roles_from_db, \
     initialize_all, edit_settings_role, edit_settings_welcome
 
 

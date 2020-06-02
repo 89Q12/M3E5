@@ -1,4 +1,4 @@
-from config.config import sql
+from base_folder.bot.config.config import sql
 import base64
 
 '''

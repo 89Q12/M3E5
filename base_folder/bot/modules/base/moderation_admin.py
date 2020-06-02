@@ -1,11 +1,11 @@
 import datetime
 
 from discord.ext import commands
-from modules.base.db_management import edit_warns, get_warns, set_prefix
+from base_folder.bot.modules.base.db_management import edit_warns, get_warns, set_prefix
 import discord.utils
-from config.Permissions import is_admin
-from config.config import build_embed
-from modules.tasker.tasker import deban
+from base_folder.bot.config.Permissions import is_admin
+from base_folder.bot.config.config import build_embed
+from base_folder.bot.modules.tasker.tasker import deban
 
 
 class ModerationAdmin(commands.Cog):
