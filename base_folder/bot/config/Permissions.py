@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from modules.base.db_management import get_settings_role, get_role
+from base_folder.bot.modules.base.db_management import get_settings_role, get_role
 
 
 def is_dev():
