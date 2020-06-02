@@ -1,22 +1,22 @@
 import logging
-
 import discord
 import mysql.connector
 from discord.embeds import EmptyEmbed
 
 
 def token():
-    return ""
+    return "NjY0MTc3MDI4MTE5MDAzMTM2.XseKww.MbC2lqXe2blItuQwFH75d1wuPr0"
 
 
 def sql():
     mydb = mysql.connector.connect(
-      host="xamh.de",
+      host="45.83.107.127",
       user="zofi",
-      passwd="brdfat65",
+      passwd="brdfat65mc",
       database='M3E5')
     return mydb
 
+# TODO: use color from database, set a default color.
 
 def build_embed(**params):
     # Copyright 2017 Zack Rauen www.ZackRauen.com
