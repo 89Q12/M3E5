@@ -11,9 +11,9 @@ def token():
 
 def sql():
     mydb = mysql.connector.connect(
-      host="xamh.de",
-      user="zofi",
-      passwd="brdfat65",
+      host="",
+      user="",
+      passwd="",
       database='M3E5')
     return mydb
 
