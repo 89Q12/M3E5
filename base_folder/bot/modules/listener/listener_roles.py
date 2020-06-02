@@ -1,4 +1,4 @@
-from modules.base.db.db_management import roles_to_db, remove_role
+from modules.base.db_management import roles_to_db, remove_role
 import discord
 from discord.ext import commands
 

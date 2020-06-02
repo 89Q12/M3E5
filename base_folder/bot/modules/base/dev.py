@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 from config.Permissions import is_dev, guild_owner
-from modules.base.db.db_management import is_user_indb, roles_to_db, roles_from_db, initialize_all, edit_settings_role
+from modules.base.db_management import is_user_indb, roles_to_db, roles_from_db, \
+    initialize_all, edit_settings_role, edit_settings_welcome
 
 
 class Dev(commands.Cog):
@@ -72,10 +73,10 @@ class Dev(commands.Cog):
         roles = await roles_from_db(guild_id)
         await ctx.send(str(roles) + f" {ctx.author.mention}")
 
-    @commands.command(pass_context=True, brief="sets standard rule set_standard_role @role")
+    @commands.command(pass_context=True, brief="sets default role set_default @role")
     @commands.guild_only()
     @guild_owner()
-    async def set_standard_role(self, ctx, role: discord.Role = None):
+    async def set_default(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
         await edit_settings_role(ctx.guild.id, role.id, "standard_role_id")
         await ctx.send(f"{role.mention} is now the standard role")
@@ -103,6 +104,14 @@ class Dev(commands.Cog):
         await ctx.channel.purge(limit=1)
         await edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
         await ctx.send(f"{role.mention} is now the mod role")
+
+    @commands.command(pass_context=True, brief="sets the welcome channel set_welcome channelid")
+    @commands.guild_only()
+    @guild_owner()
+    async def set_welcome(self, ctx, channel_id):
+        channel = self.client.get_channel(channel_id)
+
+        await ctx.send(channel)
 
 
 def setup(client):

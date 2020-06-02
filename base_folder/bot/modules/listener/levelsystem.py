@@ -1,5 +1,5 @@
 from discord.ext import commands
-from modules.base.db.db_management import update_xp_text, get_text_xp,\
+from modules.base.db_management import update_xp_text, get_text_xp,\
     get_lvl_text, update_text_lvl, \
     edit_settings_levelsystem, get_levelsystem
 

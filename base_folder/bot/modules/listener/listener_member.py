@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from modules.base.db.db_management import is_user_indb, get_settings_role, get_leave_channel, \
-    get_role, on_error, get_prefix, roles_to_db, remove_role
+from modules.base.db_management import is_user_indb, get_settings_role, get_leave_channel, \
+    get_role, on_error, get_prefix
 
 
 class ListenerMember(commands.Cog):

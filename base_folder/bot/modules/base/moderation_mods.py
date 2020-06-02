@@ -3,7 +3,7 @@ from discord.ext import commands
 import discord.utils
 from config.Permissions import is_mod
 from modules.tasker.tasker import demute
-from modules.base.db.db_management import get_warns, edit_warns
+from modules.base.db_management import get_warns, edit_warns
 
 
 class ModerationMod(commands.Cog):

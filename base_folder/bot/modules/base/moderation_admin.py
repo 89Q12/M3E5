@@ -1,7 +1,10 @@
+import datetime
+
 from discord.ext import commands
-from modules.base.db.db_management import edit_warns, get_warns, set_prefix
+from modules.base.db_management import edit_warns, get_warns, set_prefix
 import discord.utils
 from config.Permissions import is_admin
+from config.config import build_embed
 from modules.tasker.tasker import deban
 
 
@@ -46,7 +49,12 @@ class ModerationAdmin(commands.Cog):
         await ctx.channel.purge(limit=1)
         warnings = await get_warns(ctx.guild.id, member.id)
         await edit_warns(ctx.guild.id, member.id, 0)
+        e = build_embed(author=self.client.user.name, title="cleared",
+                        description="infractions cleared",
+                        author_url=member.avatar_url, timestamp=datetime.datetime.now(),
+                        )
         await ctx.send(f"{member} Had {warnings} infractions but now {member} has 0 ")
+        await ctx.send(embed=e)
 
     @commands.command(pass_context=True)
     @is_admin()

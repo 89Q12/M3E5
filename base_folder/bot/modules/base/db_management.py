@@ -150,6 +150,15 @@ Channel settings and warning settings
 '''
 
 
+async def edit_settings_welcome(guild_id, channel_id):
+    # sets the welcome_channel to the given channel id
+    conn = connector()
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET welcome_channel={str(channel_id)} WHERE guild_id = {guild_id}")
+    conn.commit()
+    c.close()
+
+
 async def edit_settings_leave(guild_id, channel_id):
     # sets the leave_channel to the given channel id
     conn = connector()
@@ -254,15 +263,6 @@ async def edit_settings_img_text(guild_id, img="Welcome {0.mention} to {1}!"):
     conn = connector()
     c = conn.cursor()
     c.execute(f"UPDATE settings SET imgwelcome_text={str(img)} WHERE guild_id={str(guild_id)}")
-    conn.commit()
-    c.close()
-
-
-async def edit_settings_welcome(guild_id, channel_id):
-    # sets the welcome_channel to the given channel id
-    conn = connector()
-    c = conn.cursor()
-    c.execute(f"UPDATE settings SET welcome_channel={str(channel_id)} WHERE guild_id = {guild_id}")
     conn.commit()
     c.close()
 

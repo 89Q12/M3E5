@@ -1,13 +1,11 @@
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-import discord
 import os, aiohttp
 from io import BytesIO
 import textwrap
 import base64
 from config.Permissions import *
-from modules.base.db.db_management import get_welcome_channel, get_img, \
+from modules.base.db_management import get_welcome_channel, get_img, \
     edit_settings_img, edit_settings_img_text, get_img_text
-
 
 '''
 MIT License
@@ -247,6 +245,7 @@ class IMGWelcome(commands.Cog):
             content = "Welcome {} to {}!".format(member.name, guild.name)
 
         file = discord.File("data/welcome.png", filename="welcome.png")
+
         await channel.send(file=file, content=content)
 
 

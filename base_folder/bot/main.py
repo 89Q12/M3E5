@@ -1,18 +1,22 @@
-import time
-import discord
 from discord.ext import commands
-from config.config import token, logging, prefix
+from config.config import token
+from modules.base.db_management import get_prefix
 
 
-client = commands.Bot(command_prefix=prefix())
+def prefix(bot, ctx):
+    return get_prefix(ctx.guild.id)
+
+
+client = commands.Bot(command_prefix=prefix)
 extensions = ["modules.test.test",
-              "modules.listener.listener",
+              "modules.listener.listener_member",
+              "modules.listener.listener_roles",
               "modules.listener.levelsystem",
-              "modules.commands.moderation.moderation_mods",
-              "modules.commands.moderation.moderation_admin",
-              "modules.commands.fun.fun",
-              "modules.commands.dev",
-              "modules.imgwelcome.imgwelcome"
+              "modules.base.moderation_admin",
+              "modules.base.moderation_mods",
+              "modules.commands.fun",
+              "modules.base.dev",
+              "modules.imgwelcome"
               ]
 
 
