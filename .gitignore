@@ -1,4 +1,5 @@
 # Ignored files
 /base_folder/nmt
 /base_folder/assistant
+/base_folder/bot/config/config.py
 /.idea/*

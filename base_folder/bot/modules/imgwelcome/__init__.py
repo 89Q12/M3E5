@@ -3,8 +3,8 @@ import os, aiohttp
 from io import BytesIO
 import textwrap
 import base64
-from config.Permissions import *
-from modules.base.db_management import get_welcome_channel, get_img, \
+from base_folder.bot.config.Permissions import *
+from base_folder.bot.modules.base.db_management import get_welcome_channel, get_img, \
     edit_settings_img, edit_settings_img_text, get_img_text
 
 '''

@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 import discord.utils
-from config.Permissions import is_mod
-from modules.tasker.tasker import demute
-from modules.base.db_management import get_warns, edit_warns
+from  base_folder.bot.config.Permissions import is_mod
+from  base_folder.bot.modules.tasker.tasker import demute
+from  base_folder.bot.modules.base.db_management import get_warns, edit_warns
 
 
 class ModerationMod(commands.Cog):

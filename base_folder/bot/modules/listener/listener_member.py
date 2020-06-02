@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from modules.base.db_management import is_user_indb, get_settings_role, get_leave_channel, \
+from base_folder.bot.modules.base.db_management import is_user_indb, get_settings_role, get_leave_channel, \
     get_role, on_error, get_prefix
 
 

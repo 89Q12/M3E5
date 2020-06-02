@@ -11,15 +11,11 @@ def token():
 
 def sql():
     mydb = mysql.connector.connect(
-      host="",
-      user="",
-      passwd="",
+      host="xamh.de",
+      user="zofi",
+      passwd="brdfat65",
       database='M3E5')
     return mydb
-    
-    
-def prefix():
-    return "-"
 
 
 def build_embed(**params):

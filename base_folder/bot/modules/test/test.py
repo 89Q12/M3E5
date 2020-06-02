@@ -1,5 +1,5 @@
 from discord.ext import commands
-from config.config import build_embed
+from base_folder.bot.config.config import build_embed
 import datetime
 
 
