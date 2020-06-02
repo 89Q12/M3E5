@@ -16,7 +16,8 @@ extensions = ["modules.test.test",
               "modules.base.moderation_mods",
               "modules.commands.fun",
               "modules.base.dev",
-              "modules.imgwelcome"
+              "modules.imgwelcome",
+              "modules.base.customize"
               ]
 
 

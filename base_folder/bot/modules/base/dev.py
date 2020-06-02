@@ -105,14 +105,6 @@ class Dev(commands.Cog):
         await edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
         await ctx.send(f"{role.mention} is now the mod role")
 
-    @commands.command(pass_context=True, brief="sets the welcome channel set_welcome channelid")
-    @commands.guild_only()
-    @guild_owner()
-    async def set_welcome(self, ctx, channel_id):
-        channel = self.client.get_channel(channel_id)
-
-        await ctx.send(channel)
-
 
 def setup(client):
     client.add_cog(Dev(client))
