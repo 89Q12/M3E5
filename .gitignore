@@ -3,3 +3,5 @@
 /base_folder/assistant
 /base_folder/bot/config/*
 /.idea/*
+*.pyc
+*.pyo
