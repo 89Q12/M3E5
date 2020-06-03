@@ -94,12 +94,12 @@ class ModerationMod(commands.Cog):
         await ctx.channel.purge(limit=1)
         if seconds > 120:
             return await ctx.send(":no_entry: Amount can't be over 120 seconds")
-        if seconds is 0:
+        if seconds == 0:
             await ctx.channel.edit(slowmode_delay=seconds)
             a = await ctx.send("**Slowmode is off for this channel**")
             #await a.add_reaction("a:zzz:714587832529846282")
         else:
-            if seconds is 1:
+            if seconds == 1:
                 numofsecs = "second"
             else:
                 numofsecs = "seconds"
