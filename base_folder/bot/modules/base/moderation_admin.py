@@ -55,12 +55,6 @@ class ModerationAdmin(commands.Cog):
         await ctx.send(f"{member} Had {warnings} infractions but now {member} has 0 ")
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True)
-    @is_admin()
-    async def prefix(self, ctx, arg):
-        await ctx.channel.purge(limit=1)
-        await set_prefix(ctx.guild.id, arg)
-        await ctx.send(arg + "is now the prefix")
 
 
 def setup(client):

@@ -1,8 +1,7 @@
-import logging
-
-import discord
 import mysql.connector
 from discord.embeds import EmptyEmbed
+import datetime
+import discord.embeds
 
 
 def token():
@@ -14,7 +13,9 @@ def sql():
       host="",
       user="",
       passwd="",
-      database='M3E5')
+      database='M3E5',
+      auth_plugin='mysql_native_password'
+    )
     return mydb
 
 

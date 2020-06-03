@@ -1,7 +1,8 @@
 # Ignored files
-/base_folder/nmt
-/base_folder/assistant
-/base_folder/bot/config/*
-/.idea/*
+base_folder/nmt
+base_folder/assistant
+base_folder/bot/config/config.py
+tests/*
+.idea/*
 *.pyc
 *.pyo
