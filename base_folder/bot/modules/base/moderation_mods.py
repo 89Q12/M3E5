@@ -108,7 +108,8 @@ class ModerationMod(commands.Cog):
                                      f"{numofsecs}\nTo turn this off, do .slowmode**")
             #await confirm.add_reaction("a:zzz:714587832529846282")
 
-    @commands.command(pass_context=True, aliases=["roleinfo"],brief="Show the color of role and how many user's the role have ")
+    @commands.command(pass_context=True, aliases=["roleinfo"],
+                      brief="Show the color of role and how many user's the role have ")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def roleInfo(self, ctx, role: discord.Role=None):

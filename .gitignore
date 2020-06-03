@@ -6,3 +6,4 @@ tests/*
 .idea/*
 *.pyc
 *.pyo
+base_folder/bot/config/config.py
