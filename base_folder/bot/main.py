@@ -17,7 +17,8 @@ extensions = ["modules.test.test",
               "modules.commands.fun",
               "modules.base.dev",
               "modules.imgwelcome",
-              "modules.base.customize"
+              "modules.base.customize",
+              "modules.listener.listener_error"
               ]
 
 
