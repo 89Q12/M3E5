@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 from base_folder.bot.config.Permissions import is_dev, guild_owner
-from base_folder.bot.modules.base.db_management import is_user_indb, roles_to_db, roles_from_db, \
-    initialize_all, edit_settings_role, edit_settings_welcome
+from base_folder.bot.modules.base.db_management import Db
 
 
 class Dev(commands.Cog):
@@ -47,30 +46,33 @@ class Dev(commands.Cog):
     @guild_owner()
     async def builddb(self, ctx):
         await ctx.channel.purge(limit=1)
+        db = Db(self.client)
         try:
-            await initialize_all(ctx.guild.id)
+            await db.initialize_all(ctx.guild.id)
         except Exception:
             print("rip")
         for user in ctx.guild.members:
-            await is_user_indb(user.name, user.id, ctx.guild.id)
+            await db.is_user_indb(user.name, user.id, ctx.guild.id)
         for i in ctx.guild.roles:
-            await roles_to_db(ctx.guild.id, i.name, i.id)
+            await db.roles_to_db(ctx.guild.id, i.name, i.id)
         await ctx.send("I'm done my master {0.mention} <3".format(ctx.author))
 
     @commands.command(pass_context=True, brief="Writes all roles in the db")
     @is_dev()
     async def roles_in_db(self, ctx):
         await ctx.channel.purge(limit=1)
+        db = Db(self.client)
         for i in ctx.guild.roles:
-            await roles_to_db(ctx.guild.id, i.name, i.id)
+            await db.roles_to_db(ctx.guild.id, i.name, i.id)
         await ctx.send("I'm done my master {0.mention} <3".format(ctx.author))
 
     @commands.command(pass_context=True, brief="shows all roles")
     @is_dev()
     async def show_roles(self, ctx):
         await ctx.channel.purge(limit=1)
+        db = Db(self.client)
         guild_id = ctx.guild.id
-        roles = await roles_from_db(guild_id)
+        roles = await db.roles_from_db(guild_id)
         await ctx.send(str(roles) + f" {ctx.author.mention}")
 
     @commands.command(pass_context=True, brief="sets default role set_default @role")
@@ -78,7 +80,8 @@ class Dev(commands.Cog):
     @guild_owner()
     async def set_default(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
-        await edit_settings_role(ctx.guild.id, role.id, "standard_role_id")
+        db = Db(self.client)
+        await db.edit_settings_role(ctx.guild.id, role.id, "standard_role_id")
         await ctx.send(f"{role.mention} is now the standard role")
 
     @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
@@ -86,7 +89,8 @@ class Dev(commands.Cog):
     @guild_owner()
     async def set_admin(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
-        await edit_settings_role(ctx.guild.id, role.id, "admin_role_id")
+        db = Db(self.client)
+        await db.edit_settings_role(ctx.guild.id, role.id, "admin_role_id")
         await ctx.send(f"{role.mention} is now the admin role")
 
     @commands.command(pass_context=True, brief="sets dev rule set_dev @role")
@@ -94,7 +98,8 @@ class Dev(commands.Cog):
     @guild_owner()
     async def set_dev(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
-        await edit_settings_role(ctx.guild.id, role.id, "dev_role_id")
+        db = Db(self.client)
+        await db.edit_settings_role(ctx.guild.id, role.id, "dev_role_id")
         await ctx.send(f"{role.mention} is now the dev role")
 
     @commands.command(pass_context=True, brief="sets mod rule set_mod @role")
@@ -102,7 +107,8 @@ class Dev(commands.Cog):
     @guild_owner()
     async def set_mod(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
-        await edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
+        db = Db(self.client)
+        await db.edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
         await ctx.send(f"{role.mention} is now the mod role")
 
 
