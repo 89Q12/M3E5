@@ -45,12 +45,10 @@ I guess it's too much but I will just work my way through all of them :D
 - Discord features
   - Multi server bot but for now it will be single server only so you have to change some things
   - Moderation features e.g. muting people etc
-  - Auto roles
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
-  - Level system
   - Auto task
-  - Alerts for various services like Twitch 
+  - Alerts for various services like Twitch and reddit
   - Music player
   - custom messaging design 
   - Logging Channels to a database
@@ -58,6 +56,7 @@ I guess it's too much but I will just work my way through all of them :D
   - Home assistant integration
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
+  - Advanced permission system 
 - Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
