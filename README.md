@@ -37,7 +37,7 @@ Like a real AI and an home assistant like Alexa.
 
 # Critical bugs
 
-- None
+- None by that I mean I haven't found any xD
 
 # Planned features
 
