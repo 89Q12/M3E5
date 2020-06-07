@@ -1,13 +1,10 @@
 from discord.ext import commands
+import base_folder.bot.logger
 from base_folder.bot.config.config import token
-from base_folder.bot.modules.base.db_management import get_prefix
+from base_folder.bot.config.config import sql
 
 
-def prefix(bot, ctx):
-    return get_prefix(ctx.guild.id)
-
-
-client = commands.Bot(command_prefix=prefix)
+client = commands.Bot(command_prefix="-")
 extensions = ["modules.test.test",
               "modules.listener.listener_member",
               "modules.listener.listener_roles",
@@ -23,6 +20,8 @@ extensions = ["modules.test.test",
 
 
 if __name__ == "__main__":
+    conn = sql()
+    client.sql = conn
     for extension in extensions:
         try:
             client.load_extension(extension)

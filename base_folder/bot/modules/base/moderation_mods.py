@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 import discord.utils
-from  base_folder.bot.config.Permissions import is_mod
-from  base_folder.bot.modules.tasker.tasker import demute
-from  base_folder.bot.modules.base.db_management import get_warns, edit_warns
+from base_folder.bot.config.Permissions import is_mod
+from base_folder.bot.modules.tasker.tasker import demute
+from base_folder.bot.modules.base.db_management import Db
 
 
 class ModerationMod(commands.Cog):
@@ -12,7 +12,7 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="kicks a givien member")
     @commands.guild_only()
-    @commands.check_any(is_mod(), commands.is_owner())
+    @is_mod()
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
         await ctx.channel.purge(limit=1)
         if member is not None:
@@ -20,7 +20,7 @@ class ModerationMod(commands.Cog):
         else:
             await ctx.send("Please specify user to kick via mention")
 
-    @commands.command(pass_context=True,brief="unbans a givien member")
+    @commands.command(pass_context=True, brief="unbans a givien member")
     @commands.guild_only()
     @commands.check_any(is_mod(), commands.is_owner())
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
@@ -69,7 +69,7 @@ class ModerationMod(commands.Cog):
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
-    async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=2):
+    async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
         role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
         if not role:  # checks if there is muted role
@@ -90,29 +90,27 @@ class ModerationMod(commands.Cog):
     @commands.command(pass_context=True, brief="enables slowmode with custom delay")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
-    async def slowmode(self, ctx, seconds: int=0):
+    async def slowmode(self, ctx, seconds: int = 0):
         await ctx.channel.purge(limit=1)
         if seconds > 120:
             return await ctx.send(":no_entry: Amount can't be over 120 seconds")
         if seconds == 0:
             await ctx.channel.edit(slowmode_delay=seconds)
-            a = await ctx.send("**Slowmode is off for this channel**")
-            #await a.add_reaction("a:zzz:714587832529846282")
+            await ctx.send("**Slowmode is off for this channel**")
         else:
             if seconds == 1:
                 numofsecs = "second"
             else:
                 numofsecs = "seconds"
             await ctx.channel.edit(slowmode_delay=seconds)
-            confirm = await ctx.send(f"**Set the channel slow mode delay to `{seconds}` "
-                                     f"{numofsecs}\nTo turn this off, do .slowmode**")
-            #await confirm.add_reaction("a:zzz:714587832529846282")
+            await ctx.send(f"**Set the channel slow mode delay to `{seconds}` "
+                           f"{numofsecs}\nTo turn this off, do .slowmode**")
 
-    @commands.command(pass_context=True, aliases=["roleinfo"],
+    @commands.command(pass_context=True,
                       brief="Show the color of role and how many user's the role have ")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
-    async def roleInfo(self, ctx, role: discord.Role=None):
+    async def roleinfo(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
         counter = 0
         for user in self.client.get_all_members():
@@ -129,33 +127,33 @@ class ModerationMod(commands.Cog):
         await ctx.channel.purge(limit=1)
         """Unmutes a muted user"""
         try:
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted")) # removes muted role
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted"))  # removes muted role
             await ctx.send(f"{member.mention} has been unmuted")
-        except Exception as e:
+        except discord.DiscordException:
             await ctx.send(f"{member.mention} already unmuted or {member.mention} was never muted")
 
-    @commands.command(pass_context=True, brief="unmutes a user")
-    @commands.check_any(is_mod(), commands.is_owner())
+    @commands.command(pass_context=True, brief="un mutes a user")
     @commands.guild_only()
     async def warn(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        warnings = await get_warns(ctx.guild.id, member.id)
-        amount = 0
+        db = Db(self.client)
+        warnings = await db.get_warns(ctx.guild.id, member.id)
         if warnings is None:
             amount = 1
-            await edit_warns(ctx.guild.id, member.id, amount)
+            await db.edit_warns(ctx.guild.id, member.id, amount)
             await ctx.send(f"{member.mention} You have been warned you have {amount} infractions!")
         else:
             warnings += 1
-            await edit_warns(ctx.guild.id, member.id, warnings)
+            await db.edit_warns(ctx.guild.id, member.id, warnings)
             await ctx.send(f"{member.mention} You have been warned you have {warnings} infractions!")
 
-    @commands.command(pass_context=True, brief="unmutes a user")
+    @commands.command(pass_context=True, brief="un mutes a user")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        warnings = await get_warns(ctx.guild.id, member.id)
+        db = Db(self.client)
+        warnings = await db.get_warns(ctx.guild.id, member.id)
         await ctx.send(f"{member} Has {warnings} infractions!")
 
 

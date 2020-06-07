@@ -6,9 +6,11 @@ import datetime
 class Test(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.sql = bot.sql
 
     @commands.command(brief="Test")
     async def xx(self, ctx):
+        print(self.sql)
         await ctx.channel.purge(limit=1)
         await ctx.send("Hi")
         message = build_embed(author=self.bot.user.name, thumbnail=ctx.author.avatar_url,
