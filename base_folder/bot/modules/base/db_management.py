@@ -1,7 +1,7 @@
 import base64
 
 '''
-Connection settings and other unused functions
+Class to create db management as class
 '''
 
 
@@ -52,6 +52,7 @@ class Db:
         error = (base64.b64encode(str(error).encode("utf8"))).decode("utf8")
         c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', '{error}')")
         conn.commit()
+        return
 
     async def insert_message(self, guild_id, user_id, message, time):
         conn = self.sql
@@ -60,7 +61,22 @@ class Db:
         c.execute(f"INSERT into messages (guild_id, user_id, message, time) "
                   f"VALUES ('{guild_id}', '{user_id}', '{message}', '{time}')")
         conn.commit()
+        return
 
+    def prefix_lookup(self, guild_id):
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"SELECT prefix FROM settings WHERE guild_id = {guild_id}")
+        prefix = c.fetchone()
+        return prefix[0]
+
+    async def set_prefix(self, guild_id, prefix):
+        conn = self.sql
+        c = conn.cursor()
+        prefix = (base64.b64encode(str(prefix).encode("utf8"))).decode("utf8")
+        c.execute(f"UPDATE settings SET prefix='{prefix}' WHERE guild_id ={guild_id}")
+        conn.commit()
+        return
     '''
     Role settings 
     '''
@@ -77,6 +93,7 @@ class Db:
             c.execute(f"INSERT INTO roles (guild_id, role_name, role_id) "
                       f"VALUES ('{guild_id}', '{str(role_name)}', '{str(role_id)}')")
             conn.commit()
+            return
 
     async def roles_from_db(self, guild_id):
         # returns a tuple with all role name's and id's
@@ -91,6 +108,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"DELETE FROM roles WHERE role_id = {role_id} and guild_id = {guild_id}")
         conn.commit()
+        return
 
     async def edit_settings_role(self, guild_id, role_id, field_name):
         # Let's you set roles e.g. mod role
@@ -99,6 +117,8 @@ class Db:
         c.execute(f"INSERT INTO settings (guild_id,{field_name}) VALUES ('{guild_id}','{role_id}')"
                   f"ON DUPLICATE KEY UPDATE {field_name}='{role_id}'")
         conn.commit()
+        return
+
     '''
     end of roles settings
     
@@ -109,16 +129,18 @@ class Db:
         # sets the welcome_channel to the given channel id
         conn = self.sql
         c = conn.cursor()
-        c.execute(f"UPDATE settings SET welcome_channel={str(channel_id)} WHERE guild_id = {guild_id}")
+        c.execute(f"UPDATE settings SET welcome_channel_id={str(channel_id)} WHERE guild_id = {guild_id}")
         conn.commit()
+        return
 
     async def edit_settings_leave(self, guild_id, channel_id):
         # sets the leave_channel to the given channel id
         conn = self.sql
-        c = conn
-        c.execute(f"UPDATE settings SET leave_channel ={str(channel_id)} "
+        c = conn.cursor()
+        c.execute(f"UPDATE settings SET leave_channel_id ={str(channel_id)}"
                   f"WHERE guild_id = {guild_id}")
         conn.commit()
+        return
 
     async def edit_warns(self, guild_id, user_id, amount):
         # sets warn with given amount
@@ -127,6 +149,7 @@ class Db:
         c.execute(f"UPDATE user_info SET warnings={str(amount)} WHERE user_id="
                   f"{str(user_id)} and guild_id={str(guild_id)}")
         conn.commit()
+        return
 
     async def get_role(self, guild_id, role_id):
         #  returns a role name when a role id is given
@@ -194,6 +217,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"UPDATE settings SET imgwelcome_toggle={str(img)} WHERE guild_id={str(guild_id)}")
         conn.commit()
+        return
 
     async def edit_settings_img_text(self, guild_id, img="Welcome {0.mention} to {1}!"):
         # Unused for now but it will be used for the welcome image function
@@ -202,6 +226,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"UPDATE settings SET imgwelcome_text={str(img)} WHERE guild_id={str(guild_id)}")
         conn.commit()
+        return
 
     async def get_img(self, guild_id):
         conn = self.sql
@@ -230,6 +255,7 @@ class Db:
         c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} a"
                   f"nd guild_id={str(guild_id)};")
         conn.commit()
+        return
 
     async def get_text_xp(self, guild_id, user_id):
         # returns the xp amount for a given user
@@ -259,6 +285,7 @@ class Db:
         c.execute(f"UPDATE user_info SET text_lvl = {str(amount)}  WHERE user_id ="
                   f"{str(user_id)} and guild_id={str(guild_id)}")
         conn.commit()
+        return
 
     async def edit_settings_levelsystem(self, guild_id, toggler):
         # Unused for now but it will be used for the welcome image function

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import discord.utils
 from base_folder.bot.config.Permissions import is_mod
+from base_folder.bot.config.config import build_embed
 from base_folder.bot.modules.tasker.tasker import demute
 from base_folder.bot.modules.base.db_management import Db
 
@@ -16,9 +17,19 @@ class ModerationMod(commands.Cog):
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
         await ctx.channel.purge(limit=1)
         if member is not None:
+            e = build_embed(title="Approved!", author=self.client.user.name,
+                            description=f"{member.mention} has been successfully kicked for {reason}")
+            await ctx.send(embed=e)
+            e = build_embed(title="Approved!", author=self.client.user.name,
+                            description=f"You have been banned from {ctx.guild.name} for {reason}."
+                                        f"If you think this is wrong then message an admin but shit happens"
+                                        f" when you don't have the name.")
             await ctx.guild.kick(member, reason=reason)
+            await member.send(embed=e)
         else:
-            await ctx.send("Please specify user to kick via mention")
+            e = build_embed(title="Error!", author=self.client.user.name,
+                            description=f"You need to specify a member via mention")
+            await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="unbans a givien member")
     @commands.guild_only()
@@ -26,23 +37,32 @@ class ModerationMod(commands.Cog):
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
         await ctx.channel.purge(limit=1)
         if member == "":
-            await ctx.send("Please specify username as text")
+            e = build_embed(title="Error!", author=self.client.user.name,
+                            description=f"No member specified! Specify a user by writing his name without #tag")
+            await ctx.send(embed=e)
             return
 
         bans = await ctx.guild.bans()
         for b in bans:
             if b.user.name == member:
+                e = build_embed(title="Approved!", author=self.client.user.name,
+                                description=f"{b.user.name} has been successfully unbanned!")
                 await ctx.guild.unban(b.user, reason=reason)
-                await ctx.send("User was unbanned")
+                await ctx.sende(embed=e)
                 return
-        await ctx.send("User was not found in ban list.")
+        e = build_embed(title="Error!", author=self.client.user.name,
+                        description=f"{member} wasn't found in the ban list so either "
+                                    f"you wrote the name wrong or {member} was never banned!")
+        await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="clears a givien amount of messages")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def clear(self, ctx, arg):
         await ctx.channel.purge(limit=int(arg))
-        await ctx.channel.send("cleared: " + arg + " messages")
+        e = build_embed(title="Success!", author=self.client.user.name,
+                        description=f"cleared: {arg} messages!")
+        await ctx.channel.send(embed=e)
 
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.check_any(is_mod(), commands.is_owner())
@@ -67,11 +87,13 @@ class ModerationMod(commands.Cog):
             await ctx.send(f"{member.mention} has been sent to hell for {reason}")
 
     @commands.command(pass_context=True, brief="mutes a user")
-    @commands.check_any(is_mod(), commands.is_owner())
+    @is_mod()
     @commands.guild_only()
     async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
         role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
+        e = build_embed(title="Success!", author=self.client.user.name,
+                        description=f"{member.mention} was successfully muted for {reason}")
         if not role:  # checks if there is muted role
             try:  # creates muted role
                 muted = await ctx.guild.create_role(name="Muted", reason="To use for muting")
@@ -80,12 +102,16 @@ class ModerationMod(commands.Cog):
                                                   read_message_history=False,
                                                   read_messages=False)
             except discord.Forbidden:
-                return await ctx.send("I have no permissions to make a muted role")  # self-explainatory
+                error = build_embed(title="Error!", author=self.client.user.name,
+                                    description=f"Master please give me admin rights")
+                return await ctx.send(embed=error)  # self-explainatory
             await member.add_roles(muted)  # adds newly created muted role
-            await ctx.send(f"{member.mention} has been sent to hell for {reason}")
+            await ctx.send(embed=e)
         else:
             await member.add_roles(role)  # adds already existing muted role
-            await ctx.send(f"{member.mention} has been sent to hell for {reason}")
+            await ctx.send(embed=e)
+
+    # TODO: make a log channel for the bot to log in e.g. slowmode etc
 
     @commands.command(pass_context=True, brief="enables slowmode with custom delay")
     @commands.check_any(is_mod(), commands.is_owner())
@@ -117,8 +143,15 @@ class ModerationMod(commands.Cog):
             for i in user.roles:
                 if role == i:
                     counter = counter + 1
-        await ctx.send(f"{role} has {counter} members and has the following attributes Color:{role.color}, "
-                       f"Created at:{role.created_at}, hoist:{role.hoist} and has the permission:{role.permissions}")
+        e = build_embed(title="Role info", author=self.client.user.name,
+                        description=f"Here are some important info's about {role.mention}")
+        e.add_field(name="Members", value=f"Has {counter} members", inline=True)
+        e.add_field(name="Created at", value=f"Was created at \n{role.created_at}", inline=True)
+        e.add_field(name="Color", value=f"Has this {role.color} color", inline=True)
+        e.add_field(name="Permissions", value=f"Shown as integers \n{role.permissions}", inline=True)
+        e.add_field(name="Shown on the right", value=f"{role.hoist}", inline=True)
+        e.add_field(name="Is mentionable", value=f"{role.mentionable}", inline=True)
+        await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="unmutes a user")
     @commands.check_any(is_mod(), commands.is_owner())
@@ -138,23 +171,30 @@ class ModerationMod(commands.Cog):
         await ctx.channel.purge(limit=1)
         db = Db(self.client)
         warnings = await db.get_warns(ctx.guild.id, member.id)
-        if warnings is None:
+        if warnings == 0:
             amount = 1
             await db.edit_warns(ctx.guild.id, member.id, amount)
-            await ctx.send(f"{member.mention} You have been warned you have {amount} infractions!")
+            e = build_embed(title="Attention", author=self.client.user.name,
+                            description=f"{member.mention} you have been warned this is your first "
+                                        f"infraction keep it at this")
+            await ctx.send(embed=e)
         else:
             warnings += 1
+            e = build_embed(title="Attention", author=self.client.user.name,
+                            description=f"{member.mention} you have been warned, you have now {warnings} warning(s)")
             await db.edit_warns(ctx.guild.id, member.id, warnings)
-            await ctx.send(f"{member.mention} You have been warned you have {warnings} infractions!")
+            await ctx.send(embed=e)
 
-    @commands.command(pass_context=True, brief="un mutes a user")
+    @commands.command(pass_context=True, brief="shows how many infractions a user has")
     @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
         db = Db(self.client)
         warnings = await db.get_warns(ctx.guild.id, member.id)
-        await ctx.send(f"{member} Has {warnings} infractions!")
+        e = build_embed(title="Attention", author=self.client.user.name,
+                        description=f"{member.mention} Has {warnings} infraction(s)!")
+        await ctx.send(embed=e)
 
 
 def setup(client):

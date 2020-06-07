@@ -46,6 +46,8 @@ class Levelsystem(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, ctx):
         db = Db(self.client)
+        if ctx is None:
+            return
         channel = ctx.guild.system_channel
         if ctx.author.id == self.client.user.id:
             return

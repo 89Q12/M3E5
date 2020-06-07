@@ -10,13 +10,17 @@ class Test(commands.Cog):
 
     @commands.command(brief="Test")
     async def xx(self, ctx):
-        print(self.sql)
         await ctx.channel.purge(limit=1)
         await ctx.send("Hi")
         message = build_embed(author=self.bot.user.name, thumbnail=ctx.author.avatar_url,
                               footer=ctx.guild.name, image=ctx.guild.icon_url,
                               timestamp=datetime.datetime.now(), color=0x9a45ba)
         message.add_field(name="**test**", value="d", inline=True)
+        message.add_field(name="**test1**", value="d", inline=True)
+        message.add_field(name="**test2**", value="d", inline=True)
+        message.add_field(name="**test3**", value="d", inline=True)
+        message.add_field(name="**test4**", value="d", inline=True)
+        message.add_field(name="**test5**", value="d", inline=True)
         await ctx.send(embed=message)
 
 

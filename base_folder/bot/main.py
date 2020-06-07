@@ -2,9 +2,17 @@ from discord.ext import commands
 import base_folder.bot.logger
 from base_folder.bot.config.config import token
 from base_folder.bot.config.config import sql
+from base_folder.bot.modules.base.db_management import Db
+import base64
 
 
-client = commands.Bot(command_prefix="-")
+def prefix(client, ctx):
+    db = Db(client)
+    pre = (base64.b64decode(str(db.prefix_lookup(ctx.guild.id)).encode("utf8"))).decode("utf8")
+    return pre
+
+
+client = commands.Bot(command_prefix=prefix)
 extensions = ["modules.test.test",
               "modules.listener.listener_member",
               "modules.listener.listener_roles",
@@ -21,7 +29,7 @@ extensions = ["modules.test.test",
 
 if __name__ == "__main__":
     conn = sql()
-    client.sql = conn
+    client.sql = conn  # creates an sql connection object that's accessible via the client object
     for extension in extensions:
         try:
             client.load_extension(extension)
