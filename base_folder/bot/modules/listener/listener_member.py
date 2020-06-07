@@ -14,8 +14,10 @@ class ListenerMember(commands.Cog):
         db = Db(self.client)
         db.is_user_indb(member.name, member.id, member.guild.id)
         role_id = await db.get_settings_role(member.guild.id, "standard_role_id")
-        role_name = await db.get_role(member.guild.id, role_id)
-        role = discord.utils.get(member.guild.roles, name=role_name)
+        if role_id == None:
+            role = member.guild.default_role
+        else:
+            role = discord.utils.get(member.guild.roles, id=role_id)
         await member.add_roles(role, reason="Autorole", atomic=True)
 
     @commands.Cog.listener()
@@ -23,8 +25,9 @@ class ListenerMember(commands.Cog):
         db = Db(self.client)
         channel_id = await db.get_leave_channel(member.guild.id)
         channel = member.guild.get_channel(channel_id)
-        e = build_embed(timestamp=datetime.datetime.now(), thumbnail=member.avatar_url,
-                        title="Bye Bye", description=f"User {member.mention} left the server...")
+        e = build_embed(author=self.client.user.name, timestamp=datetime.datetime.now(),
+                        thumbnail=member.avatar_url, title="Bye Bye",
+                        description=f"User {member.mention} left the server...")
         await channel.send(embed=e)
 
 

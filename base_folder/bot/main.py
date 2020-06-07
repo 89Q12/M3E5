@@ -23,8 +23,7 @@ extensions = ["modules.test.test",
               "modules.base.dev",
               "modules.imgwelcome",
               "modules.base.customize",
-              "modules.listener.listener_error"
-              ]
+              "modules.listener.listener_error"]
 
 
 if __name__ == "__main__":

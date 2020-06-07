@@ -5,12 +5,10 @@ from base_folder.bot.modules.base.db_management import Db
 async def update_data(ctx, db):
     xp = await db.get_text_xp(ctx.guild.id, ctx.author.id)
     amount = 0
-    if xp is None:
-        amount = 5
-        await db.update_xp_text(ctx.guild.id, ctx.author.id, amount)
-    else:
-        amount = 5 + xp
-        await db.update_xp_text(ctx.guild.id, ctx.author.id, amount)
+    for msg in range(len(ctx.content)):
+        print(msg)
+        amount += 1
+    await db.update_xp_text(ctx.guild.id, ctx.author.id, amount+xp)
 
 
 async def is_enabled(guild: int, db):
@@ -51,18 +49,17 @@ class Levelsystem(commands.Cog):
         channel = ctx.guild.system_channel
         if ctx.author.id == self.client.user.id:
             return
+        if ctx.author.bot:
+            return
         if not await is_enabled(ctx.guild.id, db):
             return
-        await update_data(ctx, db)
         xp = await db.get_text_xp(ctx.guild.id, ctx.author.id)
+        await update_data(ctx, db)
         lvl_start = await db.get_lvl_text(ctx.guild.id, ctx.author.id)
-        lvl_end = int(float(str(xp)) ** (1 / 4))
-        if lvl_start is None:
-            await db.update_text_lvl(ctx.guild.id, ctx.author.id)
-            lvl_start = await db.get_lvl_text(ctx.guild.id, ctx.author.id)
+        lvl_end = int(float(xp) ** (1/4))
         if lvl_start < lvl_end:
             await db.update_text_lvl(ctx.guild.id, ctx.author.id, lvl_end)
-            await channel.send(f"{ctx.author.mention} reached level {ctx.author} and has now {lvl_end, xp} xp")
+            await channel.send(f"{ctx.author.mention} reached level {lvl_end} and has now {xp} xp")
 
 
 def setup(client):
