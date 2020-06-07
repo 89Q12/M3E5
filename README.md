@@ -30,14 +30,13 @@ Like a real AI and an home assistant like Alexa.
   - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
-  - the permissionsystem is currently not working, so you need to set the role id's in permissions.py
   - levelsystem is now working(text based)
 - Chatbot 
   - currently trainning but I'm halfway through it
 
 # Critical bugs
 
-- None by that I mean I haven't found any xD
+  - the permissionsystem is currently not working, so you need to set the role id's in permissions.py
 
 # Planned features
 
