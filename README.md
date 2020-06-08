@@ -37,6 +37,7 @@ Like a real AI and an home assistant like Alexa.
 # Critical bugs
 
   - the permissionsystem is currently not working, so you need to set the role id's in permissions.py
+  - Not enough comments D: hehe
 
 # Planned features
 
