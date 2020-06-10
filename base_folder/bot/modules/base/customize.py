@@ -2,6 +2,7 @@ from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
 from base_folder.bot.modules.base.db_management import Db
+
 '''
 All commands that a guild team can use to customize the bot to there needs.
 '''
