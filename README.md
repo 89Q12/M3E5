@@ -23,8 +23,6 @@ Like a real AI and an home assistant like Alexa.
     - mute/unmute
     - giving someone a role e.g. .give_role @someone @some_role
     - info about a role: how many users the role have and permissions
-    - Tempban  but not great implemented
-    - Tempmute but not great implemented
     - warn 
     - infractions
     - clear infractions
@@ -44,10 +42,11 @@ Like a real AI and an home assistant like Alexa.
 ![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
+  - Tempbn/mute will be ready as soon as I have the celery implemention ready
   - Multi server bot but for now it will be single server only so you have to change some things
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
-  - Auto task
+  - Auto tasks
   - Alerts for various services like Twitch and reddit
   - Music player
   - custom messaging design 
@@ -57,6 +56,7 @@ Like a real AI and an home assistant like Alexa.
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
+  - celery as queuing system, the brocker will be redis. With the bot becomes scaleable and background tasks get easier to manage
 - Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
