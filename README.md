@@ -74,7 +74,7 @@ Like a real AI and an home assistant like Alexa.
   
 # Install instructions 
  
- I working on an docker img infrastructure but atm follow the run instructions 
+ I'm working on an docker img infrastructure but atm follow the run instructions 
  
 ### run instructions
  
