@@ -4,7 +4,7 @@ from base_folder.bot.modules.base.db_management import Db
 import discord.utils
 from base_folder.bot.config.Permissions import is_mod
 from base_folder.bot.config.config import build_embed
-from base_folder.bot.modules.tasker.tasker import deban
+
 
 
 class ModerationAdmin(commands.Cog):
