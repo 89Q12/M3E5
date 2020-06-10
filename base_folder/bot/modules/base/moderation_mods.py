@@ -1,21 +1,25 @@
+import datetime
 import discord
 from discord.ext import commands
 import discord.utils
-from base_folder.bot.config.Permissions import is_mod
+from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.bot.modules.tasker.tasker import demute
 from base_folder.bot.modules.base.db_management import Db
 
 
 class ModerationMod(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.db = Db(client)
 
     @commands.command(pass_context=True, brief="kicks a givien member")
     @commands.guild_only()
-    @is_mod()
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         if member is not None:
             e = build_embed(title="Approved!", author=self.client.user.name,
                             description=f"{member.mention} has been successfully kicked for {reason}")
@@ -33,9 +37,12 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="unbans a givien member")
     @commands.guild_only()
-    @commands.check_any(is_mod(), commands.is_owner())
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         if member == "":
             e = build_embed(title="Error!", author=self.client.user.name,
                             description=f"No member specified! Specify a user by writing his name without #tag")
@@ -56,43 +63,44 @@ class ModerationMod(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="clears a givien amount of messages")
-    @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def clear(self, ctx, arg):
         await ctx.channel.purge(limit=int(arg))
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         e = build_embed(title="Success!", author=self.client.user.name,
                         description=f"cleared: {arg} messages!")
         await ctx.channel.send(embed=e)
 
     @commands.command(pass_context=True, brief="mutes a user")
-    @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
-    async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=2):
+    async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=1):
         await ctx.channel.purge(limit=1)
-        role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
-        if not role:  # checks if there is muted role
-            try:  # creates muted role
-                muted = await ctx.guild.create_role(name="Muted", reason="To use for muting")
-                for channel in ctx.guild.channels:  # removes permission to view and send in the channels
-                    await channel.set_permissions(muted, send_messages=False,
-                                                  read_message_history=False,
-                                                  read_messages=False)
-            except discord.Forbidden:
-                return await ctx.send("I have no permissions to make a muted role")  # self-explainatory
-            await member.add_roles(muted)  # adds newly created muted role
-            await ctx.send(f"{member.mention} has been sent to hell for {reason}")
-            await demute(time, ctx, member)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
         else:
-            await member.add_roles(role)  # adds already existing muted role
-            await ctx.send(f"{member.mention} has been sent to hell for {reason}")
+            raise commands.errors.CheckFailure
+        muteduntil = ctx.message.created_at + datetime.timedelta(hours=time)
+        role = discord.utils.get(ctx.guild.roles, name="Muted")
+        e = build_embed(title="Approved!", author=self.client.user.name,
+                        description=f"{member.mention} was successfully muted for {reason} until {muteduntil}")
+        await member.add_roles(role)
+        await self.db.edit_muted_at(ctx.guild.id, member.id, ctx.message.created_at)
+        await self.db.muted_until(ctx.guild.id, member.id, muteduntil)
+        await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="mutes a user")
-    @is_mod()
     @commands.guild_only()
     async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
-        e = build_embed(title="Success!", author=self.client.user.name,
+        e = build_embed(title="Approved!", author=self.client.user.name,
                         description=f"{member.mention} was successfully muted for {reason}")
         if not role:  # checks if there is muted role
             try:  # creates muted role
@@ -114,10 +122,13 @@ class ModerationMod(commands.Cog):
     # TODO: make a log channel for the bot to log in e.g. slowmode etc
 
     @commands.command(pass_context=True, brief="enables slowmode with custom delay")
-    @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def slowmode(self, ctx, seconds: int = 0):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         if seconds > 120:
             return await ctx.send(":no_entry: Amount can't be over 120 seconds")
         if seconds == 0:
@@ -134,9 +145,12 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True,
                       brief="Show the color of role and how many user's the role have ")
-    @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def roleinfo(self, ctx, role: discord.Role = None):
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         await ctx.channel.purge(limit=1)
         counter = 0
         for user in self.client.get_all_members():
@@ -153,11 +167,16 @@ class ModerationMod(commands.Cog):
         e.add_field(name="Is mentionable", value=f"{role.mentionable}", inline=True)
         await ctx.send(embed=e)
 
+# TODO: umute send message convert to embed
+
     @commands.command(pass_context=True, brief="unmutes a user")
-    @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def unmute(self, ctx,  member: discord.Member = None):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         """Unmutes a muted user"""
         try:
             await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted"))  # removes muted role
@@ -169,6 +188,10 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def warn(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         db = Db(self.client)
         warnings = await db.get_warns(ctx.guild.id, member.id)
         if warnings == 0:
@@ -186,10 +209,13 @@ class ModerationMod(commands.Cog):
             await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="shows how many infractions a user has")
-    @commands.check_any(is_mod(), commands.is_owner())
     @commands.guild_only()
     async def infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         db = Db(self.client)
         warnings = await db.get_warns(ctx.guild.id, member.id)
         e = build_embed(title="Attention", author=self.client.user.name,

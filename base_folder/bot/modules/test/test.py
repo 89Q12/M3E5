@@ -6,12 +6,13 @@ import datetime
 class Test(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.sql = bot.sql
 
     @commands.command(brief="Test")
-    async def xx(self, ctx):
+    async def xx(self, ctx, arg: int):
         await ctx.channel.purge(limit=1)
-        await ctx.send("Hi")
+        await ctx.send(ctx.message.created_at)
+        muteduntil = ctx.message.created_at + datetime.timedelta(hours=arg)
+        await ctx.send(muteduntil)
         message = build_embed(author=self.bot.user.name, thumbnail=ctx.author.avatar_url,
                               footer=ctx.guild.name, image=ctx.guild.icon_url,
                               timestamp=datetime.datetime.now(), color=0x9a45ba)
