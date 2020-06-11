@@ -10,9 +10,9 @@ def token():
 
 def sql():
     mydb = mysql.connector.connect(
-      host="",
-      user="",
-      passwd="",
+      host="ds",
+      user=""d,
+      passwd="a",
       database='M3E5',
       auth_plugin='mysql_native_password'
     )
