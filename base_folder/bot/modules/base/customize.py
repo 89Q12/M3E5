@@ -1,7 +1,7 @@
 from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import *
+from queuing.db import *
 
 '''
 All commands that a guild team can use to customize the bot to there needs.
@@ -14,6 +14,7 @@ All commands that a guild team can use to customize the bot to there needs.
 class Custom(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.db = client.sql
 
     '''
     Custom settings
@@ -22,40 +23,42 @@ class Custom(commands.Cog):
     @commands.command(pass_context=True, brief="sets the welcome channel set_welcome channelid")
     @commands.guild_only()
     async def set_welcome(self, ctx, channel_id: int):
-        if await Auth(self.client, ctx).permissions() >= 3:
+        await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
             raise commands.errors.CheckFailure
         channel = self.client.get_channel(channel_id)
-        edit_settings_welcome.delay(ctx.guild.id, channel_id)
         e = build_embed(title="Success", author=self.client.user.name,
                         description=f"{channel.mention} is now the welcome channel")
         await ctx.send(embed=e)
+        edit_settings_welcome.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True, brief="sets the leave channel set_leave channel id")
     @commands.guild_only()
     async def set_leave(self, ctx, channel_id: int):
-        if await Auth(self.client, ctx).permissions() >= 3:
+        await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
             raise commands.errors.CheckFailure
         channel = self.client.get_channel(channel_id)
-        edit_settings_leave.delay(ctx.guild.id, channel_id)
         e = build_embed(title="Success", author=self.client.user.name,
                         description=f"{channel.mention} is now the leave channel")
         await ctx.send(embed=e)
+        edit_settings_leave.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True)
     async def prefix(self, ctx, arg):
-        if await Auth(self.client, ctx).permissions() >= 3:
+        await  ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
             raise commands.errors.CheckFailure
         e = build_embed(title="Success", author=self.client.user.name,
                         description=f"{arg} is now the bot prefix")
-        await ctx.channel.purge(limit=1)
-        set_prefix.delay(ctx.guild.id, arg)
         await ctx.send(embed=e)
+        set_prefix.delay(ctx.guild.id, arg)
 
 
 def setup(client):

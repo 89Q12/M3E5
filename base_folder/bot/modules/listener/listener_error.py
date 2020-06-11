@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import on_error
+from queuing.db import on_error
 
 
 class ErrorHandler(commands.Cog):
@@ -46,11 +46,11 @@ class ErrorHandler(commands.Cog):
                 pass
             return
 
-        on_error.delay(ctx.guild.id, ex)
         e = build_embed(title="Error!", author=self.client.user.name,
                         description="Something is totally wrong here in the M3E5 land "
                                     "I will open issue at my creator's bridge")
-        await ctx.send(embed=e)
+        await ctx.send(ex)
+        on_error.delay(ctx.guild.id, str(ex))
 
 
 def setup(client):

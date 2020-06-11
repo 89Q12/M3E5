@@ -2,12 +2,14 @@ import discord
 from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import *
+from base_folder.bot.modules.base.get_from_db import Db
+from queuing.db import *
 
 
 class Dev(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.db = Db(client)
 
     @commands.command(pass_context=True, brief="unloads a module")
     async def unload(self, ctx, cog: str):
@@ -74,10 +76,7 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        try:
-            initialize_all.delay(ctx.guild.id)
-        except Exception:
-            pass
+        initialize_all.delay(ctx.guild.id)
         for user in ctx.guild.members:
             is_user_indb.delay(user.name, user.id, ctx.guild.id)
         for i in ctx.guild.roles:
@@ -107,9 +106,8 @@ class Dev(commands.Cog):
         else:
             raise commands.errors.CheckFailure
         guild_id = ctx.guild.id
-        roles = roles_from_db.delay(guild_id)
-        r = roles.get()
-        await ctx.send(str(r) + f" {ctx.author.mention}")
+        roles = await self.db.roles_from_db(guild_id)
+        await ctx.send(str(roles) + f" {ctx.author.mention}")
 
     @commands.command(pass_context=True, brief="sets default role set_default @role")
     @commands.guild_only()
@@ -132,10 +130,10 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        edit_settings_role.delay(ctx.guild.id, role.id, "admin_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the admin role")
         await ctx.send(embed=e)
+        edit_settings_role.delay(ctx.guild.id, role.id, "admin_role_id")
 
     @commands.command(pass_context=True, brief="sets dev rule set_dev @role")
     @commands.guild_only()
@@ -145,10 +143,10 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        edit_settings_role.delay(ctx.guild.id, role.id, "dev_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the dev role")
         await ctx.send(embed=e)
+        edit_settings_role.delay(ctx.guild.id, role.id, "dev_role_id")
 
     @commands.command(pass_context=True, brief="sets mod rule set_mod @role")
     @commands.guild_only()
@@ -158,10 +156,10 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        edit_settings_role.delay(ctx.guild.id, role.id, "mod_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the mod role")
         await ctx.send(embed=e)
+        edit_settings_role.delay(ctx.guild.id, role.id, "mod_role_id")
 
 
 def setup(client):

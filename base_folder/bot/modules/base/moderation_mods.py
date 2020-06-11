@@ -4,18 +4,20 @@ from discord.ext import commands
 import discord.utils
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import *
+from base_folder.bot.modules.base.get_from_db import Db
+from queuing.db import *
 
 
 class ModerationMod(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.db = Db(client)
 
     @commands.command(pass_context=True, brief="kicks a givien member")
     @commands.guild_only()
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -38,7 +40,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -65,7 +67,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def clear(self, ctx, arg):
         await ctx.channel.purge(limit=int(arg))
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -77,7 +79,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=1):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -86,15 +88,15 @@ class ModerationMod(commands.Cog):
         e = build_embed(title="Approved!", author=self.client.user.name,
                         description=f"{member.mention} was successfully muted for {reason} until {muteduntil}")
         await member.add_roles(role)
+        await ctx.send(embed=e)
         edit_muted_at.delay(ctx.guild.id, member.id, ctx.message.created_at)
         muted_until.delay(ctx.guild.id, member.id, muteduntil)
-        await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.guild_only()
     async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -124,7 +126,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def slowmode(self, ctx, seconds: int = 0):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -146,7 +148,7 @@ class ModerationMod(commands.Cog):
                       brief="Show the color of role and how many user's the role have ")
     @commands.guild_only()
     async def roleinfo(self, ctx, role: discord.Role = None):
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -172,7 +174,7 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def unmute(self, ctx,  member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
@@ -187,14 +189,14 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def warn(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
-        warnings = get_warns.delay(ctx.guild.id, member.id)
+        warnings = await self.db.get_warns(ctx.guild.id, member.id)
         if warnings == 0:
             amount = 1
-            await edit_warns.delay(ctx.guild.id, member.id, amount)
+            edit_warns.delay(ctx.guild.id, member.id, amount)
             e = build_embed(title="Attention", author=self.client.user.name,
                             description=f"{member.mention} you have been warned this is your first "
                                         f"infraction keep it at this")
@@ -203,20 +205,20 @@ class ModerationMod(commands.Cog):
             warnings += 1
             e = build_embed(title="Attention", author=self.client.user.name,
                             description=f"{member.mention} you have been warned, you have now {warnings} warning(s)")
-            await edit_warns.delay(ctx.guild.id, member.id, warnings)
+            edit_warns.delay(ctx.guild.id, member.id, warnings)
             await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="shows how many infractions a user has")
     @commands.guild_only()
     async def infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        if await Auth(self.client, ctx).permissions() >= 2:
+        if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
             raise commands.errors.CheckFailure
-        warnings = get_warns.delay(ctx.guild.id, member.id)
+        warnings = await self.db.get_warns(ctx.guild.id, member.id)
         e = build_embed(title="Attention", author=self.client.user.name,
-                        description=f"{member.mention} Has {warnings.get()} infraction(s)!")
+                        description=f"{member.mention} Has {warnings} infraction(s)!")
         await ctx.send(embed=e)
 
 
