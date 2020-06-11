@@ -1,16 +1,21 @@
-# M3E5
+# About
+
+## M3E5
 M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works. 
 If you have any questions or you want to see the bot in action join this [discord](https://discord.gg/GWJ6Jeg)
 
-# Why the name?
+## Why the name?
 
 I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique bot with tons of unique features.<br>
 Like a real AI and an home assistant like Alexa.
 
-# Things that are working right now
+# Planned features
+
+![Status](https://img.shields.io/badge/status-completed-green.svg)
+
 - Discord bot base
   - the standard prefix is - but it's changeable with -prefix arg 
-  - basic commands
+  - basic Moderation commands
     - Ban
     - unban
     - kick
@@ -18,8 +23,6 @@ Like a real AI and an home assistant like Alexa.
     - mute/unmute
     - giving someone a role e.g. .give_role @someone @some_role
     - info about a role: how many users the role have and permissions
-    - Tempban  but not great implemented
-    - Tempmute but not great implemented
     - warn 
     - infractions
     - clear infractions
@@ -30,28 +33,21 @@ Like a real AI and an home assistant like Alexa.
   - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
-  - the permissionsystem is currently not working, so you need to set the role id's in permissions.py
   - levelsystem is now working(text based)
+  - basic permission system
 - Chatbot 
   - currently trainning but I'm halfway through it
+  
 
-# Critical bugs
-
-- None by that I mean I haven't found any xD
-
-# Planned features
-
-I guess it's too much but I will just work my way through all of them :D
+![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
+  - Tempbn/mute will be ready as soon as I have the celery implemention ready
   - Multi server bot but for now it will be single server only so you have to change some things
-  - Moderation features e.g. muting people etc
-  - Auto roles
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
-  - Level system
-  - Auto task
-  - Alerts for various services like Twitch 
+  - Auto tasks
+  - Alerts for various services like Twitch and reddit
   - Music player
   - custom messaging design 
   - Logging Channels to a database
@@ -59,6 +55,8 @@ I guess it's too much but I will just work my way through all of them :D
   - Home assistant integration
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
+  - Advanced permission system, that ueses groups of accepted roles and banned roles per command
+  - celery as queuing system, the brocker will be redis. With the bot becomes scaleable and background tasks get easier to manage
 - Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
@@ -68,12 +66,17 @@ I guess it's too much but I will just work my way through all of them :D
   - Discord bridge
   - Seamless ai bridge 
   - Disabling a few commands that aren't needed e.g. play a song on youtube, because this gets handeld by the bot
+ 
+# Critical bugs
+
+  - the permissionsystem is currently not working, so you need to set the role id's in permissions.py
+  - Not enough in the code comments D: hehe
   
- # Install instructions 
+# Install instructions 
  
- I will add them as soon as I have time to make an docker img
+ I'm working on an docker img infrastructure but atm follow the run instructions 
  
- ### run instructions
+### run instructions
  
  Clone the repo and install requirements and setup a mysql server with the database file I uploaded. 
  In the config you need to paste your bot token, then you can run main.py. 
@@ -85,7 +88,6 @@ I guess it's too much but I will just work my way through all of them :D
  - .set_dev  @role
  - .set_mod  @role
  - .set_admin  @role
- - open the bot.db and edit the settings_{guild.id} table and set your welcome and leave channel
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
  
@@ -102,10 +104,6 @@ As I stated earlier I'm using Google's nmt but a modified version by [daniel-kuk
 All credits for the chatbot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
 
 # Examples
-
-Below you will find some examples.
-
-
 ## Here are some examples of the chatbot:
 
 Question: Can you sing me a song?

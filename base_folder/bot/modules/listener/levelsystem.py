@@ -58,5 +58,6 @@ class Levelsystem(commands.Cog):
             update_text_lvl.delay(ctx.guild.id, ctx.author.id, lvl_end)
 
 
+
 def setup(client):
     client.add_cog(Levelsystem(client))

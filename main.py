@@ -37,4 +37,3 @@ for extension in extensions:
         exc = '{}: {}'.format(type(e).__name__, e)
         print('Failed to load extension {}\n{}'.format(extension, exc))
 client.run(token())
-
