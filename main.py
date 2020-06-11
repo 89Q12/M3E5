@@ -1,19 +1,14 @@
-import discord
 from discord.ext import commands
-import base_folder.bot.logger
 from base_folder.bot.config.config import token
 from base_folder.bot.config.config import sql
-from base_folder.bot.config.Permissions import Auth
-from base_folder.bot.modules.base.db_management import Db
-from base_folder.tasks import add
+from base_folder.bot.modules.base.get_from_db import Db
 import base64
 
 
 def prefix(client, ctx):
     db = Db(client)
-    r = add.delay(db,ctx.guild.id)
-    pre = (base64.b64decode(str(r.get()).encode("utf8"))).decode("utf8")
-    r.forget()
+    r = db.prefix_lookup(ctx.guild.id)
+    pre = (base64.b64decode(str(r).encode("utf8"))).decode("utf8")
     return pre
 
 

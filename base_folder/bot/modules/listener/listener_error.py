@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from base_folder.bot.config.config import build_embed, sql
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.bot.config.config import build_embed
+from queuing.db import on_error
 
 
 class ErrorHandler(commands.Cog):
@@ -10,8 +10,6 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, ex):
-        db = Db(self.client)
-
         if hasattr(ctx.command, 'on_error'):
             return
 
@@ -48,11 +46,11 @@ class ErrorHandler(commands.Cog):
                 pass
             return
 
-        await db.on_error(ctx.guild.id, ex)
         e = build_embed(title="Error!", author=self.client.user.name,
                         description="Something is totally wrong here in the M3E5 land "
                                     "I will open issue at my creator's bridge")
-        await ctx.send(embed=e)
+        await ctx.send(ex)
+        on_error.delay(ctx.guild.id, str(ex))
 
 
 def setup(client):

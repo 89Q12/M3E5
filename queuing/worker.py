@@ -1,7 +1,7 @@
 from celery import Celery, Task
 
-app = Celery('base_folder', include=['base_folder.tasks'])
-app.config_from_object('base_folder.celeryconfig')
+app = Celery('queuing', include=['queuing.db'])
+app.config_from_object('queuing.celeryconfig')
 
 # Optional configuration, see the application user guide.
 app.conf.update(

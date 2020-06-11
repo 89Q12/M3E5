@@ -1,37 +1,41 @@
-from base_folder.bot.modules.base.db_management import Db
-
+from base_folder.bot.modules.base.get_from_db import Db
 # TODO: Rewrite the permission system so that it uses groups with permissions instead of roles v1.1
 
 
 class Auth(object):
     def __init__(self, client, ctx):
-        self.client = client
-        self.db = Db(client)
         self.ctx = ctx
+        self.db = Db(client)
 
     async def is_dev(self):
         guild_id = self.ctx.guild.id
         dev = await self.db.get_settings_role(guild_id, "dev_role_id")
+        if await self.guild_owner():
+            return 4
         for r in self.ctx.author.roles:
             if r.id == dev:
-                return True
-        return False
+                return 1
+        return 0
 
     async def is_mod(self):
         guild_id = self.ctx.guild.id
         mod = await self.db.get_settings_role(guild_id, "mod_role_id")
+        if await self.guild_owner():
+            return 4
         for r in self.ctx.author.roles:
             if r.id == mod:
-                return True
-        return False
+                return 2
+        return 0
 
     async def is_admin(self):
         guild_id = self.ctx.guild.id
         admin = await self.db.get_settings_role(guild_id, "admin_role_id")
+        if await self.guild_owner():
+            return 4
         for r in self.ctx.author.roles:
             if r.id == admin:
-                return True
-        return False
+                return 3
+        return 0
 
     async def guild_owner(self):
         if self.ctx.guild.owner_id == self.ctx.author.id:
