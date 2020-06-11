@@ -56,7 +56,7 @@ Like a real AI and an home assistant like Alexa.
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
-  - celery as queuing system, the brocker will be redis. With the bot becomes scaleable and background tasks get easier to manage
+  - celery as queuing system, the brocker will be redis. With that the bot becomes scaleable and background tasks get easier to manage
 - Chatbot features
   - Answers to messages like a real human 
   - Discord bridge 
