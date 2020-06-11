@@ -4,8 +4,8 @@ from .worker import app, Task
 from base_folder.bot.config.config import sql
 
 
-@app.task(ignore_result=False)
-def add(guild_id):
+@app.task(ignore_result=True)
+def test(guild_id):
     conn = sql()
     c = conn.cursor()
     c.execute(f"SELECT prefix FROM settings WHERE guild_id = '{guild_id}'")
@@ -28,15 +28,15 @@ class DatabaseTask(Task, ABC):
         return self._db
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def initialize_all(guild_id):
     initialize_guilds(guild_id)
     initialize_settings(guild_id)
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def initialize_guilds(guild_id):
-    conn = sql()
+    conn = initialize_guilds.db
     c = conn.cursor()
     c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
     conn.commit()
@@ -44,9 +44,9 @@ def initialize_guilds(guild_id):
     return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def initialize_settings(guild_id):
-    conn = sql()
+    conn = initialize_settings.db
     c = conn.cursor()
     c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
     conn.commit()
@@ -59,25 +59,25 @@ General per guild settings
 '''
 
 
-@app.task(base=DatabaseTask)
-def is_user_indb(user, user_id, guild_id):
+@app.task(base=DatabaseTask, ignore_result=True)
+def is_user_indb(user_name, user_id, guild_id):
     # Checks if a given user is in the db else writes it in the db
-    conn = sql()
+    conn = is_user_indb.db
     c = conn.cursor()
     c.execute(f"SELECT user_id FROM user_info WHERE user_id ={user_id} and guild_id={guild_id}")
-    u = c.fetchone()
-    if u is None:
+    user = c.fetchone()
+    if user is None:
         c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
-                  f"VALUES ('{str(user)} ', '{str(user_id)}', '{str(guild_id)}')")
+                  f"VALUES ('{str(user_name)} ', '{str(user_id)}', '{str(guild_id)}')")
         conn.commit()
         c.close()
     else:
         return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def on_error(guild_id, error):
-    conn = sql()
+    conn = on_error.db
     c = conn.cursor()
     error = (base64.b64encode(str(error).encode("utf8"))).decode("utf8")
     c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', '{error}')")
@@ -86,9 +86,9 @@ def on_error(guild_id, error):
     return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def insert_message(guild_id, user_id, message, time):
-    conn = sql()
+    conn = insert_message.db
     c = conn.cursor()
     message = (base64.b64encode(str(message).encode("utf8"))).decode("utf8")
     c.execute(f"INSERT into messages (guild_id, user_id, message, time) "
@@ -100,7 +100,7 @@ def insert_message(guild_id, user_id, message, time):
 
 @app.task(base=DatabaseTask)
 def prefix_lookup(guild_id):
-    conn = sql()
+    conn = prefix_lookup.db
     c = conn.cursor()
     c.execute(f"SELECT prefix FROM settings WHERE guild_id = {guild_id}")
     prefix = c.fetchone()
@@ -108,9 +108,9 @@ def prefix_lookup(guild_id):
     return prefix[0]
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def set_prefix(guild_id, prefix):
-    conn = sql()
+    conn = set_prefix.db
     c = conn.cursor()
     prefix = (base64.b64encode(str(prefix).encode("utf8"))).decode("utf8")
     c.execute(f"UPDATE settings SET prefix='{prefix}' WHERE guild_id ={guild_id}")
@@ -122,7 +122,7 @@ def set_prefix(guild_id, prefix):
 @app.task(base=DatabaseTask)
 def get_warns(guild_id, user_id):
     # returns the number of warnings a user has
-    conn = sql()
+    conn = get_warns.db
     c = conn.cursor()
     c.execute("SELECT warnings FROM user_info WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -131,10 +131,10 @@ def get_warns(guild_id, user_id):
     return warnings[0]
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_warns(guild_id, user_id, amount):
     # sets warn with given amount
-    conn = sql()
+    conn = edit_warns.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET warnings={str(amount)} WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -143,9 +143,9 @@ def edit_warns(guild_id, user_id, amount):
     return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_muted_at(guild_id, user_id, date):
-    conn = sql()
+    conn = edit_muted_at.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET muted_at='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -157,7 +157,7 @@ def edit_muted_at(guild_id, user_id, date):
 @app.task(base=DatabaseTask)
 def get_muted_at(guild_id, user_id):
     # returns the number of warnings a user has
-    conn = sql()
+    conn = get_muted_at.db
     c = conn.cursor()
     c.execute("SELECT muted_at FROM user_info WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -166,19 +166,20 @@ def get_muted_at(guild_id, user_id):
     return warnings[0]
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def muted_until(guild_id, user_id, date):
-    conn = sql()
+    conn = muted_until.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET muted_until='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
+    return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_banned_at(guild_id, user_id, date):
-    conn = sql()
+    conn = edit_banned_at.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET banned_at='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -190,7 +191,7 @@ def edit_banned_at(guild_id, user_id, date):
 @app.task(base=DatabaseTask)
 def get_banned_at(guild_id, user_id):
     # returns the number of warnings a user has
-    conn = sql()
+    conn = get_banned_at.db
     c = conn.cursor()
     c.execute("SELECT banned_at FROM user_info WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -199,9 +200,9 @@ def get_banned_at(guild_id, user_id):
     return warnings[0]
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def banned_until(guild_id, user_id, date):
-    conn = sql()
+    conn = banned_until.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET banned_until='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -214,10 +215,10 @@ Role settings
 '''
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def roles_to_db(guild_id, role_name, role_id):
     # Checks if a given role is in the db else writes it in the db
-    conn = sql()
+    conn = roles_to_db.db
     c = conn.cursor()
     c.execute(f"SELECT role_id FROM roles WHERE role_id={str(role_id)} and guild_id={str(guild_id)}")
     sq = c.fetchone()
@@ -233,7 +234,7 @@ def roles_to_db(guild_id, role_name, role_id):
 @app.task(base=DatabaseTask)
 def roles_from_db(guild_id):
     # returns a tuple with all role name's and id's
-    conn = sql()
+    conn = roles_from_db.db
     c = conn.cursor()
     c.execute(f"SELECT role_id, role_name FROM roles WHERE guild_id={str(guild_id)}")
     roles = c.fetchall()
@@ -241,9 +242,9 @@ def roles_from_db(guild_id):
     return roles
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def remove_role(guild_id, role_id):
-    conn = sql()
+    conn = remove_role.db
     c = conn.cursor()
     c.execute(f"DELETE FROM roles WHERE role_id = {role_id} and guild_id = {guild_id}")
     conn.commit()
@@ -251,10 +252,10 @@ def remove_role(guild_id, role_id):
     return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_role(guild_id, role_id, field_name):
     # Let's you set roles e.g. mod role
-    conn = sql()
+    conn = edit_settings_role.db
     c = conn.cursor()
     c.execute(f"INSERT INTO settings (guild_id,{field_name}) VALUES ('{guild_id}','{role_id}')"
               f"ON DUPLICATE KEY UPDATE {field_name}='{role_id}'")
@@ -267,7 +268,7 @@ def edit_settings_role(guild_id, role_id, field_name):
 def get_role(guild_id, role_id):
     #  returns a role name when a role id is given
     # errors out when role id is none bruh
-    conn = sql()
+    conn = get_role.db
     c = conn.cursor()
     c.execute(f"SELECT role_name FROM roles WHERE role_id={str(role_id)} "
               f"and guild_id ={guild_id};")
@@ -279,7 +280,7 @@ def get_role(guild_id, role_id):
 def get_settings_role(guild_id, field_name):
     #  returns a role name
     # errors out when  field_name is none bruh
-    conn = sql()
+    conn =  get_settings_role.db
     c = conn.cursor()
     c.execute(f"SELECT {str(field_name)} FROM settings WHERE guild_id={str(guild_id)}")
     role_id = c.fetchone()
@@ -294,10 +295,10 @@ Channel settings and warning settings
 '''
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_welcome(guild_id, channel_id):
     # sets the welcome_channel to the given channel id
-    conn = sql()
+    conn = edit_settings_welcome.db
     c = conn.cursor()
     c.execute(f"UPDATE settings SET welcome_channel_id={str(channel_id)} WHERE guild_id = {guild_id}")
     conn.commit()
@@ -305,10 +306,10 @@ def edit_settings_welcome(guild_id, channel_id):
     return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_leave(guild_id, channel_id):
     # sets the leave_channel to the given channel id
-    conn = sql()
+    conn = edit_settings_leave.db
     c = conn.cursor()
     c.execute(f"UPDATE settings SET leave_channel_id ={str(channel_id)}"
               f"WHERE guild_id = {guild_id}")
@@ -320,7 +321,7 @@ def edit_settings_leave(guild_id, channel_id):
 @app.task(base=DatabaseTask)
 def get_welcome_channel(guild_id):
     # returns the  welcome channel
-    conn = sql()
+    conn = get_welcome_channel.db
     c = conn.cursor()
     c.execute(f"SELECT welcome_channel_id FROM settings WHERE guild_id={str(guild_id)}")
     welcome_channel = c.fetchone()
@@ -334,7 +335,7 @@ def get_welcome_channel(guild_id):
 @app.task(base=DatabaseTask)
 def get_leave_channel(guild_id):
     # returns the leave channel
-    conn = sql()
+    conn = get_leave_channel.db
     c = conn.cursor()
     c.execute(f"SELECT leave_channel_id FROM settings WHERE guild_id={str(guild_id)}")
     leave_channel = c.fetchone()
@@ -352,11 +353,11 @@ Welcomeimg
 '''
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_img(guild_id, img):
     # Unused for now but it will be used for the welcome image function
     # sets the column imgwelcome to 1/enabled or 0/disabled
-    conn = sql()
+    conn = edit_settings_img.db
     c = conn.cursor()
     c.execute(f"UPDATE settings SET imgwelcome_toggle={str(img)} WHERE guild_id={str(guild_id)}")
     conn.commit()
@@ -364,11 +365,11 @@ def edit_settings_img(guild_id, img):
     return
 
 
-@app.task(base=DatabaseTask)
-def edit_settings_img_text(self, guild_id, img="Welcome {0.mention} to {1}!"):
+@app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_img_text(guild_id, img="Welcome {0.mention} to {1}!"):
     # Unused for now but it will be used for the welcome image function
     # sets the message text in the column imgwelcome_text to what ever you enter
-    conn = sql()
+    conn = edit_settings_img_text.db
     c = conn.cursor()
     c.execute(f"UPDATE settings SET imgwelcome_text={str(img)} WHERE guild_id={str(guild_id)}")
     conn.commit()
@@ -378,7 +379,7 @@ def edit_settings_img_text(self, guild_id, img="Welcome {0.mention} to {1}!"):
 
 @app.task(base=DatabaseTask)
 def get_img(guild_id):
-    conn = sql()
+    conn = get_img.db
     c = conn.cursor()
     c.execute(f"SELECT imgwelcome_toggle FROM settings WHERE guild_id={str(guild_id)};")
     img = c.fetchone()
@@ -388,7 +389,7 @@ def get_img(guild_id):
 
 @app.task(base=DatabaseTask)
 def get_img_text(guild_id):
-    conn = sql()
+    conn = get_img_text.db
     c = conn.cursor()
     c.execute(f"SELECT imgwelcome_text FROM settings WHERE guild_id={str(guild_id)};")
     text = c.fetchone()
@@ -403,10 +404,10 @@ Level system
 '''
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def update_xp_text(guild_id, user_id, amount):
     # updates the xp amount for a given user
-    conn = sql()
+    conn = update_xp_text.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} a"
               f"nd guild_id={str(guild_id)};")
@@ -418,7 +419,7 @@ def update_xp_text(guild_id, user_id, amount):
 @app.task(base=DatabaseTask)
 def get_text_xp(guild_id, user_id):
     # returns the xp amount for a given user
-    conn = sql()
+    conn = get_text_xp.db
     c = conn.cursor()
     c.execute("SELECT text_xp FROM user_info WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -430,22 +431,19 @@ def get_text_xp(guild_id, user_id):
 @app.task(base=DatabaseTask)
 def get_lvl_text(guild_id, user_id):
     # returns the text lvl  amount for a given user
-    conn = sql()
+    conn = get_lvl_text.db
     c = conn.cursor()
     c.execute("SELECT text_lvl FROM user_info WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     lvl = c.fetchone()
     c.close()
-    if lvl is None:
-        return None
-    else:
-        return lvl[0]
+    return lvl[0]
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def update_text_lvl(guild_id, user_id, amount=1):
     # updates the text lvl for a given user
-    conn = sql()
+    conn = update_text_lvl.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET text_lvl = {str(amount)}  WHERE user_id ="
               f"{str(user_id)} and guild_id={str(guild_id)}")
@@ -454,11 +452,11 @@ def update_text_lvl(guild_id, user_id, amount=1):
     return
 
 
-@app.task(base=DatabaseTask)
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_levelsystem(guild_id, toggler):
     # Unused for now but it will be used for the welcome image function
     # sets the column level system to 1/enabled or 0/disabled
-    conn = sql()
+    conn = edit_settings_levelsystem.db
     c = conn.cursor()
     c.execute(f"UPDATE settings SET levelsystem_toggle= {str(toggler)} WHERE guild_id={guild_id}")
     conn.commit()
