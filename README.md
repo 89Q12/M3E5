@@ -1,6 +1,5 @@
 # About
 
-## M3E5
 M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works. I try my best to program this bot with focus on perfomance and scalability.
 
 If you have any questions or you want to see the bot in action join this [discord](https://discord.gg/GWJ6Jeg)
