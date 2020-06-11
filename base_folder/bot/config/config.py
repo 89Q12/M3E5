@@ -5,14 +5,14 @@ import discord.embeds
 
 
 def token():
-    return "NjY0MTc3MDI4MTE5MDAzMTM2.Xtajaw.O5pAKBmqZZuMY39Fzih60WYovgw"
+    return ardaf
 
 
 def sql():
     mydb = mysql.connector.connect(
-      host="xamh.de",
-      user="zofi",
-      passwd="brdfat65mc",
+      host="",
+      user="",
+      passwd="",
       database='M3E5',
       auth_plugin='mysql_native_password'
     )
