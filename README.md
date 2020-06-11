@@ -26,6 +26,7 @@ Like a real AI and an home assistant like Alexa.
     - warn 
     - infractions
     - clear infractions
+    - info about a role
   - Welcome image
   - db connection
   - Auto roles
@@ -42,7 +43,8 @@ Like a real AI and an home assistant like Alexa.
 ![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
-  - Tempbn/mute will be ready as soon as I have the celery implemention ready
+  - Tempban/mute will be ready as soon as I have the celery implemention ready
+  - lock/unlock a specific channel for specific roles 
   - Multi server bot but for now it will be single server only so you have to change some things
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
