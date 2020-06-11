@@ -1,0 +1,25 @@
+groupname: test
+    settings:
+        -default
+        uses:
+            - tst
+            dsfkpnmgdksonfgküoje
+            sfg
+            sdf
+            g
+            df
+            gdsf
+
+    permissions:
+        - admin
+        - da
+        - d
+groupname: x
+    settings:
+        -default
+        uses:
+           -d
+    permissions:
+        - mod
+        - ds
+        - dev

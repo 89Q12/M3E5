@@ -13,6 +13,7 @@ def prefix(client, ctx):
     db = Db(client)
     r = add.delay(db,ctx.guild.id)
     pre = (base64.b64decode(str(r.get()).encode("utf8"))).decode("utf8")
+    r.forget()
     return pre
 
 
