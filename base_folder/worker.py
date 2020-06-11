@@ -1,8 +1,6 @@
-from __future__ import absolute_import, unicode_literals
+from celery import Celery, Task
 
-from celery import Celery
-
-app = Celery('task')
+app = Celery('base_folder', include=['base_folder.tasks'])
 app.config_from_object('base_folder.celeryconfig')
 
 # Optional configuration, see the application user guide.

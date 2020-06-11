@@ -1,6 +1,5 @@
-from base_folder.tasks import get_levelsystem, add
+from base_folder.tasks import get_levelsystem, add, prefix_lookup
 
-r = add.delay(715131657107144724)
+r = prefix_lookup.delay(715131657107144724)
 print(r.status)
-
-r.forget()
+print(r.get())

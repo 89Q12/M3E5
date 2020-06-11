@@ -1,14 +1,10 @@
 import base64
-
-
-from celery import Celery, Task
+from abc import ABC
+from .worker import app, Task
 from base_folder.bot.config.config import sql
 
-app = Celery('tasks')
-app.config_from_object('base_folder.celeryconfig')
 
-
-@app.task
+@app.task(ignore_result=False)
 def add(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -22,7 +18,7 @@ Initialize the tables
 '''
 
 
-class DatabaseTask(Task):
+class DatabaseTask(Task, ABC):
     _db = None
 
     @property
