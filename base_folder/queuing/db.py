@@ -1,16 +1,7 @@
 import base64
 from abc import ABC
-from .worker import app, Task
+from base_folder.queuing.worker import app, Task
 from base_folder.bot.config.config import sql
-
-
-@app.task(ignore_result=True)
-def test(guild_id):
-    conn = sql()
-    c = conn.cursor()
-    c.execute(f"SELECT prefix FROM settings WHERE guild_id = '{guild_id}'")
-    x = c.fetchone()
-    return x[0]
 
 
 '''

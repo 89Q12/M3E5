@@ -1,17 +1,16 @@
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.queuing.db import get_settings_role
 
 # TODO: Rewrite the permission system so that it uses groups with permissions instead of roles v1.1
 
 
 class Auth(object):
     def __init__(self, client, ctx):
-        self.client = client
-        self.db = Db(client)
         self.ctx = ctx
 
     async def is_dev(self):
         guild_id = self.ctx.guild.id
-        dev = await self.db.get_settings_role(guild_id, "dev_role_id")
+        id = get_settings_role.delay(guild_id, "dev_role_id")
+        dev = id.get()
         for r in self.ctx.author.roles:
             if r.id == dev:
                 return True
@@ -19,7 +18,8 @@ class Auth(object):
 
     async def is_mod(self):
         guild_id = self.ctx.guild.id
-        mod = await self.db.get_settings_role(guild_id, "mod_role_id")
+        id = get_settings_role.delay(guild_id, "mod_role_id")
+        mod = id.get()
         for r in self.ctx.author.roles:
             if r.id == mod:
                 return True
@@ -27,7 +27,8 @@ class Auth(object):
 
     async def is_admin(self):
         guild_id = self.ctx.guild.id
-        admin = await self.db.get_settings_role(guild_id, "admin_role_id")
+        id = get_settings_role.delay(guild_id, "admin_role_id")
+        admin = id.get()
         for r in self.ctx.author.roles:
             if r.id == admin:
                 return True

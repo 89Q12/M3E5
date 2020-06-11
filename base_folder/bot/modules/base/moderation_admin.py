@@ -1,6 +1,6 @@
 import datetime
 from discord.ext import commands
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.queuing.db import *
 import discord.utils
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
@@ -9,7 +9,6 @@ from base_folder.bot.config.config import build_embed
 class ModerationAdmin(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.db = Db(client)
 
     @commands.command(pass_context=True, brief="gives a member a role( @role, @member)")
     @commands.guild_only()
@@ -38,6 +37,7 @@ class ModerationAdmin(commands.Cog):
                                         f"If you think this is wrong then message an admin but shit happens"
                                         f" when you don't have the name.")
             await ctx.guild.ban(member, reason=reason)
+            edit_banned_at.delay(ctx.message.created_at)
             await member.send(embed=e)
             e = build_embed(title="Approved", author=self.client.user.name,
                             description=f"{member.mention} has been successfully banned for {reason}.")
@@ -47,7 +47,7 @@ class ModerationAdmin(commands.Cog):
                             description=f"You need to specify an member")
             await ctx.send(embed=e)
 
-    @commands.command(pass_context=True,brief="bans a given member for a time ( in hours), ban @member time e.g. 2 ")
+    @commands.command(pass_context=True, brief="bans a given member for a time ( in hours), ban @member time e.g. 2 ")
     @commands.guild_only()
     async def tempban(self, ctx, member: discord.Member = None, reason=None, time=2):
         await ctx.channel.purge(limit=1)
@@ -60,8 +60,8 @@ class ModerationAdmin(commands.Cog):
             banneduntil = ctx.message.created_at + datetime.timedelta(hours=time)
             e = build_embed(title="Success!", author=self.client.user.name,
                             description=f"{member.mention} was successfully banned for {reason}, until {banneduntil}")
-            await self.db.edit_banned_at(ctx.guild.id, member.id, ctx.message.created_at)
-            await self.db.banned_until(ctx.guild.id, member.id, banneduntil)
+            edit_banned_at.delay(ctx.guild.id, member.id, ctx.message.created_at)
+            banned_until.delay(ctx.guild.id, member.id, banneduntil)
             await ctx.send(embed=e)
             e = build_embed(title="Approved!", author=self.client.user.name,
                             description=f"You have been banned from {ctx.guild.name} for {reason}."
@@ -77,10 +77,10 @@ class ModerationAdmin(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        warnings = await self.db.get_warns(ctx.guild.id, member.id)
-        await self.db.edit_warns(ctx.guild.id, member.id, 0)
+        warnings = get_warns.delay(ctx.guild.id, member.id)
+        edit_warns.delay(ctx.guild.id, member.id, 0)
         e = build_embed(author=self.client.user.name, title="Infractions cleared!",
-                        description=f"{member} Had {warnings} infractions but now {member} has 0!",
+                        description=f"{member} Had {warnings.get()} infractions but now {member} has 0!",
                         author_url=member.avatar_url, timestamp=datetime.datetime.now(),
                         )
         await ctx.send(embed=e)

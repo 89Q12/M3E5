@@ -1,7 +1,7 @@
 from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.queuing.db import *
 
 '''
 All commands that a guild team can use to customize the bot to there needs.
@@ -26,9 +26,8 @@ class Custom(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
         channel = self.client.get_channel(channel_id)
-        await db.edit_settings_welcome(ctx.guild.id, channel_id)
+        edit_settings_welcome.delay(ctx.guild.id, channel_id)
         e = build_embed(title="Success", author=self.client.user.name,
                         description=f"{channel.mention} is now the welcome channel")
         await ctx.send(embed=e)
@@ -40,9 +39,8 @@ class Custom(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
         channel = self.client.get_channel(channel_id)
-        await db.edit_settings_leave(ctx.guild.id, channel_id)
+        edit_settings_leave.delay(ctx.guild.id, channel_id)
         e = build_embed(title="Success", author=self.client.user.name,
                         description=f"{channel.mention} is now the leave channel")
         await ctx.send(embed=e)
@@ -53,11 +51,10 @@ class Custom(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
         e = build_embed(title="Success", author=self.client.user.name,
                         description=f"{arg} is now the bot prefix")
         await ctx.channel.purge(limit=1)
-        await db.set_prefix(ctx.guild.id, arg)
+        set_prefix.delay(ctx.guild.id, arg)
         await ctx.send(embed=e)
 
 

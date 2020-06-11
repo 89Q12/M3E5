@@ -4,13 +4,12 @@ from discord.ext import commands
 import discord.utils
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.queuing.db import *
 
 
 class ModerationMod(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.db = Db(client)
 
     @commands.command(pass_context=True, brief="kicks a givien member")
     @commands.guild_only()
@@ -87,8 +86,8 @@ class ModerationMod(commands.Cog):
         e = build_embed(title="Approved!", author=self.client.user.name,
                         description=f"{member.mention} was successfully muted for {reason} until {muteduntil}")
         await member.add_roles(role)
-        await self.db.edit_muted_at(ctx.guild.id, member.id, ctx.message.created_at)
-        await self.db.muted_until(ctx.guild.id, member.id, muteduntil)
+        edit_muted_at.delay(ctx.guild.id, member.id, ctx.message.created_at)
+        muted_until.delay(ctx.guild.id, member.id, muteduntil)
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="mutes a user")
@@ -192,11 +191,10 @@ class ModerationMod(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
-        warnings = await db.get_warns(ctx.guild.id, member.id)
+        warnings = get_warns.delay(ctx.guild.id, member.id)
         if warnings == 0:
             amount = 1
-            await db.edit_warns(ctx.guild.id, member.id, amount)
+            await edit_warns.delay(ctx.guild.id, member.id, amount)
             e = build_embed(title="Attention", author=self.client.user.name,
                             description=f"{member.mention} you have been warned this is your first "
                                         f"infraction keep it at this")
@@ -205,7 +203,7 @@ class ModerationMod(commands.Cog):
             warnings += 1
             e = build_embed(title="Attention", author=self.client.user.name,
                             description=f"{member.mention} you have been warned, you have now {warnings} warning(s)")
-            await db.edit_warns(ctx.guild.id, member.id, warnings)
+            await edit_warns.delay(ctx.guild.id, member.id, warnings)
             await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="shows how many infractions a user has")
@@ -216,10 +214,9 @@ class ModerationMod(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
-        warnings = await db.get_warns(ctx.guild.id, member.id)
+        warnings = get_warns.delay(ctx.guild.id, member.id)
         e = build_embed(title="Attention", author=self.client.user.name,
-                        description=f"{member.mention} Has {warnings} infraction(s)!")
+                        description=f"{member.mention} Has {warnings.get()} infraction(s)!")
         await ctx.send(embed=e)
 
 

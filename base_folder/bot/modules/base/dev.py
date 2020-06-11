@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.queuing.db import *
 
 
 class Dev(commands.Cog):
@@ -74,15 +74,14 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
         try:
-            await db.initialize_all(ctx.guild.id)
+            initialize_all.delay(ctx.guild.id)
         except Exception:
             pass
         for user in ctx.guild.members:
-            db.is_user_indb(user.name, user.id, ctx.guild.id)
+            is_user_indb.delay(user.name, user.id, ctx.guild.id)
         for i in ctx.guild.roles:
-            await db.roles_to_db(ctx.guild.id, i.name, i.id)
+            roles_to_db.delay(ctx.guild.id, i.name, i.id)
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"I'm done my master {ctx.author.mention} <3")
         await ctx.send(embed=e)
@@ -94,9 +93,8 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
         for i in ctx.guild.roles:
-            await db.roles_to_db(ctx.guild.id, i.name, i.id)
+            roles_to_db.delay(ctx.guild.id, i.name, i.id)
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"I'm done my master {ctx.author.mention} <3")
         await ctx.send(embed=e)
@@ -108,10 +106,10 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
         guild_id = ctx.guild.id
-        roles = await db.roles_from_db(guild_id)
-        await ctx.send(str(roles) + f" {ctx.author.mention}")
+        roles = roles_from_db.delay(guild_id)
+        r = roles.get()
+        await ctx.send(str(r) + f" {ctx.author.mention}")
 
     @commands.command(pass_context=True, brief="sets default role set_default @role")
     @commands.guild_only()
@@ -121,8 +119,7 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "standard_role_id")
+        edit_settings_role.delay(ctx.guild.id, role.id, "standard_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the default role")
         await ctx.send(embed=e)
@@ -135,8 +132,7 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "admin_role_id")
+        edit_settings_role.delay(ctx.guild.id, role.id, "admin_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the admin role")
         await ctx.send(embed=e)
@@ -149,8 +145,7 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "dev_role_id")
+        edit_settings_role.delay(ctx.guild.id, role.id, "dev_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the dev role")
         await ctx.send(embed=e)
@@ -163,8 +158,7 @@ class Dev(commands.Cog):
             pass
         else:
             raise commands.errors.CheckFailure
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
+        edit_settings_role.delay(ctx.guild.id, role.id, "mod_role_id")
         e = build_embed(title="Hey", author=self.client.user.name,
                         description=f"{role} is now the mod role")
         await ctx.send(embed=e)

@@ -1,11 +1,8 @@
-import discord
 from discord.ext import commands
-import base_folder.bot.logger
 from base_folder.bot.config.config import token
 from base_folder.bot.config.config import sql
-from base_folder.bot.config.Permissions import Auth
-from base_folder.bot.modules.base.db_management import Db
-from base_folder.tasks import add
+from base_folder.queuing.db_management import Db
+from base_folder.queuing.db import add
 import base64
 
 
