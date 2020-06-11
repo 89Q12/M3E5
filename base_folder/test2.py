@@ -1,5 +1,5 @@
-from base_folder.tasks import add
+from tasks import add
 
-r = add.delay(4, 4)
+r = add.delay(1, 1)
 
-print(r.backend)
+print(r.get())
