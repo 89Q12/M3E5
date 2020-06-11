@@ -1,5 +1,6 @@
-from tasks import add
+from base_folder.tasks import get_levelsystem, add
 
-r = add.delay(1, 1)
+r = add.delay(715131657107144724)
+print(r.status)
 
-print(r.get())
+r.forget()

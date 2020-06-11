@@ -1,14 +1,14 @@
 import base64
-from abc import ABC
+
 
 from celery import Celery, Task
 from base_folder.bot.config.config import sql
 
-app = Celery('test', task_cls='base_folder.tasks:DatabaseTask')
+app = Celery('tasks')
 app.config_from_object('base_folder.celeryconfig')
 
 
-@app.test
+@app.task
 def add(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -22,7 +22,7 @@ Initialize the tables
 '''
 
 
-class DatabaseTask(Task, ABC):
+class DatabaseTask(Task):
     _db = None
 
     @property
@@ -32,13 +32,13 @@ class DatabaseTask(Task, ABC):
         return self._db
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def initialize_all(guild_id):
-    await initialize_guilds(guild_id)
-    await initialize_settings(guild_id)
+    initialize_guilds(guild_id)
+    initialize_settings(guild_id)
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def initialize_guilds(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -48,7 +48,7 @@ def initialize_guilds(guild_id):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def initialize_settings(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -63,7 +63,7 @@ General per guild settings
 '''
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def is_user_indb(user, user_id, guild_id):
     # Checks if a given user is in the db else writes it in the db
     conn = sql()
@@ -79,7 +79,7 @@ def is_user_indb(user, user_id, guild_id):
         return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def on_error(guild_id, error):
     conn = sql()
     c = conn.cursor()
@@ -90,7 +90,7 @@ def on_error(guild_id, error):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def insert_message(guild_id, user_id, message, time):
     conn = sql()
     c = conn.cursor()
@@ -102,7 +102,7 @@ def insert_message(guild_id, user_id, message, time):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def prefix_lookup(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -112,7 +112,7 @@ def prefix_lookup(guild_id):
     return prefix[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def set_prefix(guild_id, prefix):
     conn = sql()
     c = conn.cursor()
@@ -123,7 +123,7 @@ def set_prefix(guild_id, prefix):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_warns(guild_id, user_id):
     # returns the number of warnings a user has
     conn = sql()
@@ -135,7 +135,7 @@ def get_warns(guild_id, user_id):
     return warnings[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_warns(guild_id, user_id, amount):
     # sets warn with given amount
     conn = sql()
@@ -147,7 +147,7 @@ def edit_warns(guild_id, user_id, amount):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_muted_at(guild_id, user_id, date):
     conn = sql()
     c = conn.cursor()
@@ -158,7 +158,7 @@ def edit_muted_at(guild_id, user_id, date):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_muted_at(guild_id, user_id):
     # returns the number of warnings a user has
     conn = sql()
@@ -170,7 +170,7 @@ def get_muted_at(guild_id, user_id):
     return warnings[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def muted_until(guild_id, user_id, date):
     conn = sql()
     c = conn.cursor()
@@ -180,7 +180,7 @@ def muted_until(guild_id, user_id, date):
     c.close()
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_banned_at(guild_id, user_id, date):
     conn = sql()
     c = conn.cursor()
@@ -191,7 +191,7 @@ def edit_banned_at(guild_id, user_id, date):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_banned_at(guild_id, user_id):
     # returns the number of warnings a user has
     conn = sql()
@@ -203,7 +203,7 @@ def get_banned_at(guild_id, user_id):
     return warnings[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def banned_until(guild_id, user_id, date):
     conn = sql()
     c = conn.cursor()
@@ -218,7 +218,7 @@ Role settings
 '''
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def roles_to_db(guild_id, role_name, role_id):
     # Checks if a given role is in the db else writes it in the db
     conn = sql()
@@ -234,7 +234,7 @@ def roles_to_db(guild_id, role_name, role_id):
         return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def roles_from_db(guild_id):
     # returns a tuple with all role name's and id's
     conn = sql()
@@ -245,7 +245,7 @@ def roles_from_db(guild_id):
     return roles
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def remove_role(guild_id, role_id):
     conn = sql()
     c = conn.cursor()
@@ -255,7 +255,7 @@ def remove_role(guild_id, role_id):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_settings_role(guild_id, role_id, field_name):
     # Let's you set roles e.g. mod role
     conn = sql()
@@ -267,7 +267,7 @@ def edit_settings_role(guild_id, role_id, field_name):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_role(guild_id, role_id):
     #  returns a role name when a role id is given
     # errors out when role id is none bruh
@@ -279,7 +279,7 @@ def get_role(guild_id, role_id):
     return role_name[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_settings_role(guild_id, field_name):
     #  returns a role name
     # errors out when  field_name is none bruh
@@ -298,7 +298,7 @@ Channel settings and warning settings
 '''
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_settings_welcome(guild_id, channel_id):
     # sets the welcome_channel to the given channel id
     conn = sql()
@@ -308,7 +308,8 @@ def edit_settings_welcome(guild_id, channel_id):
     c.close()
     return
 
-@app.test(base=DatabaseTask)
+
+@app.task(base=DatabaseTask)
 def edit_settings_leave(guild_id, channel_id):
     # sets the leave_channel to the given channel id
     conn = sql()
@@ -320,7 +321,7 @@ def edit_settings_leave(guild_id, channel_id):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_welcome_channel(guild_id):
     # returns the  welcome channel
     conn = sql()
@@ -334,7 +335,7 @@ def get_welcome_channel(guild_id):
         return welcome_channel[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_leave_channel(guild_id):
     # returns the leave channel
     conn = sql()
@@ -355,7 +356,7 @@ Welcomeimg
 '''
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_settings_img(guild_id, img):
     # Unused for now but it will be used for the welcome image function
     # sets the column imgwelcome to 1/enabled or 0/disabled
@@ -367,7 +368,7 @@ def edit_settings_img(guild_id, img):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_settings_img_text(self, guild_id, img="Welcome {0.mention} to {1}!"):
     # Unused for now but it will be used for the welcome image function
     # sets the message text in the column imgwelcome_text to what ever you enter
@@ -379,7 +380,7 @@ def edit_settings_img_text(self, guild_id, img="Welcome {0.mention} to {1}!"):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_img(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -389,7 +390,7 @@ def get_img(guild_id):
     return img[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_img_text(guild_id):
     conn = sql()
     c = conn.cursor()
@@ -406,7 +407,7 @@ Level system
 '''
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def update_xp_text(guild_id, user_id, amount):
     # updates the xp amount for a given user
     conn = sql()
@@ -418,7 +419,7 @@ def update_xp_text(guild_id, user_id, amount):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_text_xp(guild_id, user_id):
     # returns the xp amount for a given user
     conn = sql()
@@ -430,8 +431,7 @@ def get_text_xp(guild_id, user_id):
     return xp[0]
 
 
-
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_lvl_text(guild_id, user_id):
     # returns the text lvl  amount for a given user
     conn = sql()
@@ -446,7 +446,7 @@ def get_lvl_text(guild_id, user_id):
         return lvl[0]
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def update_text_lvl(guild_id, user_id, amount=1):
     # updates the text lvl for a given user
     conn = sql()
@@ -458,7 +458,7 @@ def update_text_lvl(guild_id, user_id, amount=1):
     return
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def edit_settings_levelsystem(guild_id, toggler):
     # Unused for now but it will be used for the welcome image function
     # sets the column level system to 1/enabled or 0/disabled
@@ -470,7 +470,7 @@ def edit_settings_levelsystem(guild_id, toggler):
     return True
 
 
-@app.test(base=DatabaseTask)
+@app.task(base=DatabaseTask)
 def get_levelsystem(guild_id):
     conn = get_levelsystem.db
     c = conn.cursor()

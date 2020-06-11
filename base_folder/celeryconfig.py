@@ -7,5 +7,5 @@ imports = ('base_folder.tasks',)
 
 # Using the database to store task state and results.
 result_backend = 'db+sqlite:///results.db'
-
+task_cls = 'base_folder.tasks:DatabaseTask'
 task_annotations = {'tasks.add': {'rate_limit': '10/s'}}
