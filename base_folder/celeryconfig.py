@@ -1,4 +1,3 @@
-
 # Broker settings.
 broker_url = 'pyamqp://guest@localhost//'
 
