@@ -28,6 +28,7 @@ Like a real AI and an home assistant like Alexa.
     - clear infractions
     - info about a role
   - Welcome image
+  - welcome/leave channel 
   - db connection
   - Auto roles
   - set default role, admin, dev and mod role
