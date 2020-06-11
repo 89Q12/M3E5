@@ -120,6 +120,9 @@ Answer: <3
 Question: i have to get an invite to grab some food from the fridge
 Answer: I'll go ahead and get it.
 
+Question: What do you think about the human race?
+Answer: I think it's a bit of a dick.
+
 Cute or? isn't it
 
 ## For examples of the home assistant please click [here](https://github.com/ggeop/Python-ai-assistant)
