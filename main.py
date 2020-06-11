@@ -5,12 +5,15 @@ from base_folder.bot.config.config import token
 from base_folder.bot.config.config import sql
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.modules.base.db_management import Db
+from base_folder.tasks import add
 import base64
 
 
 def prefix(client, ctx):
     db = Db(client)
-    pre = (base64.b64decode(str(db.prefix_lookup(ctx.guild.id)).encode("utf8"))).decode("utf8")
+    r = add.delay(db,ctx.guild.id)
+    pre = (base64.b64decode(str(r.get()).encode("utf8"))).decode("utf8")
+    r.forget()
     return pre
 
 
@@ -39,4 +42,3 @@ for extension in extensions:
         exc = '{}: {}'.format(type(e).__name__, e)
         print('Failed to load extension {}\n{}'.format(extension, exc))
 client.run(token())
-

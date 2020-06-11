@@ -22,12 +22,14 @@ class Db:
         c = conn.cursor()
         c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
         conn.commit()
+        c.close()
 
     async def initialize_settings(self, guild_id):
         conn = self.sql
         c = conn.cursor()
         c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
         conn.commit()
+        c.close()
 
     '''
     General per guild settings
@@ -43,6 +45,7 @@ class Db:
             c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
                       f"VALUES ('{str(user)} ', '{str(user_id)}', '{str(guild_id)}')")
             conn.commit()
+            c.close()
         else:
             return
 
@@ -52,6 +55,7 @@ class Db:
         error = (base64.b64encode(str(error).encode("utf8"))).decode("utf8")
         c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', '{error}')")
         conn.commit()
+        c.close()
         return
 
     async def insert_message(self, guild_id, user_id, message, time):
@@ -61,6 +65,7 @@ class Db:
         c.execute(f"INSERT into messages (guild_id, user_id, message, time) "
                   f"VALUES ('{guild_id}', '{user_id}', '{message}', '{time}')")
         conn.commit()
+        c.close()
         return
 
     def prefix_lookup(self, guild_id):
@@ -68,6 +73,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT prefix FROM settings WHERE guild_id = {guild_id}")
         prefix = c.fetchone()
+        c.close()
         return prefix[0]
 
     async def set_prefix(self, guild_id, prefix):
@@ -76,7 +82,83 @@ class Db:
         prefix = (base64.b64encode(str(prefix).encode("utf8"))).decode("utf8")
         c.execute(f"UPDATE settings SET prefix='{prefix}' WHERE guild_id ={guild_id}")
         conn.commit()
+        c.close()
         return
+
+    async def get_warns(self, guild_id, user_id):
+        # returns the number of warnings a user has
+        conn = self.sql
+        c = conn.cursor()
+        c.execute("SELECT warnings FROM user_info WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        warnings = c.fetchone()
+        c.close()
+        return warnings[0]
+
+    async def edit_warns(self, guild_id, user_id, amount):
+        # sets warn with given amount
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"UPDATE user_info SET warnings={str(amount)} WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        conn.commit()
+        c.close()
+        return
+
+    async def edit_muted_at(self, guild_id, user_id, date):
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"UPDATE user_info SET muted_at='{date}' WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        conn.commit()
+        c.close()
+        return
+
+    async def get_muted_at(self, guild_id, user_id):
+        # returns the number of warnings a user has
+        conn = self.sql
+        c = conn.cursor()
+        c.execute("SELECT muted_at FROM user_info WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        warnings = c.fetchone()
+        c.close()
+        return warnings[0]
+
+    async def muted_until(self, guild_id, user_id, date):
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"UPDATE user_info SET muted_until='{date}' WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        conn.commit()
+        c.close()
+
+    async def edit_banned_at(self, guild_id, user_id, date):
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"UPDATE user_info SET banned_at='{date}' WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        conn.commit()
+        c.close()
+        return
+
+    async def get_banned_at(self, guild_id, user_id):
+        # returns the number of warnings a user has
+        conn = self.sql
+        c = conn.cursor()
+        c.execute("SELECT banned_at FROM user_info WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        warnings = c.fetchone()
+        c.close()
+        return warnings[0]
+
+    async def banned_until(self, guild_id, user_id, date):
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"UPDATE user_info SET banned_until='{date}' WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        conn.commit()
+        c.close()
+
     '''
     Role settings 
     '''
@@ -101,6 +183,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT role_id, role_name FROM roles WHERE guild_id={str(guild_id)}")
         roles = c.fetchall()
+        c.close()
         return roles
 
     async def remove_role(self, guild_id, role_id):
@@ -108,6 +191,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"DELETE FROM roles WHERE role_id = {role_id} and guild_id = {guild_id}")
         conn.commit()
+        c.close()
         return
 
     async def edit_settings_role(self, guild_id, role_id, field_name):
@@ -117,38 +201,7 @@ class Db:
         c.execute(f"INSERT INTO settings (guild_id,{field_name}) VALUES ('{guild_id}','{role_id}')"
                   f"ON DUPLICATE KEY UPDATE {field_name}='{role_id}'")
         conn.commit()
-        return
-
-    '''
-    end of roles settings
-    
-    Channel settings and warning settings
-    '''
-
-    async def edit_settings_welcome(self, guild_id, channel_id):
-        # sets the welcome_channel to the given channel id
-        conn = self.sql
-        c = conn.cursor()
-        c.execute(f"UPDATE settings SET welcome_channel_id={str(channel_id)} WHERE guild_id = {guild_id}")
-        conn.commit()
-        return
-
-    async def edit_settings_leave(self, guild_id, channel_id):
-        # sets the leave_channel to the given channel id
-        conn = self.sql
-        c = conn.cursor()
-        c.execute(f"UPDATE settings SET leave_channel_id ={str(channel_id)}"
-                  f"WHERE guild_id = {guild_id}")
-        conn.commit()
-        return
-
-    async def edit_warns(self, guild_id, user_id, amount):
-        # sets warn with given amount
-        conn = self.sql
-        c = conn.cursor()
-        c.execute(f"UPDATE user_info SET warnings={str(amount)} WHERE user_id="
-                  f"{str(user_id)} and guild_id={str(guild_id)}")
-        conn.commit()
+        c.close()
         return
 
     async def get_role(self, guild_id, role_id):
@@ -168,19 +221,33 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT {str(field_name)} FROM settings WHERE guild_id={str(guild_id)}")
         role_id = c.fetchone()
+        c.close()
         return role_id[0]
 
-    async def get_warns(self, guild_id, user_id):
-        # returns the number of warnings a user has
+    '''
+    end of roles settings
+    
+    Channel settings and warning settings
+    '''
+
+    async def edit_settings_welcome(self, guild_id, channel_id):
+        # sets the welcome_channel to the given channel id
         conn = self.sql
         c = conn.cursor()
-        c.execute("SELECT warnings FROM user_info WHERE user_id="
-                  f"{str(user_id)} and guild_id={str(guild_id)}")
-        warnings = c.fetchone()
-        if warnings is None:
-            return 0
-        else:
-            return warnings[0]
+        c.execute(f"UPDATE settings SET welcome_channel_id={str(channel_id)} WHERE guild_id = {guild_id}")
+        conn.commit()
+        c.close()
+        return
+
+    async def edit_settings_leave(self, guild_id, channel_id):
+        # sets the leave_channel to the given channel id
+        conn = self.sql
+        c = conn.cursor()
+        c.execute(f"UPDATE settings SET leave_channel_id ={str(channel_id)}"
+                  f"WHERE guild_id = {guild_id}")
+        conn.commit()
+        c.close()
+        return
 
     async def get_welcome_channel(self, guild_id):
         # returns the  welcome channel
@@ -188,6 +255,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT welcome_channel_id FROM settings WHERE guild_id={str(guild_id)}")
         welcome_channel = c.fetchone()
+        c.close()
         if welcome_channel is None:
             return "you need to set a channel first"
         else:
@@ -199,6 +267,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT leave_channel_id FROM settings WHERE guild_id={str(guild_id)}")
         leave_channel = c.fetchone()
+        c.close()
         if leave_channel is None:
             return "you need to set a channel first"
         else:
@@ -217,6 +286,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"UPDATE settings SET imgwelcome_toggle={str(img)} WHERE guild_id={str(guild_id)}")
         conn.commit()
+        c.close()
         return
 
     async def edit_settings_img_text(self, guild_id, img="Welcome {0.mention} to {1}!"):
@@ -226,6 +296,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"UPDATE settings SET imgwelcome_text={str(img)} WHERE guild_id={str(guild_id)}")
         conn.commit()
+        c.close()
         return
 
     async def get_img(self, guild_id):
@@ -233,6 +304,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT imgwelcome_toggle FROM settings WHERE guild_id={str(guild_id)};")
         img = c.fetchone()
+        c.close()
         return img[0]
 
     async def get_img_text(self, guild_id):
@@ -240,6 +312,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT imgwelcome_text FROM settings WHERE guild_id={str(guild_id)};")
         text = c.fetchone()
+        c.close()
         return text[0]
 
     '''
@@ -255,6 +328,7 @@ class Db:
         c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} a"
                   f"nd guild_id={str(guild_id)};")
         conn.commit()
+        c.close()
         return
 
     async def get_text_xp(self, guild_id, user_id):
@@ -264,6 +338,7 @@ class Db:
         c.execute("SELECT text_xp FROM user_info WHERE user_id="
                   f"{str(user_id)} and guild_id={str(guild_id)}")
         xp = c.fetchone()
+        c.close()
         return xp[0]
 
     async def get_lvl_text(self, guild_id, user_id):
@@ -273,6 +348,7 @@ class Db:
         c.execute("SELECT text_lvl FROM user_info WHERE user_id="
                   f"{str(user_id)} and guild_id={str(guild_id)}")
         lvl = c.fetchone()
+        c.close()
         if lvl is None:
             return None
         else:
@@ -285,6 +361,7 @@ class Db:
         c.execute(f"UPDATE user_info SET text_lvl = {str(amount)}  WHERE user_id ="
                   f"{str(user_id)} and guild_id={str(guild_id)}")
         conn.commit()
+        c.close()
         return
 
     async def edit_settings_levelsystem(self, guild_id, toggler):
@@ -294,6 +371,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"UPDATE settings SET levelsystem_toggle= {str(toggler)} WHERE guild_id={guild_id}")
         conn.commit()
+        c.close()
         return True
 
     async def get_levelsystem(self, guild_id):
@@ -301,6 +379,7 @@ class Db:
         c = conn.cursor()
         c.execute(f"SELECT levelsystem_toggle FROM settings WHERE guild_id =  {str(guild_id)};")
         img = c.fetchone()
+        c.close()
         return img[0]
 
     '''
