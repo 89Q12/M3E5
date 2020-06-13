@@ -108,10 +108,10 @@ All credits for the chatbot goes to Google and [daniel-kukiela](https://github.c
 # Examples
 ## Here are some examples of the chatbot:
 
-Question: Can you sing me a song?
+Question: Can you sing me a song?<br>
 Answer: I'll post it.
 
-Question: You are cute
+Question: You are cute<br>
 Answer: I'm so confused.
 
 Question: <3<br>
