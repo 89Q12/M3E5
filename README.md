@@ -117,10 +117,10 @@ Answer: I'm so confused.
 Question: <3<br>
 Answer: <3
 
-Question: i have to get an invite to grab some food from the fridge
+Question: i have to get an invite to grab some food from the fridge<br>
 Answer: I'll go ahead and get it.
 
-Question: What do you think about the human race?
+Question: What do you think about the human race?<br>
 Answer: I think it's a bit of a dick.
 
 Cute or? isn't it
