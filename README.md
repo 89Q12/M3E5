@@ -37,6 +37,7 @@ Like a real AI and an home assistant like Alexa.
   - loading/unloading/reloading cogs is now working if you have the dev role
   - levelsystem is now working(text based)
   - basic permission system
+  - Multi server support
 - Chatbot 
   - currently trainning but I'm halfway through it
   
@@ -46,7 +47,6 @@ Like a real AI and an home assistant like Alexa.
 - Discord features
   - Tempban/mute will be ready as soon as I have the celery implemention ready
   - lock/unlock a specific channel for specific roles 
-  - Multi server bot but for now it will be single server only so you have to change some things
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
   - Auto tasks
