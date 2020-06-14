@@ -73,7 +73,7 @@ Like a real AI and an home assistant like Alexa.
  
 # Critical bugs
 
-  - Sql connection is broken due to the fact that I create an object an the values are therefor cached :/
+  - Sql connection is broken due to the fact that I create an object an the values are there for cached :/<br>
   -Not enough in the code comments D: hehe
   
 # Install instructions 
