@@ -29,7 +29,6 @@ Like a real AI and an home assistant like Alexa.
     - info about a role
   - Welcome image
   - welcome/leave channel 
-  - db connection
   - Auto roles
   - set default role, admin, dev and mod role
   - Join and leave messages
@@ -45,6 +44,7 @@ Like a real AI and an home assistant like Alexa.
 ![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
+  - db connection
   - custom help command
   - Tempban/mute will be ready as soon as I have the celery implemention ready
   - lock/unlock a specific channel for specific roles 
