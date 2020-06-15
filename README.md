@@ -1,7 +1,8 @@
 # About
 
-M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works. I try my best to program this bot with focus on perfomance and scalability.
-
+M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.
+The Ai is currently online on telegram, it can be reached via this @Zofiasbaby_bot username. Just write /start then you talk to her.<br>
+I try my best to program this bot with focus on perfomance and scalability but I'm still learning.
 If you have any questions or you want to see the bot in action join this [discord](https://discord.gg/GWJ6Jeg)
 
 ## Why the name?
@@ -26,24 +27,34 @@ Like a real AI and an home assistant like Alexa.
     - warn 
     - infractions
     - clear infractions
+    - info about a role
+  - profile shows you your writer rank/xp and warnings
   - Welcome image
-  - db connection
+  - welcome/leave channel 
   - Auto roles
+  - db connection
   - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
-  - levelsystem is now working(text based)
+  - levelsystem(text based)
   - basic permission system
+  - One bot instance can run on multiple servers now with out errors
+  - when the bot joins a server the database is automatically initialized
+  - On server join the owner gets a message with all setup commands that need to be executed
+  - Docker image is ready for the bot and rabbitmq 
+  - celery as queuing system works now
 - Chatbot 
-  - currently trainning but I'm halfway through it
-  
+  - trained
+  - Answers to messages like a real human 
 
 ![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
-  - Tempbn/mute will be ready as soon as I have the celery implemention ready
-  - Multi server bot but for now it will be single server only so you have to change some things
+  - celery docker image
+  - custom help command
+  - Tempban/mute currently no idea how to do it perfectly 
+  - lock/unlock a specific channel for specific roles 
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
   - Auto tasks
@@ -56,9 +67,7 @@ Like a real AI and an home assistant like Alexa.
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
-  - celery as queuing system, the brocker will be redis. With that the bot becomes scaleable and background tasks get easier to manage
 - Chatbot features
-  - Answers to messages like a real human 
   - Discord bridge 
   - Home assistant bridge
   - maybe more but idk now yet
@@ -69,8 +78,8 @@ Like a real AI and an home assistant like Alexa.
  
 # Critical bugs
 
-  - the permissionsystem is currently not working, so you need to set the role id's in permissions.py
-  - Not enough in the code comments D: hehe
+  - Sql connection is broken due to the fact that I create an object an the values are there for cached :/<br>
+  -Not enough in the code comments D: hehe
   
 # Install instructions 
  
@@ -82,12 +91,15 @@ Like a real AI and an home assistant like Alexa.
  In the config you need to paste your bot token, then you can run main.py. 
  Invite your bot to your server and run the following commands to initialize the bot and the database.
  Run the commands in the following order:
- - .builddb
- - .roles_in_db
- - .set_standard_role @role
- - .set_dev  @role
- - .set_mod  @role
- - .set_admin  @role
+ -prefix if you want to change the prefix
+ -set_leave
+ -set_welcome
+ -set_lvl
+ -set_cmd
+ -set_default
+ -set_dev
+ -set_mod
+ -set_admin
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
  
@@ -106,17 +118,20 @@ All credits for the chatbot goes to Google and [daniel-kukiela](https://github.c
 # Examples
 ## Here are some examples of the chatbot:
 
-Question: Can you sing me a song?
+Question: Can you sing me a song?<br>
 Answer: I'll post it.
 
-Question: You are cute
+Question: You are cute<br>
 Answer: I'm so confused.
 
 Question: <3<br>
 Answer: <3
 
-Question: i have to get an invite to grab some food from the fridge
+Question: i have to get an invite to grab some food from the fridge<br>
 Answer: I'll go ahead and get it.
+
+Question: What do you think about the human race?<br>
+Answer: I think it's a bit of a dick.
 
 Cute or? isn't it
 
