@@ -90,15 +90,15 @@ Like a real AI and an home assistant like Alexa.
  In the config you need to paste your bot token, then you can run main.py. 
  Invite your bot to your server and run the following commands to initialize the bot and the database.
  Run the commands in the following order:
- -prefix if you want to change the prefix
- -set_leave
- -set_welcome
- -set_lvl
- -set_cmd
- -set_default
- -set_dev
- -set_mod
- -set_admin
+- -prefix if you want to change the prefix
+- -set_leave
+- -set_welcome
+- -set_lvl
+- -set_cmd
+- -set_default
+- -set_dev
+- -set_mod
+- -set_admin
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
  
