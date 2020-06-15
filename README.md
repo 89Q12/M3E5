@@ -115,6 +115,16 @@ As I stated earlier I'm using Google's nmt but a modified version by [daniel-kuk
 All credits for the chatbot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
 
 # Examples
+
+## Screenshots of the message design of some commands:
+serverinfo command<br>
+![serverinfo command](https://cdn.discordapp.com/attachments/712041605753733152/722159106013528135/unknown.png)<br>
+profile command<br>
+![profile command](https://cdn.discordapp.com/attachments/680655385102909441/722188507564605520/unknown.png)<br>
+command not found error<br>
+![not found command error](https://cdn.discordapp.com/attachments/680655385102909441/722188706265563146/unknown.png)<br>
+internal error on command<br>
+![internal error](https://cdn.discordapp.com/attachments/680655448042504232/722189322174070896/unknown.png)<br>
 ## Here are some examples of the chatbot:
 
 Question: Can you sing me a song?<br>
