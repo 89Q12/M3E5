@@ -1,16 +1,12 @@
-import discord
 from discord.ext import commands
-import base_folder.bot.logger
 from base_folder.bot.config.config import token
-from base_folder.bot.config.config import sql
-from base_folder.bot.config.Permissions import Auth
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.bot.modules.base.get_from_db import Db
 import base64
 
 
 def prefix(client, ctx):
-    db = Db(client)
-    pre = (base64.b64decode(str(db.prefix_lookup(ctx.guild.id)).encode("utf8"))).decode("utf8")
+    r = client.sql.prefix_lookup(ctx.guild.id)
+    pre = (base64.b64decode(str(r).encode("utf8"))).decode("utf8")
     return pre
 
 
@@ -23,14 +19,15 @@ extensions = ["base_folder.bot.modules.test.test",
               "base_folder.bot.modules.base.moderation_admin",
               "base_folder.bot.modules.base.moderation_mods",
               "base_folder.bot.modules.commands.fun",
+              "base_folder.bot.modules.commands.infocommands",
               "base_folder.bot.modules.base.dev",
               "base_folder.bot.modules.imgwelcome",
               "base_folder.bot.modules.base.customize",
-              "base_folder.bot.modules.listener.listener_error"]
+              "base_folder.bot.modules.listener.listener_error",
+              "base_folder.bot.modules.listener.listener_internal"]
 
-
-conn = sql()
-client.sql = conn  # creates an sql connection object that's accessible via the client object
+conn = Db()
+client.sql = conn # creates an sql connection object that's accessible via the client object
 for extension in extensions:
     try:
         client.load_extension(extension)
@@ -39,4 +36,3 @@ for extension in extensions:
         exc = '{}: {}'.format(type(e).__name__, e)
         print('Failed to load extension {}\n{}'.format(extension, exc))
 client.run(token())
-

@@ -1,61 +1,58 @@
-import discord
-from discord.ext import commands
-from base_folder.bot.modules.base.db_management import Db
-
-# TODO: Rewrite the permission system so that it uses groups with permission instead of roles
+from base_folder.bot.modules.base.get_from_db import Db
 
 
-def is_dev():
-    async def predicate(ctx):
-        '''
-        guild_id = ctx.guild.id
-        dev = await get_settings_role(guild_id, "dev_role_id")
-        if ctx.guild.owner_id == ctx.author.id:
-            return True
-        for r in ctx.author.roles:
+# TODO: Rewrite the permission system so that it uses groups with permissions instead of roles v1.1
+
+
+class Auth(object):
+    def __init__(self, client, ctx):
+        self.ctx = ctx
+        self.client = client
+
+    async def is_dev(self):
+        guild_id = self.ctx.guild.id
+        dev = await self.client.sql.get_settings_role(guild_id, "dev_role_id")
+        if await self.guild_owner():
+            return 4
+        for r in self.ctx.author.roles:
             if r.id == dev:
-                return True
-        '''
-        return True
-    return commands.check(predicate)
+                return 1
+        return 0
 
-
-def is_mod():
-    async def predicate(ctx):
-        '''
-        guild_id = ctx.guild.id
-        db = Db(client)
-        mod = await db.get_settings_role(guild_id, "mod_role_id")
-        if ctx.guild.owner_id == ctx.author.id:
-            return True
-        for r in ctx.author.roles:
+    async def is_mod(self):
+        guild_id = self.ctx.guild.id
+        mod = await self.client.sql.get_settings_role(guild_id, "mod_role_id")
+        if await self.guild_owner():
+            return 4
+        for r in self.ctx.author.roles:
             if r.id == mod:
-                return True
-        '''
-        return True
-    return commands.check(predicate)
+                return 2
+        return 0
 
-
-def is_admin():
-    async def predicate(ctx):
-        '''
-        guild_id = ctx.guild.id
-        db = Db(client)
-        admin = await db.get_settings_role(guild_id, "admin_role_id")
-        if ctx.guild.owner_id == ctx.author.id:
-            return True
-        for r in ctx.author.roles:
+    async def is_admin(self):
+        guild_id = self.ctx.guild.id
+        admin = await self.client.sql.get_settings_role(guild_id, "admin_role_id")
+        if await self.guild_owner():
+            return 4
+        for r in self.ctx.author.roles:
             if r.id == admin:
-                return True or commands.is_owner()
-        '''
-        return True
-    return commands.check(predicate)
+                return 3
+        return 0
 
-
-def guild_owner():
-    async def predicate(ctx):
-        if ctx.guild.owner_id == ctx.author.id:
+    async def guild_owner(self):
+        if self.ctx.guild.owner_id == self.ctx.author.id:
             return True
         else:
             return False
-    return commands.check(predicate)
+
+    async def permissions(self):
+        if await self.is_dev():
+            return 1
+        if await self.is_mod():
+            return 2
+        if await self.is_admin():
+            return 3
+        if await self.guild_owner():
+            return 4
+        return 0
+

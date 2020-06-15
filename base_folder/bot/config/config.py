@@ -19,11 +19,30 @@ def sql():
     return mydb
 
 
+def success_embed(client):
+    e = build_embed(
+        title="Success!",
+        author=client.user.name,
+        author_img=client.user.avatar_url,
+        timestamp=datetime.datetime.now())
+    return e
+
+
+def error_embed(client):
+    e = build_embed(
+        title="Error!",
+        author=client.user.name,
+        author_img=client.user.avatar_url,
+        timestamp=datetime.datetime.now(),
+        color=discord.Color.red())
+    return e
+
+
 def build_embed(**params):
     # Copyright 2017 Zack Rauen www.ZackRauen.com
     title = params.get("title", EmptyEmbed)
     description = params.get("description", EmptyEmbed)
-    color = params.get("color", EmptyEmbed)
+    color = params.get("color", discord.Color.blurple())
     url = params.get("url", EmptyEmbed)
     author = params.get("author", "")
     author_url = params.get("author_url", EmptyEmbed)

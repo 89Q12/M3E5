@@ -6,3 +6,5 @@ tests/*
 .idea/*
 *.pyc
 *.pyo
+README.md
+

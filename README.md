@@ -28,26 +28,32 @@ Like a real AI and an home assistant like Alexa.
     - infractions
     - clear infractions
     - info about a role
+  - profile shows you your writer rank/xp and warnings
   - Welcome image
   - welcome/leave channel 
   - Auto roles
+  - db connection
   - set default role, admin, dev and mod role
   - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
-  - levelsystem is now working(text based)
+  - levelsystem(text based)
   - basic permission system
-  - Multi server support
+  - One bot instance can run on multiple servers now with out errors
+  - when the bot joins a server the database is automatically initialized
+  - On server join the owner gets a message with all setup commands that need to be executed
+  - Docker image is ready for the bot and rabbitmq 
+  - celery as queuing system works now
 - Chatbot 
-  - currently trainning but I'm halfway through it
-  
+  - trained
+  - Answers to messages like a real human 
 
 ![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
-  - db connection
+  - celery docker image
   - custom help command
-  - Tempban/mute will be ready as soon as I have the celery implemention ready
+  - Tempban/mute currently no idea how to do it perfectly 
   - lock/unlock a specific channel for specific roles 
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like .hug <name>
@@ -61,9 +67,7 @@ Like a real AI and an home assistant like Alexa.
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
-  - celery as queuing system, the brocker will be redis. With that the bot becomes scaleable and background tasks get easier to manage
 - Chatbot features
-  - Answers to messages like a real human 
   - Discord bridge 
   - Home assistant bridge
   - maybe more but idk now yet
@@ -87,12 +91,15 @@ Like a real AI and an home assistant like Alexa.
  In the config you need to paste your bot token, then you can run main.py. 
  Invite your bot to your server and run the following commands to initialize the bot and the database.
  Run the commands in the following order:
- - .builddb
- - .roles_in_db
- - .set_standard_role @role
- - .set_dev  @role
- - .set_mod  @role
- - .set_admin  @role
+ -prefix if you want to change the prefix
+ -set_leave
+ -set_welcome
+ -set_lvl
+ -set_cmd
+ -set_default
+ -set_dev
+ -set_mod
+ -set_admin
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
  

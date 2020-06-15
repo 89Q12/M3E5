@@ -1,65 +1,42 @@
 from discord.ext import commands
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.bot.config.config import success_embed
+from queuing.db import update_text_lvl, update_xp_text
 
 
-async def update_data(ctx, db):
-    xp = await db.get_text_xp(ctx.guild.id, ctx.author.id)
+async def update_data(ctx, xp):
     amount = 0
-    for msg in range(len(ctx.content)):
-        print(msg)
-        amount += 1
-    await db.update_xp_text(ctx.guild.id, ctx.author.id, amount+xp)
-
-
-async def is_enabled(guild: int, db):
-    if int(await db.get_levelsystem(guild)) == 1:
-        return True
-    else:
-        return False
+    amount += len(ctx.content)
+    xp = amount + xp
+    update_xp_text.delay(ctx.guild.id, ctx.author.id, xp)
+    return xp
 
 
 class Levelsystem(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.group(pass_context=True)
-    async def levelsystem(self, ctx):
-        # Base command
-        if ctx.invoked_subcommand is None:
-            return await ctx.send_help(ctx.command)
-
-    @levelsystem.command(name="toggle")
-    async def levelsystem_toggle(self, ctx):
-        # Toggle on/off the level system
-        await ctx.channel.purge(limit=1)
-        db = Db(self.client)
-        toggle = int(await db.get_levelsystem(ctx.guild.id))
-        if 0 == toggle:
-            await db.edit_settings_levelsystem(ctx.guild.id, 1)
-            await ctx.send("Level system is now enabled")
-        else:
-            await db.edit_settings_levelsystem(ctx.guild.id, 0)
-            await ctx.send("Level system is now disabled")
-
     @commands.Cog.listener()
-    async def on_message(self, ctx):
-        db = Db(self.client)
-        if ctx is None:
+    async def on_message(self, message):
+        if message.content is None:
             return
-        channel = ctx.guild.system_channel
-        if ctx.author.id == self.client.user.id:
+        if message.author.id == self.client.user.id:
             return
-        if ctx.author.bot:
-            return
-        if not await is_enabled(ctx.guild.id, db):
-            return
-        xp = await db.get_text_xp(ctx.guild.id, ctx.author.id)
-        await update_data(ctx, db)
-        lvl_start = await db.get_lvl_text(ctx.guild.id, ctx.author.id)
-        lvl_end = int(float(xp) ** (1/4))
+        channel_id = await self.client.sql.get_lvl_channel(message.guild.id)
+        if channel_id == 0 or None:
+            channel = message.guild.system_channel
+        else:
+            channel = self.client.get_channel(channel_id)
+        xp_before = await self.client.sql.get_text_xp(message.guild.id, message.author.id)
+        xp_after = await update_data(message, xp_before)
+        e = success_embed(self.client)
+        lvl_start = await self.client.sql.get_lvl_text(message.guild.id, message.author.id)
+        lvl_end = int(float(str(xp_after)) ** (1 / 4))
         if lvl_start < lvl_end:
-            await db.update_text_lvl(ctx.guild.id, ctx.author.id, lvl_end)
-            await channel.send(f"{ctx.author.mention} reached level {lvl_end} and has now {xp} xp")
+            e.title = "LEEVEEL UP"
+            e.description = f"{message.author.mention} reached level {lvl_end} and has now {xp_after}xp"
+            await channel.send(embed=e)
+            update_text_lvl.delay(message.guild.id, message.author.id, lvl_end)
+            update_xp_text.delay(message.guild.id, message.author.id, xp_after)
 
 
 def setup(client):

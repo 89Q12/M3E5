@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-from base_folder.bot.config.Permissions import is_dev, guild_owner
-from base_folder.bot.config.config import build_embed
-from base_folder.bot.modules.base.db_management import Db
+from base_folder.bot.config.Permissions import Auth
+from base_folder.bot.config.config import success_embed, error_embed
+from queuing.db import *
 
 
 class Dev(commands.Cog):
@@ -10,134 +10,115 @@ class Dev(commands.Cog):
         self.client = client
 
     @commands.command(pass_context=True, brief="unloads a module")
-    @is_dev()
+    @commands.is_owner()
     async def unload(self, ctx, cog: str):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 1:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         try:
             self.client.unload_extension(cog)
         except Exception as ex:
-            e = build_embed(title="Error", author=self.client.user.name,
-                            description=f"{cog} could not be unloaded, here is the error:{ex}")
+            e = error_embed(self.client)
+            e.description=f"{cog} could not be unloaded, here is the error:{ex}"
             await ctx.send(embed=e)
             return
-        e = build_embed(title="Success", author=self.client.user.name,
-                        description=f"{cog} unloaded")
+        e = success_embed(self.client)
+        e.description = f"{cog} unloaded"
         await ctx.send(embed=e)
         return
 
     @commands.command(pass_context=True, brief="loads a module")
-    @is_dev()
+    @commands.is_owner()
     async def load(self, ctx, cog: str):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 1:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         try:
             self.client.load_extension(cog)
         except Exception as ex:
-            e = build_embed(title="Error", author=self.client.user.name,
-                            description=f"{cog} could not be loaded, here is the error:{ex}")
+            e = error_embed(self.client)
+            e.description = f"{cog} could not be loaded, here is the error:{ex}"
             await ctx.send(embed=e)
             return
-        e = build_embed(title="Success", author=self.client.user.name,
-                        description=f"{cog} loaded")
+        e = success_embed(self.client)
+        e.description = f"{cog} loaded"
         await ctx.send(embed=e)
         return
 
     @commands.command(pass_context=True, brief="reloads a module")
-    @is_dev()
+    @commands.is_owner()
     async def reload(self, ctx, cog: str):
         await ctx.channel.purge(limit=1)
+        if await Auth(self.client, ctx).permissions() >= 1:
+            pass
+        else:
+            raise commands.errors.CheckFailure
         try:
             self.client.unload_extension(cog)
             self.client.load_extension(cog)
         except Exception as ex:
-            e = build_embed(title="Error", author=self.client.user.name,
-                            description=f"{cog} could not be reloaded, here is the error:{ex}")
+            e = error_embed(self.client)
+            e.description = f"{cog} could not be reloaded, here is the error:{ex}"
             await ctx.send(embed=e)
             return
-        e = build_embed(title="Success", author=self.client.user.name,
-                        description=f"{cog} reloaded")
+        e = success_embed(self.client)
+        e.description = f"{cog} reloaded"
         await ctx.send(embed=e)
         return
 
     @commands.command(pass_context=True, brief="builds the database")
-    @guild_owner()
     async def builddb(self, ctx):
         await ctx.channel.purge(limit=1)
-        db = Db(self.client)
-        try:
-            await db.initialize_all(ctx.guild.id)
-        except Exception:
+        if await Auth(self.client, ctx).permissions() >= 1:
             pass
+        else:
+            raise commands.errors.CheckFailure
+        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        if log is None:
+            log = ctx
         for user in ctx.guild.members:
-            await db.is_user_indb(user.name, user.id, ctx.guild.id)
+            is_user_indb.delay(user.name, user.id, ctx.guild.id)
         for i in ctx.guild.roles:
-            await db.roles_to_db(ctx.guild.id, i.name, i.id)
-        e = build_embed(title="Hey", author=self.client.user.name,
-                        description=f"I'm done my master {ctx.author.mention} <3")
-        await ctx.send(embed=e)
+            roles_to_db.delay(ctx.guild.id, i.name, i.id)
+        e = success_embed(self.client)
+        e.description = f"I'm done my master {ctx.author.mention} <3"
+        e.title = "Hey"
+        await log.send(embed=e)
 
     @commands.command(pass_context=True, brief="Writes all roles in the db")
-    @is_dev()
     async def roles_in_db(self, ctx):
         await ctx.channel.purge(limit=1)
-        db = Db(self.client)
+        if await Auth(self.client, ctx).permissions() >= 1:
+            pass
+        else:
+            raise commands.errors.CheckFailure
+        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        if log is None:
+            log = ctx
         for i in ctx.guild.roles:
-            await db.roles_to_db(ctx.guild.id, i.name, i.id)
-        e = build_embed(title="Hey", author=self.client.user.name,
-                        description=f"I'm done my master {ctx.author.mention} <3")
-        await ctx.send(embed=e)
+            roles_to_db.delay(ctx.guild.id, i.name, i.id)
+        e = success_embed(self.client)
+        e.description = f"I'm done my master {ctx.author.mention} <3"
+        e.title = "Hey"
+        await log.send(embed=e)
 
     @commands.command(pass_context=True, brief="shows all roles")
-    @is_dev()
     async def show_roles(self, ctx):
         await ctx.channel.purge(limit=1)
-        db = Db(self.client)
+        if await Auth(self.client, ctx).permissions() >= 1:
+            pass
+        else:
+            raise commands.errors.CheckFailure
+        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        if log is None:
+            log = ctx
         guild_id = ctx.guild.id
-        roles = await db.roles_from_db(guild_id)
-        await ctx.send(str(roles) + f" {ctx.author.mention}")
-
-    @commands.command(pass_context=True, brief="sets default role set_default @role")
-    @commands.guild_only()
-    @guild_owner()
-    async def set_default(self, ctx, role: discord.Role = None):
-        await ctx.channel.purge(limit=1)
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "standard_role_id")
-        e = build_embed(title="Hey", author=self.client.user.name,
-                        description=f"{role} is now the default role")
-        await ctx.send(embed=e)
-
-    @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
-    @commands.guild_only()
-    @guild_owner()
-    async def set_admin(self, ctx, role: discord.Role = None):
-        await ctx.channel.purge(limit=1)
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "admin_role_id")
-        e = build_embed(title="Hey", author=self.client.user.name,
-                        description=f"{role} is now the admin role")
-        await ctx.send(embed=e)
-
-    @commands.command(pass_context=True, brief="sets dev rule set_dev @role")
-    @commands.guild_only()
-    @guild_owner()
-    async def set_dev(self, ctx, role: discord.Role = None):
-        await ctx.channel.purge(limit=1)
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "dev_role_id")
-        e = build_embed(title="Hey", author=self.client.user.name,
-                        description=f"{role} is now the dev role")
-        await ctx.send(embed=e)
-
-    @commands.command(pass_context=True, brief="sets mod rule set_mod @role")
-    @commands.guild_only()
-    @guild_owner()
-    async def set_mod(self, ctx, role: discord.Role = None):
-        await ctx.channel.purge(limit=1)
-        db = Db(self.client)
-        await db.edit_settings_role(ctx.guild.id, role.id, "mod_role_id")
-        e = build_embed(title="Hey", author=self.client.user.name,
-                        description=f"{role} is now the mod role")
-        await ctx.send(embed=e)
+        roles = await self.client.sql.roles_from_db(guild_id)
+        await log.send(str(roles) + f" {ctx.author.mention}")
 
 
 def setup(client):
