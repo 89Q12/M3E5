@@ -7,7 +7,6 @@ import textwrap
 import base64
 from discord.ext import commands
 from queuing.db import edit_settings_img_text, edit_settings_img
-from base_folder.bot.modules.base.get_from_db import Db
 
 '''
 MIT License
@@ -36,11 +35,10 @@ SOFTWARE.
 
 class IMGWelcome(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
-        self.db = Db(bot)
+        self.client = bot
 
     async def __is_enabled(self, guild: int):
-        toggle = await self.db.get_img(guild)
+        toggle = await self.client.sql.get_img(guild)
         if int(toggle) == 1:
             return True
         else:
@@ -56,13 +54,16 @@ class IMGWelcome(commands.Cog):
     @imgwelcome.command(name="toggle")
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcomer"""
-        toggle = int(await self.db.get_img(ctx.guild.id))
+        toggle = int(await self.client.sql.get_img(self.client, ctx.guild.id))
         await ctx.channel.purge(limit=1)
+        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        if log is None:
+            log = ctx
         if 0 == toggle:
-            await ctx.send("Welcome image is now enabled")
+            await log.send("Welcome image is now enabled")
             edit_settings_img.delay(ctx.guild.id, 1)
         else:
-            await ctx.send("Welcome image is now disabled")
+            await log.send("Welcome image is now disabled")
             edit_settings_img.delay(ctx.guild.id, 0)
 
     @imgwelcome.command(name="img")
@@ -80,7 +81,7 @@ class IMGWelcome(commands.Cog):
                 return m.author == ctx.message.author and m.channel == ctx.message.channel
 
             try:
-                msg = await self.bot.wait_for('message', check=check, timeout=20)
+                msg = await self.client.wait_for('message', check=check, timeout=20)
             except:
                 return await ctx.send("Timed out.")
 
@@ -143,7 +144,7 @@ class IMGWelcome(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
-        channel_id = await self.db.get_welcome_channel(member.guild.id)
+        channel_id = await self.client.sql.get_welcome_channel(member.guild.id)
         channel = member.guild.get_channel(channel_id.get())
         if not channel:
             return
@@ -238,7 +239,7 @@ class IMGWelcome(commands.Cog):
         welcome_picture.save("data/welcome.png")
 
         try:
-            r = await self.db.get_img_text(guild.id)
+            r = await self.client.sql.get_img_text(guild.id)
             content = base64.b64decode(str(r.encode("utf8"))).decode("utf8")\
                 .replace("user", member.mention)\
                 .replace("server", guild.name)

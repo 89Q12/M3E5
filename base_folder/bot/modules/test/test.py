@@ -10,19 +10,20 @@ class Test(commands.Cog):
     @commands.command(brief="Test")
     async def xx(self, ctx, arg: int):
         await ctx.channel.purge(limit=1)
-        await ctx.send(ctx.message.created_at)
         muteduntil = ctx.message.created_at + datetime.timedelta(hours=arg)
         await ctx.send(muteduntil)
-        message = build_embed(author=self.bot.user.name, thumbnail=ctx.author.avatar_url,
-                              footer=ctx.guild.name, image=ctx.guild.icon_url,
-                              timestamp=datetime.datetime.now(), color=0x9a45ba)
-        message.add_field(name="**test**", value="d", inline=True)
-        message.add_field(name="**test1**", value="d", inline=True)
-        message.add_field(name="**test2**", value="d", inline=True)
-        message.add_field(name="**test3**", value="d", inline=True)
-        message.add_field(name="**test4**", value="d", inline=True)
-        message.add_field(name="**test5**", value="d", inline=True)
-        await ctx.send(embed=message)
+        messages = build_embed(author=self.bot.user.name, title="Hey!",
+                               description="Thanks for choosing me! "
+                                           "here are some commands you need to execute:")
+        messages.add_field(name="Important setup commands", value="-prefix the prefix\n -set_leave\n -set_welcome\n "
+                                                                  "-set_lvl\n -set_cmd\n -set_default\n -set_dev\n"
+                                                                  " -set_mod\n set_admin", inline=True)
+        messages.add_field(name="Usage", value="sets the prefix\n sets the leave channel\n sets the welcome channel\n "
+                                               "sets the lvl up channel\n sets the command channel\n "
+                                               "sets the default role a user should have on join\n "
+                                               "sets the dev role\n sets the mod role\n sets the admin role")
+
+        await ctx.send(embed=messages)
 
 
 def setup(bot):

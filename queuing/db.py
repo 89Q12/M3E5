@@ -20,34 +20,12 @@ class DatabaseTask(Task, ABC):
         return self._db
 
 
-@app.task(base=DatabaseTask, ignore_result=True)
-def initialize_all(guild_id):
-    try:
-        initialize_guilds(guild_id)
-    except IntegrityError:
-        pass
-    try:
-        initialize_settings(guild_id)
-    except IntegrityError:
-        pass
-    finally:
-        return
-
-
-@app.task(base=DatabaseTask, ignore_result=True)
-def initialize_guilds(guild_id):
-    conn = initialize_guilds.db
+@app.task(base=DatabaseTask, ignore_result=False)
+def initialize_guild(guild_id):
+    conn = initialize_guild.db
     c = conn.cursor()
     c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
     conn.commit()
-    c.close()
-    return
-
-
-@app.task(base=DatabaseTask, ignore_result=True)
-def initialize_settings(guild_id):
-    conn = initialize_settings.db
-    c = conn.cursor()
     c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
     conn.commit()
     c.close()
@@ -64,14 +42,11 @@ def is_user_indb(user_name, user_id, guild_id):
     # Checks if a given user is in the db else writes it in the db
     conn = is_user_indb.db
     c = conn.cursor()
-    c.execute(f"SELECT user_id FROM user_info WHERE user_id ={user_id} and guild_id={guild_id}")
-    user = c.fetchone()
-    if user is None:
+    try:
         c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
                   f"VALUES ('{str(user_name)} ', '{str(user_id)}', '{str(guild_id)}')")
         conn.commit()
-        c.close()
-    else:
+    except:
         return
 
 
@@ -164,6 +139,7 @@ def banned_until(guild_id, user_id, date):
     c.close()
     return
 
+
 '''
 Role settings 
 '''
@@ -207,17 +183,6 @@ def edit_settings_role(guild_id, role_id, field_name):
     return
 
 
-@app.task(base=DatabaseTask)
-def get_settings_role(guild_id, field_name):
-    #  returns a role name
-    # errors out when  field_name is none bruh
-    conn =  get_settings_role.db
-    c = conn.cursor()
-    c.execute(f"SELECT {str(field_name)} FROM settings WHERE guild_id={str(guild_id)}")
-    role_id = c.fetchone()
-    c.close()
-    return role_id[0]
-
 
 '''
 end of roles settings
@@ -231,7 +196,7 @@ def edit_settings_welcome(guild_id, channel_id):
     # sets the welcome_channel to the given channel id
     conn = edit_settings_welcome.db
     c = conn.cursor()
-    c.execute(f"UPDATE settings SET welcome_channel_id={str(channel_id)} WHERE guild_id = {guild_id}")
+    c.execute(f"UPDATE settings SET welcome_channel_id={str(channel_id)} WHERE guild_id = '{guild_id}'")
     conn.commit()
     c.close()
     return
@@ -242,39 +207,32 @@ def edit_settings_leave(guild_id, channel_id):
     # sets the leave_channel to the given channel id
     conn = edit_settings_leave.db
     c = conn.cursor()
-    c.execute(f"UPDATE settings SET leave_channel_id ={str(channel_id)}"
-              f"WHERE guild_id = {guild_id}")
+    c.execute(f"UPDATE settings SET leave_channel_id ={str(channel_id)} WHERE guild_id ='{guild_id}'")
     conn.commit()
     c.close()
     return
 
 
-@app.task(base=DatabaseTask)
-def get_welcome_channel(guild_id):
-    # returns the  welcome channel
-    conn = get_welcome_channel.db
+@app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_cmd(guild_id, channel_id):
+    # sets the leave_channel to the given channel id
+    conn = edit_settings_leave.db
     c = conn.cursor()
-    c.execute(f"SELECT welcome_channel_id FROM settings WHERE guild_id={str(guild_id)}")
-    welcome_channel = c.fetchone()
+    c.execute(f"UPDATE settings SET cmd_channel_id ={str(channel_id)} WHERE guild_id ='{guild_id}'")
+    conn.commit()
     c.close()
-    if welcome_channel is None:
-        return "you need to set a channel first"
-    else:
-        return welcome_channel[0]
+    return
 
 
-@app.task(base=DatabaseTask)
-def get_leave_channel(guild_id):
-    # returns the leave channel
-    conn = get_leave_channel.db
+@app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_lvl(guild_id, channel_id):
+    # sets the leave_channel to the given channel id
+    conn = edit_settings_leave.db
     c = conn.cursor()
-    c.execute(f"SELECT leave_channel_id FROM settings WHERE guild_id={str(guild_id)}")
-    leave_channel = c.fetchone()
+    c.execute(f"UPDATE settings SET lvl_channel_id ={str(channel_id)} WHERE guild_id ='{guild_id}'")
+    conn.commit()
     c.close()
-    if leave_channel is None:
-        return "you need to set a channel first"
-    else:
-        return leave_channel[0]
+    return
 
 
 '''
@@ -320,17 +278,16 @@ def update_xp_text(guild_id, user_id, amount):
     # updates the xp amount for a given user
     conn = update_xp_text.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} a"
-              f"nd guild_id={str(guild_id)};")
+    c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} and guild_id={str(guild_id)};")
     conn.commit()
     c.close()
     return
 
 
-@app.task(base=DatabaseTask, ignore_result=True)
+@app.task(ignore_result=True)
 def update_text_lvl(guild_id, user_id, amount=1):
     # updates the text lvl for a given user
-    conn = update_text_lvl.db
+    conn = update_xp_text.db
     c = conn.cursor()
     c.execute(f"UPDATE user_info SET text_lvl = {str(amount)}  WHERE user_id ="
               f"{str(user_id)} and guild_id={str(guild_id)}")

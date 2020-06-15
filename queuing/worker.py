@@ -1,6 +1,6 @@
 from celery import Celery, Task
 
-app = Celery('queuing', include=['queuing.db'])
+app = Celery('queuing', include=['queuing.db', ])
 app.config_from_object('queuing.celeryconfig')
 
 # Optional configuration, see the application user guide.
