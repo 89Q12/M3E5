@@ -1,7 +1,8 @@
 # About
 
-M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works. I try my best to program this bot with focus on perfomance and scalability.
-The Ai is currently online on telegram, it can be reached via this @Zofiasbaby_bot username. Just write /start then you talk to her. 
+M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.
+The Ai is currently online on telegram, it can be reached via this @Zofiasbaby_bot username. Just write /start then you talk to her.<br>
+I try my best to program this bot with focus on perfomance and scalability but I'm still learning.
 If you have any questions or you want to see the bot in action join this [discord](https://discord.gg/GWJ6Jeg)
 
 ## Why the name?
