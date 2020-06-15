@@ -42,7 +42,6 @@ Like a real AI and an home assistant like Alexa.
   - One bot instance can run on multiple servers now with out errors
   - when the bot joins a server the database is automatically initialized
   - On server join the owner gets a message with all setup commands that need to be executed
-  - Docker image is ready for the bot and rabbitmq 
   - celery as queuing system works now
 - Chatbot 
   - trained
@@ -52,6 +51,7 @@ Like a real AI and an home assistant like Alexa.
 
 - Discord features
   - celery docker image
+  - Docker image is nearly ready for the bot and rabbitmq 
   - custom help command
   - Tempban/mute currently no idea how to do it perfectly 
   - lock/unlock a specific channel for specific roles 
