@@ -67,6 +67,7 @@ Like a real AI and an home assistant like Alexa.
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
+  - reaction roles
 - Chatbot features
   - Discord bridge 
   - Home assistant bridge
