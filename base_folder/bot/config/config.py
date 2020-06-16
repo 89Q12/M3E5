@@ -3,20 +3,45 @@ from discord.embeds import EmptyEmbed
 import datetime
 import discord.embeds
 
+'''
+Config
+'''
+BOT_TOKEN = "TOKEN"
 
-def token():
-    return ""
+# Sql config
+SQL_IP = "the address of your server. it should be localhost"
+SQL_USER = "username"
+SQL_passwd = "yourpassword"
+SQL_DB = "DB_name"
+SQL_AUTH_PLUGIN = "mysql_native_password"
+
+# Celery config
+broker_url = 'amqp://username:password@ipaddress of your server:5672/vhost'
+result_backend = 'amqp://username:password@ipaddress of your server:5672/vhost'
+imports = ('base_folder.queuing.db',)
+include = ['base_folder.queuing']
+task_cls = 'base_folder.queuing.db:DatabaseTask'
+timezone = 'Europe/Berlin'
+
+'''
+SQL
+'''
 
 
 def sql():
     mydb = mysql.connector.connect(
-      host="",
-      user="",
-      passwd="",
-      database='M3E5',
-      auth_plugin='mysql_native_password'
+      host=SQL_IP,
+      user=SQL_USER,
+      passwd=SQL_passwd,
+      database=SQL_DB,
+      auth_plugin=SQL_AUTH_PLUGIN
     )
     return mydb
+
+
+'''
+Embeds
+'''
 
 
 def success_embed(client):

@@ -2,7 +2,7 @@ import datetime
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
-from queuing.db import *
+from base_folder.queuing.db import *
 
 
 class ListenerMember(commands.Cog):

@@ -1,9 +1,7 @@
 import base64
 from abc import ABC
-from queuing.worker import app, Task
+from base_folder.queuing.worker import app, Task
 from base_folder.bot.config.config import sql
-from mysql.connector import IntegrityError
-
 
 '''
 Initialize the tables

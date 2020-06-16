@@ -1,5 +1,5 @@
 from discord.ext import commands
-from base_folder.bot.config.config import token
+from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.get_from_db import Db
 import base64
 
@@ -35,4 +35,4 @@ for extension in extensions:
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
         print('Failed to load extension {}\n{}'.format(extension, exc))
-client.run(token())
+client.run(BOT_TOKEN)

@@ -1,4 +1,4 @@
-from queuing.db import *
+from base_folder.queuing.db import *
 import discord
 from discord.ext import commands
 

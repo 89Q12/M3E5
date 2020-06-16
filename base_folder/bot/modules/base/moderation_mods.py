@@ -3,8 +3,8 @@ import discord
 from discord.ext import commands
 import discord.utils
 from base_folder.bot.config.Permissions import Auth
-from base_folder.bot.config.config import build_embed, success_embed, error_embed
-from queuing.db import *
+from base_folder.bot.config.config import success_embed, error_embed
+from base_folder.queuing.db import *
 
 
 class ModerationMod(commands.Cog):
