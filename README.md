@@ -37,7 +37,7 @@ Like a real AI and an home assistant like Alexa.
   - loading/unloading/reloading cogs is now working if you have the dev role
   - levelsystem(text based)
   - basic permission system
-  - One bot instance can run on multiple servers now with out errors
+  - One bot instance can run on multiple servers now without errors
   - when the bot joins a server the database is automatically initialized
   - On server join the owner gets a message with all setup commands that need to be executed
   - celery as queuing system works now
