@@ -147,7 +147,7 @@ Like a real AI and an home assistant like Alexa.
 - Navigate to base_folder/bot/config and open the config.py
 - Now enter your bot token and all other things.
 - Note that you only need to the rabbitmq server address, username and vhost for celery
-- Then run ``` docker-compose up``` and look if everything works if so hit ctrl+c and run ``` docker-compose -d up``` that runs it in detached mode.
+- Then run ``` docker-compose up``` and look if everything works if so hit ctrl+c and run ``` docker-compose up -d``` that runs it in detached mode.
 
 ### run instructions
  After installing everything invite your bot to your server and run the following commands to initialize the bot and the database.
