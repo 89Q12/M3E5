@@ -23,18 +23,16 @@ Like a real AI and an home assistant like Alexa.
     - clear amount e.g. 100 messages
     - mute/unmute
     - giving someone a role e.g. .give_role @someone @some_role
-    - info about a role: how many users the role have and permissions
+    - info about a role e.g. how many users the role have and permissions
     - warn 
     - infractions
     - clear infractions
-    - info about a role
   - profile shows you your writer rank/xp and warnings
   - Welcome image
   - welcome/leave channel 
   - Auto roles
   - db connection
   - set default role, admin, dev and mod role
-  - Join and leave messages
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
   - levelsystem(text based)
@@ -50,8 +48,7 @@ Like a real AI and an home assistant like Alexa.
 ![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
 
 - Discord features
-  - celery docker image
-  - Docker image is nearly ready for the bot and rabbitmq 
+  - custom Join and leave messages
   - custom help command
   - Tempban/mute currently no idea how to do it perfectly 
   - lock/unlock a specific channel for specific roles 
@@ -83,13 +80,77 @@ Like a real AI and an home assistant like Alexa.
   
 # Install instructions 
  
- I'm working on an docker img infrastructure but atm follow the run instructions 
+ You need to install a few things and I assume that you're using linux:
+ - Docker
+ - Docker-compose
+ - rabbitmq
+ - mysql-server
  
+ ### First things first:<br>
+ - I assume that you're using Linux<br>
+ - clone the repo and cd into the cloned repo
+ - Instal, for docker [goto](https://docs.docker.com/get-docker/) for docker-compose [goto](https://docs.docker.com/compose/install/).
+ 
+ ### For rabbitmq follow these steps:<br>
+- Add the ppa repo to your source list<br>
+```echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list ```<br>
+- Get the signing key<br>
+```wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add - ```<br>
+- Then update your system<br>
+```sudo apt-get update ```<br>
+- Install the rabbitmq server<br>
+```sudo apt-get install rabbitmq-server```<br>
+- Enable the server as a service<br>
+```sudo systemctl enable rabbitmq-server```<br>
+- Start the server<br>
+```sudo systemctl start rabbitmq-server```<br>
+ Now we need to configure a few things<br>
+- Create a user<br>
+```sudo rabbitmqctl add_user myuser somepassword```<br>
+- Create a vhost the name doesn't really matter for us but remember the name cause you need the name a few times<br>
+```sudo rabbitmqctl add_vhost myvhost ```<br>
+- Create a tag, I used administrator <br>
+```sudo rabbitmqctl set_user_tags myuser mytag```<br>
+- Setting the permissions for the user<br>
+```sudo rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*" ```<br>
+### For mysql follow these steps:<br>
+- Install mysql-server<br>
+```sudo apt install mysql-server```<br>
+- Cofigure mysql<br>
+```sudo mysql_secure_installation```<br>
+- Logging into mysql to adjust somethings<br>
+```sudo mysql ```<br>
+- You should see a table look for root and the plugin it should be auth_socket but we want to change that<br>
+```SELECT user,authentication_string,plugin,host FROM mysql.user;```<br>
+- Editing the root user, just change the password to your needs<br>
+```ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'password';```<br>
+```FLUSH PRIVILEGES; ```<br>
+- And then check the plugin again, it should now be caching_sha2_password like the others<br>
+```SELECT user,authentication_string,plugin,host FROM mysql.user; ```<br>
+-then the server<br>
+```exit ```<br>
+- logging back into the mysql server <br>
+```mysql -u root -p```<br>
+- Creating a user with all privileges<br>
+```CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';```<br>
+- Grant all rights<br>
+```GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost' WITH GRANT OPTION;```<br>
+- Now create the bot database
+```create database theNameOfTheDb;```<br>
+- Now use the db with that command<br>
+```use  theNameOfTheDb;```<br>
+- Now import the database file, I assume that you're still in the directory of the cloned repo<br>
+```source M3E5.sql```<br>
+-Thats it, exit the sql server<br>
+```exit ```<br>
+### Setup the config file
+- Navigate to base_folder/bot/config and open the config.py
+- Now enter your bot token and all other things.
+- Note that you only need to the rabbitmq server address, username and vhost for celery
+- Then run ``` docker-compose up``` and look if everything works if so hit ctrl+c and run ``` docker-compose -d up``` that runs it in detached mode.
+
 ### run instructions
- 
- Clone the repo and install requirements and setup a mysql server with the database file I uploaded. 
- In the config you need to paste your bot token, then you can run main.py. 
- Invite your bot to your server and run the following commands to initialize the bot and the database.
+ After installing everything invite your bot to your server and run the following commands to initialize the bot and the database.
  Run the commands in the following order:
 - -prefix if you want to change the prefix
 - -set_leave
