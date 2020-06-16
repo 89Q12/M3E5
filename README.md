@@ -56,7 +56,7 @@ Like a real AI and an home assistant like Alexa.
   - Tempban/mute currently no idea how to do it perfectly 
   - lock/unlock a specific channel for specific roles 
   - Custom commands
-  - Bunch of standard commands like welcome messages and funny commands like .hug <name>
+  - Bunch of standard commands like welcome messages and funny commands like hug @name
   - Auto tasks
   - Alerts for various services like Twitch and reddit
   - Music player
