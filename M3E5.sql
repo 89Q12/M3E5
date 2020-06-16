@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 30, 2020 at 03:56 PM
+-- Generation Time: Jun 16, 2020 at 04:28 PM
 -- Server version: 8.0.20-0ubuntu0.20.04.1
 -- PHP Version: 7.4.3
 
@@ -31,7 +31,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `Error` (
   `id` bigint NOT NULL,
   `guild_id` bigint NOT NULL,
-  `error` varchar(255) NOT NULL,
+  `error` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -45,7 +45,6 @@ CREATE TABLE `guilds` (
   `guild_id` bigint NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
 -- --------------------------------------------------------
 
 --
@@ -56,7 +55,7 @@ CREATE TABLE `messages` (
   `id` bigint NOT NULL,
   `guild_id` bigint NOT NULL,
   `user_id` bigint NOT NULL,
-  `message` varchar(2000) NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -72,7 +71,6 @@ CREATE TABLE `roles` (
   `role_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
 -- --------------------------------------------------------
 
 --
@@ -81,16 +79,19 @@ CREATE TABLE `roles` (
 
 CREATE TABLE `settings` (
   `guild_id` bigint NOT NULL,
-  `standard_role_id` bigint DEFAULT '0',
+  `standard_role_id` bigint NOT NULL DEFAULT '0',
   `dev_role_id` bigint NOT NULL DEFAULT '0',
   `mod_role_id` bigint NOT NULL DEFAULT '0',
   `admin_role_id` bigint NOT NULL DEFAULT '0',
   `imgwelcome_toggle` tinyint(1) NOT NULL DEFAULT '0',
-  `imgwelcome_text` varchar(255) NOT NULL DEFAULT 'Welcome user to server!',
-  `imgwelcome_channel` bigint NOT NULL DEFAULT '0',
+  `imgwelcome_text` varchar(2000) NOT NULL DEFAULT 'V2VsY29tZSB0byB0aGUgc2VydmVyIHlvdSBsaXR0bGUgdXNlcg==',
+  `levelsystem_toggle` tinyint(1) NOT NULL DEFAULT '0',
   `welcome_channel_id` bigint NOT NULL DEFAULT '0',
   `leave_channel_id` bigint NOT NULL DEFAULT '0',
-  `levelsystem_toggle` tinyint(1) NOT NULL DEFAULT '0'
+  `lvl_channel_id` bigint NOT NULL DEFAULT '0',
+  `cmd_channel_id` bigint NOT NULL DEFAULT '0',
+  `prefix` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'LQ==',
+  `Color` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'default()'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -104,12 +105,16 @@ CREATE TABLE `user_info` (
   `user_id` bigint NOT NULL,
   `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `guild_id` bigint NOT NULL,
-  `text_xp` int NOT NULL DEFAULT '0',
+  `warnings` int NOT NULL DEFAULT '0',
+  `text_xp` bigint NOT NULL DEFAULT '0',
   `text_lvl` int NOT NULL DEFAULT '0',
   `voice_xp` int NOT NULL DEFAULT '0',
-  `voice_lvl` int NOT NULL DEFAULT '0'
+  `voice_lvl` int NOT NULL DEFAULT '0',
+  `banned_at` datetime DEFAULT NULL,
+  `banned_until` datetime DEFAULT NULL,
+  `muted_at` datetime DEFAULT NULL,
+  `muted_until` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 
 --
 -- Indexes for dumped tables
@@ -120,7 +125,8 @@ CREATE TABLE `user_info` (
 --
 ALTER TABLE `Error`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `guild_id` (`guild_id`);
+  ADD KEY `guild_id` (`guild_id`) USING BTREE,
+  ADD KEY `date` (`date`) USING BTREE;
 
 --
 -- Indexes for table `guilds`
@@ -133,8 +139,8 @@ ALTER TABLE `guilds`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `guild_id` (`guild_id`) USING BTREE,
-  ADD UNIQUE KEY `user_id` (`user_id`);
+  ADD KEY `guild_id` (`guild_id`) USING BTREE,
+  ADD KEY `user_id` (`user_id`) USING BTREE;
 
 --
 -- Indexes for table `roles`
@@ -154,8 +160,10 @@ ALTER TABLE `settings`
 --
 ALTER TABLE `user_info`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `test` (`guild_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `muted_at` (`muted_at`),
+  ADD KEY `banned_at` (`banned_at`) USING BTREE,
+  ADD KEY `user_info_ibfk_1` (`guild_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -177,7 +185,7 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `user_info`
 --
 ALTER TABLE `user_info`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -187,14 +195,14 @@ ALTER TABLE `user_info`
 -- Constraints for table `Error`
 --
 ALTER TABLE `Error`
-  ADD CONSTRAINT `Error_ibfk_1` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`guild_id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `Error_ibfk_1` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`guild_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `messages`
 --
 ALTER TABLE `messages`
-  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`guild_id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`guild_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_info` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `roles`
@@ -212,7 +220,7 @@ ALTER TABLE `settings`
 -- Constraints for table `user_info`
 --
 ALTER TABLE `user_info`
-  ADD CONSTRAINT `test` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`guild_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `user_info_ibfk_1` FOREIGN KEY (`guild_id`) REFERENCES `guilds` (`guild_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

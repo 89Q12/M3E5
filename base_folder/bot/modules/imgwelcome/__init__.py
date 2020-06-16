@@ -6,7 +6,7 @@ from io import BytesIO
 import textwrap
 import base64
 from discord.ext import commands
-from queuing.db import edit_settings_img_text, edit_settings_img
+from base_folder.queuing.db import edit_settings_img_text, edit_settings_img
 
 '''
 MIT License

@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+
+  m3e5:
+    container_name: m3e5
+    build: .
+    command: python main.py
+    volumes:
+      - .:/usr/src/app
+
+  celery:
+    container_name: celery
+    build: .
+    command: celery -A base_folder.queuing.worker worker --loglevel=info
+    volumes:
+      - .:/usr/src/app

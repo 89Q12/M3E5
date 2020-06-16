@@ -1,6 +1,6 @@
 from discord.ext import commands
 from base_folder.bot.config.config import success_embed
-from queuing.db import update_text_lvl, update_xp_text
+from base_folder.queuing.db import update_text_lvl, update_xp_text
 
 
 async def update_data(ctx, xp):

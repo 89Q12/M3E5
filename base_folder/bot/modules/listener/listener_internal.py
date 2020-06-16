@@ -1,9 +1,7 @@
-import asyncio
-
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
-from queuing.db import initialize_guild, is_user_indb
+from base_folder.queuing.db import initialize_guild, is_user_indb
 
 # TODO: Automod
 
@@ -41,6 +39,9 @@ class Internal(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if self.client.user.mentioned_in(message):
+            channel = self.client.get_channel(message.channel.id)
+            await channel.send("Hello there")
         pass
 
 

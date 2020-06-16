@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import success_embed
-from queuing.db import *
+from base_folder.queuing.db import *
 
 '''
 All commands that a guild team can use to customize the bot to there needs.

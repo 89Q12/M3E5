@@ -1,8 +1,7 @@
-import discord
 from discord.ext import commands
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import success_embed, error_embed
-from queuing.db import *
+from base_folder.queuing.db import *
 
 
 class Dev(commands.Cog):
