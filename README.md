@@ -1,6 +1,6 @@
 # About
 
-M3E5 is a Discord bot that implements an chatbot and an home assistant. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.
+M3E5 is a Discord bot that implements an chatbot. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.
 The Ai is currently online on telegram, it can be reached via this @Zofiasbaby_bot username. Just write /start then you talk to her.<br>
 I try my best to program this bot with focus on perfomance and scalability but I'm still learning.
 If you have any questions or you want to see the bot in action join this [discord](https://discord.gg/GWJ6Jeg)
@@ -8,7 +8,7 @@ If you have any questions or you want to see the bot in action join this [discor
 ## Why the name?
 
 I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique bot with tons of unique features.<br>
-Like a real AI and an home assistant like Alexa.
+Like a real AI and some other features.
 
 # Planned features
 
@@ -50,6 +50,7 @@ Like a real AI and an home assistant like Alexa.
 - Discord features
   - custom Join and leave messages
   - custom help command
+  - anti spam
   - Tempban/mute currently no idea how to do it perfectly 
   - lock/unlock a specific channel for specific roles 
   - Custom commands
@@ -60,19 +61,13 @@ Like a real AI and an home assistant like Alexa.
   - custom messaging design 
   - Logging Channels to a database
   - Recording meetings ( Voice recording to an mp3 file)
-  - Home assistant integration
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
   - reaction roles
 - Chatbot features
   - Discord bridge 
-  - Home assistant bridge
   - maybe more but idk now yet
-- Home assistant
-  - Discord bridge
-  - Seamless ai bridge 
-  - Disabling a few commands that aren't needed e.g. play a song on youtube, because this gets handeld by the bot
  
 # Critical bugs
 
@@ -163,13 +158,6 @@ Like a real AI and an home assistant like Alexa.
 - -set_admin
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
- 
-# Home assistant
-
-For this part I'm using a modified version of this [assistant](https://github.com/ggeop/Python-ai-assistant).<br> 
-All credits for the home assistant goes to [ggeop](https://github.com/ggeop).
-
-The assistant uses nltk, that means that if you write "what time is it" it will understand that you're asking for the current time :D
 
 # Chatbot
 
@@ -205,7 +193,3 @@ Question: What do you think about the human race?<br>
 Answer: I think it's a bit of a dick.
 
 Cute or? isn't it
-
-## For examples of the home assistant please click [here](https://github.com/ggeop/Python-ai-assistant)
-
-Because I don't want to steal any credits or so and I'm lazy xD
