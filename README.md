@@ -65,6 +65,7 @@ Like a real AI and some other features.
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that ueses groups of accepted roles and banned roles per command
   - reaction roles
+  - unittests
 - Chatbot features
   - Discord bridge 
   - maybe more but idk now yet
