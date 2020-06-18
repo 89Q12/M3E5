@@ -1,3 +1,4 @@
+![py_versions](https://img.shields.io/badge/python-3.7_3.8-blue)
 # About
 
 M3E5 is a Discord bot that implements an chatbot. The chatbot is based on Google's nmt AI, it's a bit hacky but it works.<br>
@@ -45,7 +46,7 @@ Like a real AI and some other features.
   - trained
   - Answers to messages like a real human 
 
-![Status](https://img.shields.io/badge/status-in%20progress-red.svg)
+![Status](https://img.shields.io/badge/status-in_progress-red.svg)
 
 - Discord features
   - custom Join and leave messages
