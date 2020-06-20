@@ -151,7 +151,7 @@ Like a real AI and some other features.
 ### Setup the config file
 - Navigate to base_folder/bot/config and open the config.py
 - Now enter your bot token and all other things.
-- Note that you only need to the rabbitmq server address, username and vhost for celery
+- Note that you only need to change the rabbitmq server address, username and vhost for celery
 - Then run ``` docker-compose up``` and look if everything works if so hit ctrl+c and run ``` docker-compose up -d``` that runs it in detached mode.
 
 ### run instructions
