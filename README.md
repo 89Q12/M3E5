@@ -83,7 +83,8 @@ For a list with all commands and there usage look at [commads](https://github.co
  
 # Critical bugs
 
-  -Not well documented
+  - Deletes sometime the error message when a command rasied multiple errors
+  - Not well documented
   
 # Install instructions 
  
