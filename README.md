@@ -11,6 +11,13 @@ If you have any questions or you want to see the bot in action join this [discor
 I got inspired by the MEE6 but I don't wanted to build a clone of MEE6 instead I want to creat a special unique bot with tons of unique features.<br>
 Like a real AI and some other features.
 
+## What M3E5 love's and uses
+
+- Docker/Docker-compose
+- rabbitmq
+- mysql
+- discord.py
+
 # Planned features
 
 ![Status](https://img.shields.io/badge/status-completed-green.svg)
