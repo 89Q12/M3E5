@@ -63,4 +63,4 @@ more commands will follow
 |:-------------|:----|:----|
 | profile | shows the profile of the member like text xp etc| profile |
 | roleinfo |Shows the color of role and how many members's the role has and some other things | roleinfo @role |
-| server_info | Shows info about the current guild e.g created at etc | server_infor |
+| server_info | Shows info about the current guild e.g created at etc | server_info |
