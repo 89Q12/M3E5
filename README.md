@@ -15,6 +15,7 @@ Like a real AI and some other features.
 
 - Docker/Docker-compose
 - rabbitmq
+- celery
 - mysql
 - discord.py
 
