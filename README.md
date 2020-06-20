@@ -81,7 +81,7 @@ Like a real AI and some other features.
  
 # Critical bugs
 
-  -Not enough in the code comments D: hehe
+  -Not well documented
   
 # Install instructions 
  
