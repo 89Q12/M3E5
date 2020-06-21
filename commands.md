@@ -57,10 +57,26 @@ Permission level bot owner required
 |unload | unloads a given module | unload name or folder.name oder folder.subfolder.name |
 
 ## User commnads
-Permission level member or or higher required
+Permission level member or higher required
 more commands will follow
 |      Command   |description|usage|
 |:-------------|:----|:----|
 | profile | shows the profile of the member like text xp etc| profile |
 | roleinfo |Shows the color of role and how many members's the role has and some other things | roleinfo @role |
 | server_info | Shows info about the current guild e.g created at etc | server_info |
+
+## Music
+Permission level member or higher required
+|      Command   |description|usage|
+|:-------------|:----|:----|
+| join | the bot joins your voice channel |join |
+| leave | the bot leaves your voice channel | leave |
+| stop | the bot leaves your voice channel | stop |
+| play | plays a song from a given url | play url |
+| nowplaying | shows the playlist, the current song, if loop is enabled and current index and len of the play list | nowplaying |
+| queue | shows the queue | queue| 
+| pause | pauses the bot  | pause |
+| skip | skips the current song | skip |
+| volume | changes the volume of the bot | volume 50 or 80 or so |
+| jumpqueue | moves a given song to a given position | jumpqueue song index future index e.g. jumpqueue 2 5|
+
