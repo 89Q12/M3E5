@@ -39,7 +39,7 @@ For a list with all commands and there usage look at [commads](https://github.co
     - infractions
     - clear infractions
   - profile shows you your writer rank/xp and warnings
-  - Music player
+  - Music player has still some bugs 
     - join
     - leave
     - stop apparently the same as leave but this will change
