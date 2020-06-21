@@ -1,4 +1,0 @@
-2020-06-16 23:11:39,059:INFO:discord.client: logging in using static token
-2020-06-16 23:11:39,624:INFO:discord.gateway: Created websocket connected to wss://gateway.discord.gg?encoding=json&v=6&compress=zlib-stream
-2020-06-16 23:11:39,625:INFO:discord.gateway: Shard ID None has sent the IDENTIFY payload.
-2020-06-16 23:11:39,789:INFO:discord.gateway: Shard ID None has connected to Gateway: ["gateway-prd-main-1wj5",{"micros":40791,"calls":["discord-sessions-prd-1-78",{"micros":34634,"calls":["start_session",{"micros":30269,"calls":["api-prd-main-us-east1-nzjx",{"micros":27490,"calls":["get_user",{"micros":2182},"add_authorized_ip",{"micros":1600},"get_guilds",{"micros":1696},"coros_wait",{"micros":0}]}]},"guilds_connect",{"micros":6,"calls":[]},"presence_connect",{"micros":1,"calls":[]}]}]}] (Session ID: 9dd58d814558c832ae355a8f093a10ae).
