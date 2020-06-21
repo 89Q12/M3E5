@@ -1,18 +1,27 @@
-from discord.ext import commands
-from base_folder.bot.config.config import build_embed
 import datetime
+
+import discord
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+import os
+import aiohttp
+from io import BytesIO
+import textwrap
+import base64
+from discord.ext import commands
+
+from base_folder.bot.config.config import build_embed
+from base_folder.queuing.db import edit_settings_img_text, edit_settings_img
 
 
 class Test(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.client = bot
 
     @commands.command(brief="Test")
     async def xx(self, ctx, arg: int):
-        await ctx.channel.purge(limit=1)
         muteduntil = ctx.message.created_at + datetime.timedelta(hours=arg)
         await ctx.send(muteduntil)
-        messages = build_embed(author=self.bot.user.name, title="Hey!",
+        messages = build_embed(author=self.client.user.name, title="Hey!",
                                description="Thanks for choosing me! "
                                            "here are some commands you need to execute:")
         messages.add_field(name="Important setup commands", value="-prefix the prefix\n -set_leave\n -set_welcome\n "

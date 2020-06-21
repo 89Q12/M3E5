@@ -10,8 +10,9 @@ class Dev(commands.Cog):
 
     @commands.command(pass_context=True, brief="unloads a module")
     @commands.is_owner()
-    async def unload(self, ctx, cog: str):
+    async def unload(self, ctx, module: str):
         await ctx.channel.purge(limit=1)
+        cog = "base_folder.bot.modules." + module
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
         else:
@@ -30,8 +31,9 @@ class Dev(commands.Cog):
 
     @commands.command(pass_context=True, brief="loads a module")
     @commands.is_owner()
-    async def load(self, ctx, cog: str):
+    async def load(self, ctx, module: str):
         await ctx.channel.purge(limit=1)
+        cog = "base_folder.bot.modules." + module
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
         else:
@@ -50,8 +52,9 @@ class Dev(commands.Cog):
 
     @commands.command(pass_context=True, brief="reloads a module")
     @commands.is_owner()
-    async def reload(self, ctx, cog: str):
+    async def reload(self, ctx, module: str):
         await ctx.channel.purge(limit=1)
+        cog = "base_folder.bot.modules." + module
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
         else:
