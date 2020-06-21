@@ -22,7 +22,7 @@ class ModerationAdmin(commands.Cog):
         if log is None:
             log = ctx
         e = success_embed(self.client)
-        e.description=f"Giving the role {role.mention} to {member.mention}"
+        e.description = f"Giving the role {role.mention} to {member.mention}"
         await log.send(embed=e)
         await member.add_roles(role)
 
@@ -88,7 +88,7 @@ class ModerationAdmin(commands.Cog):
         if log is None:
             log = ctx
         warnings = await self.client.sql.get_warns(ctx.guild.id, member.id)
-        e = build_embed(author=self.client.user.name, author_img=self.client.user.avatart_url, title="Infractions cleared!",
+        e = build_embed(author=self.client.user.name, author_img=self.client.user.avatar_url, title="Infractions cleared!",
                         description=f"{member} Had {warnings} infractions but now {member} has 0!",
                         timestamp=datetime.datetime.now(),
                         )

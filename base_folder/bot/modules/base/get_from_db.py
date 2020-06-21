@@ -88,6 +88,15 @@ class Db:
         c.close()
         return leave_channel[0]
 
+    async def get_leave_text(self, guild_id):
+        conn = sql()
+        c = conn.cursor()
+        c.execute(f"SELECT leave_text FROM settings WHERE guild_id={str(guild_id)}")
+        leave_text = c.fetchone()
+        conn.commit()
+        c.close()
+        return leave_text[0]
+
     async def get_img(self, guild_id):
         conn = sql()
         c = conn.cursor()

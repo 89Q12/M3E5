@@ -223,6 +223,18 @@ def edit_settings_cmd(guild_id, channel_id):
 
 
 @app.task(base=DatabaseTask, ignore_result=True)
+def set_leave_text(guild_id, text):
+    # sets the leave_channel to the given channel id
+    conn = edit_settings_leave.db
+    c = conn.cursor()
+    text = base64.b64encode(text.encode("utf8")).decode("utf8")
+    c.execute(f"UPDATE settings SET leave_text ='{str(text)}' WHERE guild_id ='{guild_id}'")
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_lvl(guild_id, channel_id):
     # sets the leave_channel to the given channel id
     conn = edit_settings_leave.db

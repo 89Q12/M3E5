@@ -125,28 +125,33 @@ class IMGWelcome(commands.Cog):
         await ctx.send("Updated text!")
         edit_settings_img_text.delay(ctx.guild.id, text)
 
+    @imgwelcome.command(name="test")
+    async def imgwelcome_test(self, ctx):
+        member: discord.member = ctx.author
+        await ctx.send(member.name)
+        await self.on_member_join(member)
+
     def _circle_border(self, circle_img_size: tuple):
         border_size = []
         for i in range(len(circle_img_size)):
             border_size.append(circle_img_size[0] + 8)
         return tuple(border_size)
 
-    async def setimage(self, member):
-        try:
-            img = Image.open(f"data/imgwelcome/{member.guild.id}.png").convert("RGBA").resize((500, 150))
-            bg = Image.new("RGBA", (500, 150), (0, 0, 0, 0))
-            bg.alpha_composite(img, (0, 0))
-            bg.save(f"data/imgwelcome/{member.guild.id}.png")
-            await member.send("Set image!")
-        except Exception as e:
-            await member.send("Failed to set image... `{}`".format(e))
-
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
         channel_id = await self.client.sql.get_welcome_channel(member.guild.id)
-        channel = member.guild.get_channel(channel_id.get())
+        channel = self.client.get_channel(channel_id.get())
         if not channel:
+            return
+        if await self.__is_enabled(member.guild.id):
+            pass
+        else:
+            r = await self.client.sql.get_img_text(guild.id)
+            content = base64.b64decode(str(r.encode("utf8"))).decode("utf8")\
+                .replace("user", member.mention)\
+                .replace("server", guild.name)
+            await channel.send(content)
             return
         await channel.trigger_typing()
 

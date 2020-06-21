@@ -25,9 +25,13 @@ class ListenerMember(commands.Cog):
             return
         channel_id = await self.client.sql.get_leave_channel(self.client, member.guild.id)
         channel = member.guild.get_channel(channel_id)
+        r = await self.client.sql.get_leave_text(member.guild.id)
+        content = base64.b64decode(str(r.encode("utf8"))).decode("utf8") \
+            .replace("user", member.mention) \
+            .replace("server",  member.guild.name)
         e = build_embed(author=self.client.user.name, author_img=self.client.user.avatart_url, timestamp=datetime.datetime.now(),
-                        thumbnail=member.avatar_url, title="Bye Bye",
-                        description=f"User {member.mention} left the server...")
+                        thumbnail=member.avatar_url, title="Bye Bye")
+        e.description = content
         await channel.send(embed=e)
 
 

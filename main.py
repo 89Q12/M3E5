@@ -1,6 +1,7 @@
 from discord.ext import commands
 from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.get_from_db import Db
+import base_folder.bot.logger
 import base64
 
 
@@ -12,7 +13,7 @@ def prefix(client, ctx):
 
 client = commands.Bot(command_prefix=prefix)
 
-extensions = ["base_folder.bot.modules.test.test",
+extensions = ["base_folder.bot.modules.test",
               "base_folder.bot.modules.listener.listener_member",
               "base_folder.bot.modules.listener.listener_roles",
               "base_folder.bot.modules.listener.levelsystem",
@@ -27,7 +28,7 @@ extensions = ["base_folder.bot.modules.test.test",
               "base_folder.bot.modules.listener.listener_internal"]
 
 conn = Db()
-client.sql = conn # creates an sql connection object that's accessible via the client object
+client.sql = conn  # creates an sql connection object that's accessible via the client object
 for extension in extensions:
     try:
         client.load_extension(extension)
