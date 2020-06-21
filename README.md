@@ -33,12 +33,23 @@ For a list with all commands and there usage look at [commads](https://github.co
     - kick
     - clear amount e.g. 100 messages
     - mute/unmute
-    - giving someone a role e.g. .give_role @someone @some_role
+    - giving someone a role
     - info about a role e.g. how many users the role have and permissions
     - warn 
     - infractions
     - clear infractions
   - profile shows you your writer rank/xp and warnings
+  - Music player
+    - join
+    - leave
+    - stop apparently the same as leave but this will change
+    - queue
+    - jumpqueue
+    - nowplaying
+    - play 
+    - pause
+    - skip
+    - reaction controls
   - Welcome image
   - welcome/leave channel 
   - Auto roles
@@ -69,6 +80,9 @@ For a list with all commands and there usage look at [commads](https://github.co
   - Auto tasks
   - Alerts for various services like Twitch and reddit
   - Music player
+    - youtube playlist
+    - Spotify
+    - youtube-dl implemention needs a rework
   - custom messaging design 
   - Logging Channels to a database
   - Recording meetings ( Voice recording to an mp3 file)
@@ -84,6 +98,7 @@ For a list with all commands and there usage look at [commads](https://github.co
 # Critical bugs
 
   - Deletes sometime the error message when a command rasied multiple errors
+  - maybe some bugs in the music cog
   - Not well documented
   
 # Install instructions 
