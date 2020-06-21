@@ -40,7 +40,7 @@ class Video(commands.Cog):
         self.requested_by = requested_by
 
     def _get_info(self, video_url):
-        info = ytdl.extract_info(video_url, download=lambda: not False)
+        info = ytdl.extract_info(video_url, download=False)
         video = None
         if "_type" in info and info["_type"] == "playlist":
             return self._get_info(
