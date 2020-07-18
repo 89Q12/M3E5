@@ -23,7 +23,7 @@ Like a real AI and some other features.
 
 ![Status](https://img.shields.io/badge/status-completed-green.svg)
 
-For a list with all commands and there usage look at [commads](https://github.com/11Tuvork28/M3E5/blob/master/commands.md)
+For a list with all commands and there usage look at [commands](https://github.com/11Tuvork28/M3E5/blob/master/commands.md)
 
 - Discord bot base
   - the standard prefix is - but it's changeable with -prefix arg 
