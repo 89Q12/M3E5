@@ -54,6 +54,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - welcome/leave channel 
   - Auto roles
   - db connection
+  - Logging messages to a database
   - set default role, admin, dev and mod role
   - reading/writing to database
   - loading/unloading/reloading cogs is now working if you have the dev role
@@ -84,7 +85,6 @@ For a list with all commands and there usage look at [commands](https://github.c
     - Spotify
     - youtube-dl implemention needs a rework
   - custom messaging design 
-  - Logging Channels to a database
   - Recording meetings ( Voice recording to an mp3 file)
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
