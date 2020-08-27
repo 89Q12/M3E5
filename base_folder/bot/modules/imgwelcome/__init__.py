@@ -44,7 +44,7 @@ class IMGWelcome(commands.Cog):
         else:
             return False
 
-    @commands.group(brief="imgwelcom toggle/text/img")
+    @commands.group(brief="imgwelcome toggle/text/img")
     @commands.has_permissions(administrator=True)
     async def imgwelcome(self, ctx):
         # Base command
@@ -53,9 +53,9 @@ class IMGWelcome(commands.Cog):
 
     @imgwelcome.command(name="toggle")
     async def imgwelcome_toggle(self, ctx):
-        """Toggle on/off the imgwelcomer"""
-        toggle = int(await self.client.sql.get_img(self.client, ctx.guild.id))
+        """Toggle on/off the imgwelcome"""
         await ctx.channel.purge(limit=1)
+        toggle = int(await self.client.sql.get_img(ctx.guild.id))
         log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
         if log is None:
             log = ctx

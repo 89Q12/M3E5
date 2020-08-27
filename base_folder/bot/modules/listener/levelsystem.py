@@ -5,8 +5,9 @@ from base_folder.queuing.db import update_text_lvl, update_xp_text
 
 async def update_data(ctx, xp):
     amount = 0
-    amount += len(ctx.content)
-    xp = amount + xp
+    for i in str(ctx.content).split(" "):
+        amount += 1
+    xp += amount
     update_xp_text.delay(ctx.guild.id, ctx.author.id, xp)
     return xp
 
