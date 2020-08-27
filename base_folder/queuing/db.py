@@ -2,11 +2,10 @@ import base64
 from abc import ABC
 from base_folder.queuing.worker import app, Task
 from base_folder.bot.config.config import sql
-
+import re
 '''
 Initialize the tables
 '''
-
 
 class DatabaseTask(Task, ABC):
     _db = None
@@ -28,6 +27,11 @@ def initialize_guild(guild_id):
     conn.commit()
     c.close()
     return
+
+
+@app.task(bind=True, ignore_result=False)
+def test(self):
+    return 1+1
 
 
 '''
@@ -54,18 +58,6 @@ def on_error(guild_id, error):
     c = conn.cursor()
     error = (base64.b64encode(str(error).encode("utf8"))).decode("utf8")
     c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', '{error}')")
-    conn.commit()
-    c.close()
-    return
-
-
-@app.task(base=DatabaseTask, ignore_result=True)
-def insert_message(guild_id, user_id, message, time):
-    conn = insert_message.db
-    c = conn.cursor()
-    message = (base64.b64encode(str(message).encode("utf8"))).decode("utf8")
-    c.execute(f"INSERT into messages (guild_id, user_id, message, time) "
-              f"VALUES ('{guild_id}', '{user_id}', '{message}', '{time}')")
     conn.commit()
     c.close()
     return
@@ -315,5 +307,30 @@ def edit_settings_levelsystem(guild_id, toggler):
     c.execute(f"UPDATE settings SET levelsystem_toggle= {str(toggler)} WHERE guild_id={guild_id}")
     conn.commit()
     c.close()
-    return True
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
+def insert_message(guild_id, userid, messageid, channelid, message):
+    """
+
+    :param guild_id: id of the guild the data is for
+    :param userid: the id of the user given by the api
+    :param messageid: the id of the message
+    :param channelid: the channel id the message was sent in
+    :param message: message content itself
+    :return: nothing
+    """
+
+    def sanitize_data(data):
+        return re.sub(r"[^a-zA-Z0-9 ]", "", data)
+
+    m = sanitize_data(message)
+    conn = insert_message.db
+    c = conn.cursor()
+    c.execute(f"INSERT INTO `messages`(`guild_id`, `user_id`, `message_id`, `channel_id`, `message`)"
+              f"VALUES ('{guild_id}','{userid}','{messageid}','{channelid}','{str(m)}')")
+    conn.commit()
+    c.close()
+    return
 

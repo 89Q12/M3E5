@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import initialize_guild, is_user_indb
+from base_folder.queuing.db import initialize_guild, is_user_indb, insert_message
 
 # TODO: Automod
 
@@ -33,16 +33,23 @@ class Internal(commands.Cog):
         for user in guild.members:
             is_user_indb.delay(user.name, user.id, guild.id)
 
+    """
+    Logging the guilds follows
+    """
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.message):
+        """
+        Logs every message the bot gets into the db with channel id message id user id guild id timestamp
+        :parameter message is the message object returned by the api
+        """
+        guildid = message.guild.id
+
+        insert_message.delay(guildid, message.author.id, message.id, message.channel.id, message.content)
+
+
     '''
     Automated moderation follows:
     '''
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if self.client.user.mentioned_in(message):
-            channel = self.client.get_channel(message.channel.id)
-            await channel.send("Hello there")
-        pass
 
 
 def setup(client):

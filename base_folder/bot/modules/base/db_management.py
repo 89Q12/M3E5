@@ -7,7 +7,7 @@ Class to create db management as class
 '''
 
 
-class Db:
+class DbRead:
     def __init__(self):
         self.sql = sql()
 

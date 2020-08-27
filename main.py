@@ -1,6 +1,6 @@
 from discord.ext import commands
 from base_folder.bot.config.config import BOT_TOKEN
-from base_folder.bot.modules.base.get_from_db import Db
+from base_folder.bot.modules.base.db_management import Db
 import base_folder.bot.logger
 import base64
 

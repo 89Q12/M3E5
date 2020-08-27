@@ -1,16 +1,6 @@
 import datetime
-
-import discord
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-import os
-import aiohttp
-from io import BytesIO
-import textwrap
-import base64
 from discord.ext import commands
-
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import edit_settings_img_text, edit_settings_img
 
 
 class Test(commands.Cog):
@@ -33,7 +23,6 @@ class Test(commands.Cog):
                                                "sets the dev role\n sets the mod role\n sets the admin role")
 
         await ctx.send(embed=messages)
-
 
 def setup(bot):
     bot.add_cog(Test(bot))

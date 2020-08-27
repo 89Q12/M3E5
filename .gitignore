@@ -7,4 +7,5 @@ tests/*
 *.pyc
 *.pyo
 README.md
+requirements.txt
 
