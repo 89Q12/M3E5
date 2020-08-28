@@ -7,7 +7,7 @@ Class to create db management as class
 '''
 
 
-class DbRead:
+class Db:
     def __init__(self):
         self.sql = sql()
 
@@ -157,3 +157,15 @@ class DbRead:
             return None
         else:
             return dates[0]
+
+    async def get_blacklist(self, user_id):
+        conn = sql()
+        c = conn.cursor()
+        c.execute(f"SELECT user_id FROM `blacklist` WHERE user_id = {user_id}")
+        user = c.fetchone()
+        conn.commit()
+        c.close()
+        if user is None:
+            return False
+        else:
+            return True

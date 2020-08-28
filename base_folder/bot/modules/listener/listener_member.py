@@ -11,6 +11,10 @@ class ListenerMember(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        blacklisted = await self.client.sql.get_blacklist(member.id)
+        if blacklisted:
+            await member.ban(member, reason="Blacklisted")
+            return
         role_id = await self.client.sql.get_settings_role(member.guild.id, "standard_role_id")
         if role_id is None or 0:
             role = member.guild.default_role

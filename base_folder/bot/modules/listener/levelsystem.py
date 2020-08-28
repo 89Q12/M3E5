@@ -12,6 +12,13 @@ async def update_data(ctx, xp):
     return xp
 
 
+def _enabled(client, guildid):
+    if client.sql.get_levelsystem(guildid) == 1:
+        return True
+    else:
+        return False
+
+
 class Levelsystem(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -19,6 +26,8 @@ class Levelsystem(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.content is None:
+            return
+        if not _enabled(self.client, message.guild.id):
             return
         if message.author.id == self.client.user.id:
             return

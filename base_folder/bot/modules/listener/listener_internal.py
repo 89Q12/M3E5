@@ -42,8 +42,9 @@ class Internal(commands.Cog):
         Logs every message the bot gets into the db with channel id message id user id guild id timestamp
         :parameter message is the message object returned by the api
         """
+        if message.author.id == self.client.user.id:
+            return
         guildid = message.guild.id
-
         insert_message.delay(guildid, message.author.id, message.id, message.channel.id, message.content)
 
 

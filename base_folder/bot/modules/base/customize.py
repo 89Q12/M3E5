@@ -19,7 +19,7 @@ class Custom(commands.Cog):
     Custom settings
     '''
 
-    @commands.command(pass_context=True, brief="sets the welcome channel set_welcome channelid")
+    @commands.command(pass_context=True, brief="sets the welcome channel set_welcome channel id")
     @commands.guild_only()
     async def set_welcome(self, ctx, channel_id: int):
         await ctx.channel.purge(limit=1)
@@ -29,7 +29,7 @@ class Custom(commands.Cog):
             raise commands.errors.CheckFailure
         channel = self.client.get_channel(channel_id)
         e = success_embed(self.client)
-        e.description=f"{channel.mention} is now the welcome channel"
+        e.description = f"{channel.mention} is now the welcome channel"
         await ctx.send(embed=e)
         edit_settings_welcome.delay(ctx.guild.id, channel_id)
 
@@ -43,7 +43,7 @@ class Custom(commands.Cog):
             raise commands.errors.CheckFailure
         channel = self.client.get_channel(channel_id)
         e = success_embed(self.client)
-        e.description=f"{channel.mention} is now the leave channel"
+        e.description = f"{channel.mention} is now the leave channel"
         await ctx.send(embed=e)
         edit_settings_leave.delay(ctx.guild.id, channel_id)
 
@@ -57,7 +57,7 @@ class Custom(commands.Cog):
             raise commands.errors.CheckFailure
         channel = self.client.get_channel(channel_id)
         e = success_embed(self.client)
-        e.description=f"{channel.mention} is now the level up channel"
+        e.description = f"{channel.mention} is now the level up channel"
         await ctx.send(embed=e)
         edit_settings_lvl.delay(ctx.guild.id, channel_id)
 
@@ -83,7 +83,7 @@ class Custom(commands.Cog):
         else:
             raise commands.errors.CheckFailure
         e = success_embed(self.client)
-        e.description=f"{arg} is now the bot prefix"
+        e.description = f"{arg} is now the bot prefix"
         await ctx.send(embed=e)
         set_prefix.delay(ctx.guild.id, arg)
 
@@ -97,7 +97,7 @@ class Custom(commands.Cog):
             raise commands.errors.CheckFailure
         edit_settings_role.delay(ctx.guild.id, role.id, "standard_role_id")
         e = success_embed(self.client)
-        e.description=f"{role} is now the default role"
+        e.description = f"{role} is now the default role"
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
@@ -109,7 +109,7 @@ class Custom(commands.Cog):
         else:
             raise commands.errors.CheckFailure
         e = success_embed(self.client)
-        e.description=f"{role} is now the admin role"
+        e.description = f"{role} is now the admin role"
         await ctx.send(embed=e)
         edit_settings_role.delay(ctx.guild.id, role.id, "admin_role_id")
 
@@ -122,7 +122,7 @@ class Custom(commands.Cog):
         else:
             raise commands.errors.CheckFailure
         e = success_embed(self.client)
-        e.description=f"{role} is now the dev role"
+        e.description = f"{role} is now the dev role"
         await ctx.send(embed=e)
         edit_settings_role.delay(ctx.guild.id, role.id, "dev_role_id")
 
@@ -135,7 +135,7 @@ class Custom(commands.Cog):
         else:
             raise commands.errors.CheckFailure
         e = success_embed(self.client)
-        e.description=f"{role} is now the mod role"
+        e.description = f"{role} is now the mod role"
         await ctx.send(embed=e)
         edit_settings_role.delay(ctx.guild.id, role.id, "mod_role_id")
 
