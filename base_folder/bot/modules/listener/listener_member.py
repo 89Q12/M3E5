@@ -33,7 +33,8 @@ class ListenerMember(commands.Cog):
         content = base64.b64decode(str(r.encode("utf8"))).decode("utf8") \
             .replace("user", member.mention) \
             .replace("server",  member.guild.name)
-        e = build_embed(author=self.client.user.name, author_img=self.client.user.avatart_url, timestamp=datetime.datetime.now(),
+        e = build_embed(author=self.client.user.name, author_img=self.client.user.avatart_url,
+                        timestamp=datetime.datetime.now(),
                         thumbnail=member.avatar_url, title="Bye Bye")
         e.description = content
         await channel.send(embed=e)

@@ -1,8 +1,10 @@
+import logging
 from discord.ext import commands
 from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
-import base_folder.bot.logger
 import base64
+
+module_logger = logging.getLogger('discord.commands')
 
 
 def prefix(client, ctx):
@@ -29,6 +31,7 @@ extensions = ["base_folder.bot.modules.test",
 
 conn = Db()
 client.sql = conn  # creates an sql connection object that's accessible via the client object
+client.log = module_logger
 for extension in extensions:
     try:
         client.load_extension(extension)
