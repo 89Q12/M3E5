@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
 from base_folder.queuing.db import initialize_guild, is_user_indb, insert_message
+from discord.ext import tasks
 
 # TODO: Automod
 
@@ -46,6 +47,11 @@ class Internal(commands.Cog):
             return
         guildid = message.guild.id
         insert_message.delay(guildid, message.author.id, message.id, message.channel.id, message.content)
+
+    '''
+    Automated background tasks
+    '''
+
 
 
 def setup(client):

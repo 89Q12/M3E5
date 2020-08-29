@@ -43,6 +43,21 @@ class ListenerMember(commands.Cog):
         e.description = content
         await channel.send(embed=e)
 
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
+        if before.display_name != after.display_name:
+            await self.client.log.stdout(stdoutchannel, f"Memeber {before.name} changed their nickname "
+                                                        f"from {before.display_name} to {after.display_name}")
+        if before.avatar_url != after.avatar_url:
+            await self.client.log.stdout(stdoutchannel, f"Memeber {before.name} changed their avater from"
+                                                        f"{before.avatar_url} to {after.avatar_url}")
+        if before.discriminator != after.discriminator:
+            await self.client.log.stdout(stdoutchannel,
+                                         f"Memeber {before.name} changed their discriminator from "
+                                         f"{before.discriminator} to {after.discriminator}")
+
+
 
 def setup(client):
     client.add_cog(ListenerMember(client))

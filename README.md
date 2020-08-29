@@ -2,7 +2,7 @@
 # About
 M3E5 is a Discord bot that has many features and commands. The goal is a bot that can do most things fast and stable and it may include a chat bot gpt2 and some other AI stuff if I find the time for it.<br>
 The Ai is currently online on telegram, it can be reached via this @Zofiasbaby_bot username. Just write /start then you talk to her.<br>
-I try my best to program this bot with focus on perfomance and scalability but I'm still learning.
+I try my best to program this bot with focus on performance and scalability but I'm still learning.
 If you have any questions or you want to see the bot in action join this [discord](https://discord.gg/GWJ6Jeg)
 
 ## Why the name?
