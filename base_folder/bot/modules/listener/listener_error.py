@@ -17,35 +17,34 @@ class ErrorHandler(commands.Cog, Youtubedl):
 
         error = getattr(ex, 'original', ex)
         embed = error_embed(self.client)
-        channel = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
-        if channel is None:
-            channel = ctx
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
         if isinstance(error, commands.CommandNotFound):
             embed.description = "I have never seen this command in my entire life"
-            await channel.send(embed=embed)
+            await ctx.send(embed=embed)
             return
 
         if isinstance(error, commands.errors.CheckFailure):
             embed.description = "You do not have permission to use this command." \
-                          "If you think this is an error, talk to your admin"
-            await channel.send(embed=embed)
+                                "If you think this is an error, talk to your admin"
+            await ctx.send(embed=embed)
             return
 
         if isinstance(error, commands.BadArgument):
             embed.description = "You gave me an wrong input check the command usage"
-            await channel.send(embed=embed)
+            await ctx.send(embed=embed)
             return
 
         if isinstance(error, commands.NoPrivateMessage):
             try:
                 embed.description = "This command is for guilds/servers only"
-                await channel.author.send(embed=embed)
+                await ctx.author.send(embed=embed)
             except discord.Forbidden:
                 pass
             return
 
         embed.description = "Something is totally wrong here in the M3E5 land I will open issue at my creator's bridge"
-        await channel.send(ex, embed=embed)
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, ex)
+        await ctx.send(embed=embed)
         on_error.delay(ctx.guild.id, str(ex))
 
 

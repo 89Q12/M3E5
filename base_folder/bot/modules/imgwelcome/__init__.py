@@ -55,6 +55,8 @@ class IMGWelcome(commands.Cog):
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcome"""
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         toggle = int(await self.client.sql.get_img(ctx.guild.id))
         log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
         if log is None:
@@ -70,6 +72,8 @@ class IMGWelcome(commands.Cog):
     async def imgwelcome_img(self, ctx):
         """Set the image"""
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("Enable imgwelcoming with n!imgwelcome toggle")
 
@@ -118,6 +122,8 @@ class IMGWelcome(commands.Cog):
         Example:
             n!imgwelcome text Welcome user to server!
         """
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("imgwelcome is not enabled")
 

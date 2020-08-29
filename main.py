@@ -1,14 +1,13 @@
 import logging
+import base64
 from discord.ext import commands
 from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
-import base64
-
-module_logger = logging.getLogger('discord.commands')
+from base_folder.bot.utils.logger import Log as stdout
 
 
-def prefix(client, ctx):
-    r = client.sql.prefix_lookup(ctx.guild.id)
+def prefix(objclient, ctx):
+    r = objclient.sql.prefix_lookup(ctx.guild.id)
     pre = (base64.b64decode(str(r).encode("utf8"))).decode("utf8")
     return pre
 
@@ -31,7 +30,7 @@ extensions = ["base_folder.bot.modules.test",
 
 conn = Db()
 client.sql = conn  # creates an sql connection object that's accessible via the client object
-client.log = module_logger
+client.log = stdout()
 for extension in extensions:
     try:
         client.load_extension(extension)

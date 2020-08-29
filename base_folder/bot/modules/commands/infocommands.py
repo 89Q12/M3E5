@@ -11,6 +11,8 @@ class UserCmds(commands.Cog):
 
     @commands.command(pass_context=True)
     async def profile(self, ctx):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         xp = await self.client.sql.get_text_xp(ctx.guild.id, ctx.author.id)
         lvl = await self.client.sql.get_lvl_text(ctx.guild.id, ctx.author.id)
         warnings = await self.client.sql.get_warns(ctx.guild.id, ctx.author.id)
@@ -23,6 +25,8 @@ class UserCmds(commands.Cog):
 
     @commands.command(pass_context=True)
     async def server_info(self, ctx):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         e = build_embed(title=ctx.guild.name,
                         author=self.client.user.name,
                         author_img=self.client.user.avatar_url,
@@ -42,11 +46,12 @@ class UserCmds(commands.Cog):
         e.add_field(name="Filesize limit", value=ctx.guild.filesize_limit)
         await ctx.send(embed=e)
 
-
     @commands.command(pass_context=True,
                       brief="Show the color of role and how many user's the role have ")
     @commands.guild_only()
     async def roleinfo(self, ctx, role: discord.Role = None):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:

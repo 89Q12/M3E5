@@ -11,6 +11,8 @@ class ListenerMember(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
+        await self.client.log.stdout(stdoutchannel, f"Memeber {member.name} joined")
         blacklisted = await self.client.sql.get_blacklist(member.id)
         if blacklisted:
             await member.ban(member, reason="Blacklisted")
@@ -27,11 +29,13 @@ class ListenerMember(commands.Cog):
     async def on_member_remove(self, member):
         if member.id == self.client.user.id:
             return
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
+        await self.client.log.stdout(stdoutchannel, f"Memeber {member.name} left or got banned/kicked")
         channel_id = await self.client.sql.get_leave_channel(self.client, member.guild.id)
         channel = member.guild.get_channel(channel_id)
         r = await self.client.sql.get_leave_text(member.guild.id)
         content = base64.b64decode(str(r.encode("utf8"))).decode("utf8") \
-            .replace("user", member.mention) \
+            .replace("user", member.name) \
             .replace("server",  member.guild.name)
         e = build_embed(author=self.client.user.name, author_img=self.client.user.avatart_url,
                         timestamp=datetime.datetime.now(),

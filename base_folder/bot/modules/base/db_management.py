@@ -12,6 +12,11 @@ class Db:
         self.sql = sql()
 
     def prefix_lookup(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the prefix for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT prefix FROM settings WHERE guild_id = {guild_id}")
@@ -31,8 +36,12 @@ class Db:
         return roles
 
     async def get_settings_role(self, guild_id, field_name):
-        #  returns a role name
-        # errors out when  field_name is none bruh
+        """
+
+        :param guild_id: the id of the guild
+        :param field_name: the name of the role admin_role dev_role etc
+        :returns: the role id of the e.g. admin role for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT {str(field_name)} FROM settings WHERE guild_id={str(guild_id)}")
@@ -42,6 +51,12 @@ class Db:
         return role_id[0]
 
     async def get_warns(self, guild_id, user_id):
+        """
+
+        :param guild_id: the id of the guild
+        :param user_id: the ID of the user
+        :returns: the warnings for the given user, can be 0
+        """
         conn = sql()
         c = conn.cursor()
         c.execute("SELECT warnings FROM user_info WHERE user_id="
@@ -52,6 +67,11 @@ class Db:
         return warnings[0]
 
     async def get_welcome_channel(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the welcome channel for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT welcome_channel_id FROM settings WHERE guild_id={str(guild_id)}")
@@ -61,6 +81,11 @@ class Db:
         return welcome_channel[0]
 
     async def get_cmd_channel(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the command channel for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT cmd_channel_id FROM settings WHERE guild_id={guild_id}")
@@ -70,6 +95,11 @@ class Db:
         return leave_channel[0]
 
     async def get_lvl_channel(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the level channel for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT lvl_channel_id FROM settings WHERE guild_id={str(guild_id)}")
@@ -79,6 +109,11 @@ class Db:
         return leave_channel[0]
 
     async def get_leave_channel(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the leave channel for the given guild
+        """
         # returns the leave channel
         conn = sql()
         c = conn.cursor()
@@ -88,7 +123,26 @@ class Db:
         c.close()
         return leave_channel[0]
 
+    async def get_stdout_channel(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the stdout(logging) channel for the given guild
+        """
+        conn = sql()
+        c = conn.cursor()
+        c.execute(f"SELECT stdout_channel_id FROM settings WHERE guild_id={str(guild_id)}")
+        stdout_channel = c.fetchone()
+        conn.commit()
+        c.close()
+        return stdout_channel[0]
+
     async def get_leave_text(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the leave text for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT leave_text FROM settings WHERE guild_id={str(guild_id)}")
@@ -98,6 +152,11 @@ class Db:
         return leave_text[0]
 
     async def get_img(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: wether the welcome image is on or off for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT imgwelcome_toggle FROM settings WHERE guild_id={str(guild_id)};")
@@ -107,6 +166,11 @@ class Db:
         return img[0]
 
     async def get_img_text(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the welcome text for the image  for the given guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT imgwelcome_text FROM settings WHERE guild_id={str(guild_id)};")
@@ -116,7 +180,12 @@ class Db:
         return text[0]
 
     async def get_text_xp(self, guild_id, user_id):
-        # returns the xp amount for a given user
+        """
+
+        :param guild_id: the id of the guild
+        :param user_id: the ID of the user
+        :returns: the xp amount for the given user
+        """
         conn = sql()
         c = conn.cursor()
         c.execute("SELECT text_xp FROM user_info WHERE user_id="
@@ -127,7 +196,12 @@ class Db:
         return xp[0]
 
     async def get_lvl_text(self, guild_id, user_id):
-        # returns the text lvl  amount for a given user
+        """
+
+        :param guild_id: the id of the guild
+        :param user_id: the ID of the user
+        :returns: the text lvl for the given user
+        """
         conn = sql()
         c = conn.cursor()
         c.execute("SELECT text_lvl FROM user_info WHERE user_id="
@@ -138,6 +212,11 @@ class Db:
         return lvl[0]
 
     async def get_levelsystem(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: if the levelsytem is on or off for the specific guild
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT levelsystem_toggle FROM settings WHERE guild_id =  {str(guild_id)};")
@@ -147,18 +226,28 @@ class Db:
         return img[0]
 
     async def get_banned_until(self, user_id):
+        """
+
+        :param user_id: the ID of the user
+        :returns: the date the user is allowed to get unbanned if none the user wasn't temp banned
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT banned_until FROM `user_info` WHERE user_id = {user_id} and banned_until IS NOT NULL")
-        dates = c.fetchone()
+        date = c.fetchone()
         conn.commit()
         c.close()
-        if dates is None:
+        if date is None:
             return None
         else:
-            return dates[0]
+            return date[0]
 
     async def get_blacklist(self, user_id):
+        """
+        Searches in the db if the user is blacklisted
+        :param user_id: the ID of the user
+        :returns: if the user is in the blacklist if false the user isnt blacklisted
+        """
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT user_id FROM `blacklist` WHERE user_id = {user_id}")
@@ -169,3 +258,5 @@ class Db:
             return False
         else:
             return True
+
+

@@ -9,6 +9,8 @@ class Test(commands.Cog):
 
     @commands.command(brief="Test")
     async def xx(self, ctx, arg: int):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         muteduntil = ctx.message.created_at + datetime.timedelta(hours=arg)
         await ctx.send(muteduntil)
         messages = build_embed(author=self.client.user.name, title="Hey!",
@@ -23,6 +25,12 @@ class Test(commands.Cog):
                                                "sets the dev role\n sets the mod role\n sets the admin role")
 
         await ctx.send(embed=messages)
+
+    @commands.command()
+    async def log(self, ctx, *, text: str):
+        channel = self.client.get_channel(716691056707764266)
+        await self.client.log.stdout(channel, ctx.message.content, ctx)
+
 
 def setup(bot):
     bot.add_cog(Test(bot))

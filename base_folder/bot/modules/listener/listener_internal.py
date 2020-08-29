@@ -48,10 +48,5 @@ class Internal(commands.Cog):
         insert_message.delay(guildid, message.author.id, message.id, message.channel.id, message.content)
 
 
-    '''
-    Automated moderation follows:
-    '''
-
-
 def setup(client):
     client.add_cog(Internal(client))

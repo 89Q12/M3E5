@@ -12,6 +12,8 @@ class Dev(commands.Cog):
     @commands.is_owner()
     async def unload(self, ctx, module: str):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         cog = "base_folder.bot.modules." + module
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
@@ -33,6 +35,8 @@ class Dev(commands.Cog):
     @commands.is_owner()
     async def load(self, ctx, module: str):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         cog = "base_folder.bot.modules." + module
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
@@ -54,6 +58,8 @@ class Dev(commands.Cog):
     @commands.is_owner()
     async def reload(self, ctx, module: str):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         cog = "base_folder.bot.modules." + module
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
@@ -75,6 +81,8 @@ class Dev(commands.Cog):
     @commands.command(pass_context=True, brief="builds the database")
     async def builddb(self, ctx):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
         else:
@@ -94,6 +102,8 @@ class Dev(commands.Cog):
     @commands.command(pass_context=True, brief="Writes all roles in the db")
     async def roles_in_db(self, ctx):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
         else:
@@ -111,6 +121,8 @@ class Dev(commands.Cog):
     @commands.command(pass_context=True, brief="shows all roles")
     async def show_roles(self, ctx):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 1:
             pass
         else:

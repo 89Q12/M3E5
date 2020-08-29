@@ -15,6 +15,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -40,6 +42,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -69,6 +73,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def clear(self, ctx, arg):
         await ctx.channel.purge(limit=int(arg))
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -84,6 +90,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=1):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -104,6 +112,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -135,6 +145,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def slowmode(self, ctx, seconds: int = 0):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -161,6 +173,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def unmute(self, ctx,  member: discord.Member = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -182,6 +196,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def warn(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
@@ -206,6 +222,8 @@ class ModerationMod(commands.Cog):
     @commands.guild_only()
     async def infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_mod() >= 2:
             pass
         else:
