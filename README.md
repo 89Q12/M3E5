@@ -27,28 +27,8 @@ For a list with all commands and there usage look at [commands](https://github.c
 - Discord bot base
   - the standard prefix is - but it's changeable with -prefix arg 
   - basic Moderation commands
-    - Ban
-    - unban
-    - kick
-    - clear amount e.g. 100 messages
-    - mute/unmute
-    - giving someone a role
-    - info about a role e.g. how many users the role have and permissions
-    - warn 
-    - infractions
-    - clear infractions
   - profile shows you your writer rank/xp and warnings
   - Music player has still some bugs 
-    - join
-    - leave
-    - stop apparently the same as leave but this will change
-    - queue
-    - jumpqueue
-    - nowplaying
-    - play 
-    - pause
-    - skip
-    - reaction controls
   - Welcome image
   - welcome/leave channel 
   - Auto roles
@@ -65,7 +45,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - celery as queuing system works now
 - Chatbot 
   - trained
-  - Answers to messages like a real human 
+  - Answers to messages like a real human but in stupid
 
 ![Status](https://img.shields.io/badge/status-in_progress-red.svg)
 
@@ -78,16 +58,16 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like hug @name
   - Auto tasks
-  - Alerts for various services like Twitch and reddit
+  - Alerts for various services like Twitch and Reddit
   - Music player
     - youtube playlist
     - Spotify
-    - youtube-dl implemention needs a rework
+    - youtube-dl implementation needs a rework
   - custom messaging design 
   - Recording meetings ( Voice recording to an mp3 file)
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
-  - Advanced permission system, that ueses groups of accepted roles and banned roles per command
+  - Advanced permission system, that uses groups of accepted roles and banned roles per command
   - reaction roles
   - unittests
 - Chatbot features
@@ -96,7 +76,6 @@ For a list with all commands and there usage look at [commands](https://github.c
  
 # Critical bugs
 
-  - Deletes sometime the error message when a command rasied multiple errors
   - maybe some bugs in the music cog
   - Not well documented
   
@@ -111,7 +90,7 @@ For a list with all commands and there usage look at [commands](https://github.c
  ### First things first:<br>
  - I assume that you're using Linux<br>
  - clone the repo and cd into the cloned repo
- - Instal, for docker [goto](https://docs.docker.com/get-docker/) for docker-compose [goto](https://docs.docker.com/compose/install/).
+ - Install, for docker [goto](https://docs.docker.com/get-docker/) for docker-compose [goto](https://docs.docker.com/compose/install/).
  
  ### For rabbitmq follow these steps:<br>
 - Add the ppa repo to your source list<br>
@@ -163,7 +142,7 @@ For a list with all commands and there usage look at [commands](https://github.c
 ```use  theNameOfTheDb;```<br>
 - Now import the database file, I assume that you're still in the directory of the cloned repo<br>
 ```source M3E5.sql```<br>
--Thats it, exit the sql server<br>
+-That's it, exit the sql server<br>
 ```exit ```<br>
 ### Setup the config file
 - Navigate to base_folder/bot/config and open the config.py
