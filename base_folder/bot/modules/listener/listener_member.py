@@ -42,10 +42,11 @@ class ListenerMember(commands.Cog):
                         thumbnail=member.avatar_url, title="Bye Bye")
         e.description = content
         await channel.send(embed=e)
-
+    '''
     @commands.Cog.listener()
-    async def on_member_update(self, before, after):
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
+    async def on_user_update(self, before, after):
+        member = self.client.Guild.get_member(before.id)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
         if before.display_name != after.display_name:
             await self.client.log.stdout(stdoutchannel, f"Memeber {before.name} changed their nickname "
                                                         f"from {before.display_name} to {after.display_name}")
@@ -56,7 +57,32 @@ class ListenerMember(commands.Cog):
             await self.client.log.stdout(stdoutchannel,
                                          f"Memeber {before.name} changed their discriminator from "
                                          f"{before.discriminator} to {after.discriminator}")
+    '''
+    @commands.Cog.listener()
+    async def on_member_update(self, before, after):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
+        if before.display_name != after.display_name:
+            await self.client.log.stdout(stdoutchannel, f"Member {before.name} changed their nickname "
+                                                        f"from {before.display_name} to {after.display_name}")
 
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
+        if not after.author.bot:
+            if before.content != after.content:
+                await self.client.log.stdout(stdoutchannel, f"Message from {before.author.name} was changed from: "
+                                                            f"'{before.content}' to '{after.content}'")
+
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload):
+        if payload.guild_id:
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(payload.guild_id))
+            channel = self.client.get_channel(payload.channel_id)
+            content = await self.client.sql.get_message(payload.guild_id, payload.message_id)
+            user = self.client.get_user(content[0])
+            if not user.bot:
+                await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted "
+                                                            f"Content: {content[1]} in Channel: {channel.name}")
 
 
 def setup(client):

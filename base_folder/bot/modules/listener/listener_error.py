@@ -11,6 +11,13 @@ class ErrorHandler(commands.Cog, Youtubedl):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, ex):
+        """
+
+        :param ctx: context of the command that caused the error
+        :param ex: the exception itself
+        :return: logs the error to the db if it wasn't a commands.* error and sends a log entry in the stdout channel
+        regardless of the error
+        """
         await ctx.channel.purge(limit=1)
         if hasattr(ctx.command, 'on_error'):
             return
@@ -18,6 +25,8 @@ class ErrorHandler(commands.Cog, Youtubedl):
         error = getattr(ex, 'original', ex)
         embed = error_embed(self.client)
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, ex)
+
         if isinstance(error, commands.CommandNotFound):
             embed.description = "I have never seen this command in my entire life"
             await ctx.send(embed=embed)
@@ -43,7 +52,6 @@ class ErrorHandler(commands.Cog, Youtubedl):
             return
 
         embed.description = "Something is totally wrong here in the M3E5 land I will open issue at my creator's bridge"
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, ex)
         await ctx.send(embed=embed)
         on_error.delay(ctx.guild.id, str(ex))
 

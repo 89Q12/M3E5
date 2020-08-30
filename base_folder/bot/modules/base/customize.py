@@ -23,6 +23,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_welcome(self, ctx, channel_id: int):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
@@ -37,6 +39,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_leave(self, ctx, channel_id: int):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
@@ -51,6 +55,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_lvl(self, ctx, channel_id: int):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
@@ -65,6 +71,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_cmd(self, ctx, channel_id: int):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
@@ -78,6 +86,8 @@ class Custom(commands.Cog):
     @commands.command(pass_context=True)
     async def prefix(self, ctx, arg):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).is_admin() >= 3:
             pass
         else:
@@ -91,6 +101,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_default(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 3:
             pass
         else:
@@ -104,6 +116,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_admin(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 3:
             pass
         else:
@@ -117,6 +131,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_dev(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 3:
             pass
         else:
@@ -130,6 +146,8 @@ class Custom(commands.Cog):
     @commands.guild_only()
     async def set_mod(self, ctx, role: discord.Role = None):
         await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if await Auth(self.client, ctx).permissions() >= 3:
             pass
         else:

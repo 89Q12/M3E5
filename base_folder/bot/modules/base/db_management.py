@@ -259,4 +259,21 @@ class Db:
         else:
             return True
 
+    async def get_message(self, guild_id, message_id):
+        """
+
+        :param guild_id: the id of the guild
+        :param message_id: the requested message id
+        :return: the message and the user_id
+        """
+        conn = sql()
+        c = conn.cursor()
+        c.execute(f"SELECT user_id, message FROM `messages` WHERE message_id = {message_id} and guild_id = {guild_id}")
+        message = c.fetchall()
+        conn.commit()
+        c.close()
+        if message is None:
+            return False
+        else:
+            return message[0]
 
