@@ -1,4 +1,6 @@
 import datetime
+import logging
+
 import discord
 from discord.ext import commands
 import discord.utils
@@ -10,6 +12,9 @@ from base_folder.queuing.db import *
 class ModerationMod(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    logging.basicConfig()
+    logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
     @commands.command(pass_context=True, brief="kicks a givien member")
     @commands.guild_only()
@@ -88,7 +93,7 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.guild_only()
-    async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=1):
+    async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=0):
         await ctx.channel.purge(limit=1)
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
@@ -107,6 +112,7 @@ class ModerationMod(commands.Cog):
         await log.send(embed=e)
         edit_muted_at.delay(ctx.guild.id, member.id, ctx.message.created_at)
         muted_until.delay(ctx.guild.id, member.id, muteduntil)
+        self.client.scheduler.add_job(self.unmute, "date", run_date=muteduntil, args=[ctx, member])
 
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.guild_only()
@@ -169,6 +175,27 @@ class ModerationMod(commands.Cog):
             await ctx.channel.edit(slowmode_delay=seconds)
             await log.send(embed=e)
 
+    async def demute(self, ctx,  member: discord.Member = None):
+        await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        if await Auth(self.client, ctx).is_mod() >= 2:
+            pass
+        else:
+            raise commands.errors.CheckFailure
+        """Unmutes a muted user"""
+        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        if log is None:
+            log = ctx
+        e = success_embed(self.client)
+        try:
+            e.description = f"{member.mention} has been unmuted "
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted"))  # removes muted role
+            await log.send(embed=e)
+        except discord.DiscordException:
+            e.description = f"{member.mention} already unmuted or {member.mention} was never muted"
+            await log.send(embed=e)
+
     @commands.command(pass_context=True, brief="unmutes a user")
     @commands.guild_only()
     async def unmute(self, ctx,  member: discord.Member = None):
@@ -192,7 +219,7 @@ class ModerationMod(commands.Cog):
             e.description = f"{member.mention} already unmuted or {member.mention} was never muted"
             await log.send(embed=e)
 
-    @commands.command(pass_context=True, brief="un mutes a user")
+    @commands.command(pass_context=True, brief="warns a user")
     @commands.guild_only()
     async def warn(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)

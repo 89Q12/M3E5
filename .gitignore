@@ -8,4 +8,4 @@ tests/*
 *.pyo
 README.md
 requirements.txt
-
+/base_folder/monitoring/

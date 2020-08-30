@@ -1,21 +1,24 @@
+import datetime
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
 from base_folder.queuing.db import initialize_guild, is_user_indb, insert_message
-from discord.ext import tasks
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # TODO: Automod
 
 
 class Internal(commands.Cog):
     def __init__(self, client):
         self.client = client
+
     '''
     Bot things like activity and on guild_join
     '''
+
     @commands.Cog.listener()
     async def on_ready(self):
         await self.client.change_presence(activity=discord.Game(name="Crushing data..."))
+
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
@@ -51,7 +54,6 @@ class Internal(commands.Cog):
     '''
     Automated background tasks
     '''
-
 
 
 def setup(client):

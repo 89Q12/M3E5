@@ -1,10 +1,13 @@
-import logging
 import base64
 from discord.ext import commands
 from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
 from base_folder.bot.utils.logger import Log as stdout
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+'''
+Helper functions
+'''
 
 def prefix(objclient, ctx):
     r = objclient.sql.prefix_lookup(ctx.guild.id)
@@ -28,9 +31,14 @@ extensions = ["base_folder.bot.modules.test",
               "base_folder.bot.modules.listener.listener_error",
               "base_folder.bot.modules.listener.listener_internal"]
 
+'''
+Defining some shortcuts
+'''
 conn = Db()
 client.sql = conn  # creates an sql connection object that's accessible via the client object
 client.log = stdout()
+client.scheduler = AsyncIOScheduler()
+client.scheduler.start()
 for extension in extensions:
     try:
         client.load_extension(extension)
@@ -38,4 +46,8 @@ for extension in extensions:
     except Exception as e:
         exc = '{}: {}'.format(type(e).__name__, e)
         print('Failed to load extension {}\n{}'.format(extension, exc))
+
+'''
+Run bots main loop
+'''
 client.run(BOT_TOKEN)

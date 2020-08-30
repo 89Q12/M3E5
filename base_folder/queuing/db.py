@@ -322,14 +322,10 @@ def insert_message(guild_id, userid, messageid, channelid, message):
     :return: nothing
     """
 
-    def sanitize_data(data):
-        return re.sub(r"[^a-zA-Z0-9 ]", "", data)
-
-    m = sanitize_data(message)
     conn = insert_message.db
     c = conn.cursor()
     c.execute(f"INSERT INTO `messages`(`guild_id`, `user_id`, `message_id`, `channel_id`, `message`)"
-              f"VALUES ('{guild_id}','{userid}','{messageid}','{channelid}','{str(m)}')")
+              f"VALUES ('{guild_id}','{userid}','{messageid}','{channelid}', %s)", (message,))
     conn.commit()
     c.close()
     return

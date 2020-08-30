@@ -12,7 +12,7 @@ class ListenerMember(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
-        await self.client.log.stdout(stdoutchannel, f"Memeber {member.name} joined")
+        await self.client.log.stdout(stdoutchannel, f"Member {member.name} joined")
         blacklisted = await self.client.sql.get_blacklist(member.id)
         if blacklisted:
             await member.ban(member, reason="Blacklisted")
@@ -30,7 +30,7 @@ class ListenerMember(commands.Cog):
         if member.id == self.client.user.id:
             return
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
-        await self.client.log.stdout(stdoutchannel, f"Memeber {member.name} left or got banned/kicked")
+        await self.client.log.stdout(stdoutchannel, f"Member {member.name} left or got banned/kicked")
         channel_id = await self.client.sql.get_leave_channel(self.client, member.guild.id)
         channel = member.guild.get_channel(channel_id)
         r = await self.client.sql.get_leave_text(member.guild.id)
@@ -42,47 +42,58 @@ class ListenerMember(commands.Cog):
                         thumbnail=member.avatar_url, title="Bye Bye")
         e.description = content
         await channel.send(embed=e)
-    '''
+
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
-        member = self.client.Guild.get_member(before.id)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
-        if before.display_name != after.display_name:
-            await self.client.log.stdout(stdoutchannel, f"Memeber {before.name} changed their nickname "
-                                                        f"from {before.display_name} to {after.display_name}")
-        if before.avatar_url != after.avatar_url:
-            await self.client.log.stdout(stdoutchannel, f"Memeber {before.name} changed their avater from"
-                                                        f"{before.avatar_url} to {after.avatar_url}")
-        if before.discriminator != after.discriminator:
-            await self.client.log.stdout(stdoutchannel,
-                                         f"Memeber {before.name} changed their discriminator from "
-                                         f"{before.discriminator} to {after.discriminator}")
-    '''
+        data = await self.client.sql.get_guild(before.id)
+        for guildID in range(len(data)):
+            guild_id = data[guildID][0]
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(guild_id))
+            if before.display_name != after.display_name:
+                await self.client.log.stdout(stdoutchannel, f"Member {after.name} changed their nickname "
+                                                            f"from {before.display_name} to {after.display_name}")
+            if before.avatar_url != after.avatar_url:
+                await self.client.log.stdout(stdoutchannel, f"Member {after.name} changed their avater from"
+                                                            f"{before.avatar_url} to {after.avatar_url}")
+            if before.discriminator != after.discriminator:
+                await self.client.log.stdout(stdoutchannel,
+                                             f"Member {after.name} changed their discriminator from "
+                                             f"{before.discriminator} to {after.discriminator}")
+
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
         if before.display_name != after.display_name:
-            await self.client.log.stdout(stdoutchannel, f"Member {before.name} changed their nickname "
+            await self.client.log.stdout(stdoutchannel, f"Member {after.name} changed their nickname "
                                                         f"from {before.display_name} to {after.display_name}")
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before, after):
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
-        if not after.author.bot:
-            if before.content != after.content:
-                await self.client.log.stdout(stdoutchannel, f"Message from {before.author.name} was changed from: "
-                                                            f"'{before.content}' to '{after.content}'")
+    async def on_raw_message_edit(self, payload):
+        if payload.data["guild_id"]:
+            content = await self.client.sql.get_message(payload.data["guild_id"], payload.message_id)
+            if content is None:
+                return
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(payload.data["guild_id"]))
+            channel = self.client.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            user = self.client.get_user(content[0])
+            if not user.bot:
+                if content[1] != message.content:
+                    await self.client.log.stdout(stdoutchannel, f"Message from {message.author.name} was changed from: "
+                                                                f"'{content[1]}' to '{message.content}'")
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
         if payload.guild_id:
+            content = await self.client.sql.get_message(payload.guild_id, payload.message_id)
+            if content is None:
+                return
             stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(payload.guild_id))
             channel = self.client.get_channel(payload.channel_id)
-            content = await self.client.sql.get_message(payload.guild_id, payload.message_id)
             user = self.client.get_user(content[0])
             if not user.bot:
-                await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted "
-                                                            f"Content: {content[1]} in Channel: {channel.name}")
+                await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted"
+                                                            f" Content: {content[1]} in Channel: {channel.name}")
 
 
 def setup(client):

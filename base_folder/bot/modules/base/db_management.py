@@ -264,7 +264,7 @@ class Db:
 
         :param guild_id: the id of the guild
         :param message_id: the requested message id
-        :return: the message and the user_id
+        :return: the message and the user_id can be none
         """
         conn = sql()
         c = conn.cursor()
@@ -272,8 +272,32 @@ class Db:
         message = c.fetchall()
         conn.commit()
         c.close()
-        if message is None:
-            return False
-        else:
-            return message[0]
+        try:
+            if message is None:
+                return False
+            else:
+                return message[0]
+        except IndexError:
+            return None
+
+    async def get_guild(self, user_id):
+        """
+
+        :param user_id: the id of the user
+        :return: list with a tuple with all guilds inside
+        """
+        conn = sql()
+        c = conn.cursor()
+        c.execute(f"SELECT guild_id FROM `user_info` WHERE user_id = {user_id}")
+        guilds = c.fetchall()
+        conn.commit()
+        c.close()
+        try:
+            if guilds is None:
+                return False
+            else:
+                return guilds
+        except IndexError:
+            return None
+
 
