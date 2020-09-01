@@ -32,6 +32,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Welcome image
   - welcome/leave channel 
   - Auto roles
+  - tempmute
   - db connection
   - Logging messages to a database
   - set default role, admin, dev and mod role
@@ -52,8 +53,8 @@ For a list with all commands and there usage look at [commands](https://github.c
 - Discord features
   - custom Join and leave messages
   - custom help command
+  - tempban
   - anti spam
-  - Tempban/mute currently no idea how to do it perfectly 
   - lock/unlock a specific channel for specific roles 
   - Custom commands
   - Bunch of standard commands like welcome messages and funny commands like hug @name
@@ -70,13 +71,14 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Advanced permission system, that uses groups of accepted roles and banned roles per command
   - reaction roles
   - unittests
+  - Web interface but I will open a seperate repository for that
 - Chatbot features
   - Discord bridge 
   - maybe more but idk now yet
  
 # Critical bugs
 
-  - maybe some bugs in the music cog
+  - maybe some bugs in the music cog will be fixed when lavalink is integrated
   - Not well documented
   
 # Install instructions 
