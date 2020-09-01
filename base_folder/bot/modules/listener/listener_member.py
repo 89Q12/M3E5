@@ -1,6 +1,8 @@
 import datetime
 import discord
 from discord.ext import commands
+
+from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
 from base_folder.queuing.db import *
 
@@ -62,7 +64,10 @@ class ListenerMember(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
+        if before.guild.id is None:
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(after.guild.id))
+        else:
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
         if before.display_name != after.display_name:
             await self.client.log.stdout(stdoutchannel, f"Member {after.name} changed their nickname "
                                                         f"from {before.display_name} to {after.display_name}")
@@ -94,6 +99,81 @@ class ListenerMember(commands.Cog):
             if not user.bot:
                 await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted"
                                                             f" Content: {content[1]} in Channel: {channel.name}")
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        ctx = self.client.helper.Ctx(member)
+        if await Auth(self.client, ctx).is_mod() >= 2:
+            return
+        if member:
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(member.guild.id))
+            if before.deaf != after.deaf:
+                if after.deaf:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"got deafed by an Team member in"
+                                                                f" {before.channel.name}")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"got undeafed by an Team member in "
+                                                                f"{before.channel.name}")
+            if before.mute != after.mute:
+                if after.mute:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"got unmuted by an Team member in {before.channel.name}")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"got muted by an Team member in {before.channel.name}")
+            '''
+            if before.self_mute != after.self_mute:
+                if after.self_mute:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"muted its self in {before.channel.name}")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"umuted its self in {before.channel.name}")
+
+            if before.self_deaf != after.self_deaf:
+                if after.self_deaf:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"deafed its self in {before.channel.name}")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"undeafed its self in {before.channel.name}")
+            '''
+            if before.self_stream != after.self_stream:
+                if after.self_stream:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"is now streaming in {before.channel.name}")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"is no longer streaming in {before.channel.name}")
+            if before.self_video != after.self_video:
+                if after.self_video:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"is now sharing his/her/its webcam  in "
+                                                                f"{before.channel.name}")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"is no longer sharing his/her/its webcam in "
+                                                                f"{after.channel.name}")
+            if before.afk != after.afk:
+                if after.afk:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"is now afk")
+                else:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"is no longer afk")
+            if before.channel != after.channel:
+                if after.channel is None:
+                    await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                f"left voice channel {before.channel.name}")
+                else:
+                    if before.channel is None:
+                        await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                    f"joined to voice channel {after.channel.name}")
+                    else:
+                        await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
+                                                                    f"moved to voice channel {after.channel.name}")
 
 
 def setup(client):

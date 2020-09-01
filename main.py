@@ -4,7 +4,7 @@ from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
 from base_folder.bot.utils.logger import Log as stdout
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+import base_folder.bot.utils.helper as helper
 '''
 Helper functions
 '''
@@ -39,6 +39,7 @@ client.sql = conn  # creates an sql connection object that's accessible via the 
 client.log = stdout()
 client.scheduler = AsyncIOScheduler()
 client.scheduler.start()
+client.helper = helper
 for extension in extensions:
     try:
         client.load_extension(extension)

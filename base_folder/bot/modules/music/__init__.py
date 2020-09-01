@@ -160,7 +160,7 @@ class Music(commands.Cog):
         state = self.get_state(ctx.guild)  # get state for this guild
         if 1 <= song <= len(state.playlist) and 1 <= new_index:
             track = state.playlist[song]  # take song at index...
-            state.playlist[new_index] = track # and insert it.
+            state.playlist[new_index] = track  # and insert it.
 
             await ctx.send(queue_text(state))
         else:
@@ -267,5 +267,3 @@ class Music(commands.Cog):
 
 def setup(client):
     client.add_cog(Music(client))
-
-
