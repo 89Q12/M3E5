@@ -1,7 +1,6 @@
 -- phpMyAdmin SQL Dump
 -- version 4.9.5deb2
 -- https://www.phpmyadmin.net/
---
 -- Host: localhost:3306
 -- Generation Time: Jun 16, 2020 at 04:28 PM
 -- Server version: 8.0.20-0ubuntu0.20.04.1
