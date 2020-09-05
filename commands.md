@@ -22,7 +22,8 @@ Permission level admin or higher required
 | set_leave|sets the leave channel  |set_leave channel id |
 | set_welcome| sets the welcome channel s |et_welcom channel id |
 | set_cmd  |sets the command channel where the bot logs commands  |set_cmd channel id |
-| set_lvl| sets the leave channel  |set_lvl channel id |
+| set_lvl | sets the leave channel  |set_lvl channel id |
+| add_reaction | Adds a reaction role to any message that the command author wrote| message id channel id then follow the instructions|
 
 ## Moderation commands
 Permission level mod or higher required 

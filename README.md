@@ -40,10 +40,10 @@ For a list with all commands and there usage look at [commands](https://github.c
   - loading/unloading/reloading cogs is now working if you have the dev role
   - levelsystem(text based)
   - basic permission system
-  - One bot instance can run on multiple servers now without errors
   - when the bot joins a server the database is automatically initialized
   - On server join the owner gets a message with all setup commands that need to be executed
-  - celery as queuing system works now
+  - celery
+  - reaction roles
 - Chatbot 
   - trained
   - Answers to messages like a real human but in stupid
@@ -69,7 +69,6 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
   - Advanced permission system, that uses groups of accepted roles and banned roles per command
-  - reaction roles
   - unittests
   - Web interface but I will open a seperate repository for that
 - Chatbot features
