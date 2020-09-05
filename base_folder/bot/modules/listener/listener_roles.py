@@ -20,9 +20,15 @@ class ListenerRoles(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role: discord.Role):
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(role.guild.id))
-        await self.client.log.stdout(stdoutchannel, f"Role {role.name} got created")
+        await self.client.log.stdout(stdoutchannel, f"Role {role.name} got deleted")
         remove_role.delay(role.guild.id, role.id)
 
+    @commands.Cog.listener()
+    async def on_guild_role_update(self, before, after):
+        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
+        if before.name != after.name:
+            await self.client.log.stdout(stdoutchannel, f"Role {after.name} got updated froo {before.name} to {after.name}")
+            update_role_name.delay(before.guild.id, before.id, after.name)
 
 def setup(client):
     client.add_cog(ListenerRoles(client))

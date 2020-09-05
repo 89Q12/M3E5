@@ -9,6 +9,7 @@ import base_folder.bot.utils.helper as helper
 Helper functions
 '''
 
+
 def prefix(objclient, ctx):
     r = objclient.sql.prefix_lookup(ctx.guild.id)
     pre = (base64.b64decode(str(r).encode("utf8"))).decode("utf8")
@@ -29,7 +30,10 @@ extensions = ["base_folder.bot.modules.test",
               "base_folder.bot.modules.imgwelcome",
               "base_folder.bot.modules.base.customize",
               "base_folder.bot.modules.listener.listener_error",
-              "base_folder.bot.modules.listener.listener_internal"]
+              "base_folder.bot.modules.listener.listener_internal",
+              "base_folder.bot.modules.reaction_roles",
+              "base_folder.bot.modules.music"
+              ]
 
 '''
 Defining some shortcuts

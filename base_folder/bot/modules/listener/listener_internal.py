@@ -2,7 +2,7 @@ import datetime
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import initialize_guild, is_user_indb, insert_message
+from base_folder.queuing.db import initialize_guild, is_user_indb, insert_message, roles_to_db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # TODO: Automod
 
@@ -36,6 +36,8 @@ class Internal(commands.Cog):
         await guild.owner.send(embed=message)
         for user in guild.members:
             is_user_indb.delay(user.name, user.id, guild.id)
+        for role in guild.roles:
+            roles_to_db.delay(guild.id, role.name, role.id)
 
     """
     Logging the guilds follows
@@ -51,6 +53,33 @@ class Internal(commands.Cog):
         guildid = message.guild.id
         insert_message.delay(guildid, message.author.id, message.id, message.channel.id, message.content)
 
+    @commands.Cog.listener()
+    async def on_raw_message_edit(self, payload):
+        if payload.data["guild_id"]:
+            content = await self.client.sql.get_message(payload.data["guild_id"], payload.message_id)
+            if content is None:
+                return
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(payload.data["guild_id"]))
+            channel = self.client.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            user = self.client.get_user(content[0])
+            if not user.bot:
+                if content[1] != message.content:
+                    await self.client.log.stdout(stdoutchannel, f"Message from {message.author.name} was changed from: "
+                                                                f"'{str(content[1]).replace('@', '')}' to '{str(message.content).replace('@', '')}'")
+
+    @commands.Cog.listener()
+    async def on_raw_message_delete(self, payload):
+        if payload.guild_id:
+            content = await self.client.sql.get_message(payload.guild_id, payload.message_id)
+            if content is None:
+                return
+            stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(payload.guild_id))
+            channel = self.client.get_channel(payload.channel_id)
+            user = self.client.get_user(content[0])
+            if not user.bot:
+                await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted"
+                                                            f" Content: {content[1]} in Channel: {channel.name}")
     '''
     Automated background tasks
     '''

@@ -129,6 +129,8 @@ class Db:
         :param guild_id: the id of the guild
         :returns: the stdout(logging) channel for the given guild
         """
+        if guild_id is None or 0:
+            raise TypeError
         conn = sql()
         c = conn.cursor()
         c.execute(f"SELECT stdout_channel_id FROM settings WHERE guild_id={str(guild_id)}")
@@ -300,4 +302,18 @@ class Db:
         except IndexError:
             return None
 
+    async def get_reaction_role(self, guild_id, message_id, emoji):
+        """
 
+        :param guild_id: the id of the guild
+        :param message_id: the id of the message where a reaction got added
+        :param emoji: the added emoji
+        :return: the role id that the user should get
+        """
+        conn = sql()
+        c = conn.cursor()
+        c.execute(f"SELECT role_id FROM `reactions` WHERE message_id = {message_id} and emoji = %s", (emoji,))
+        roleid = c.fetchone()
+        conn.commit()
+        c.close()
+        return roleid[0]

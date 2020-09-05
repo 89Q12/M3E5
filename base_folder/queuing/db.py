@@ -7,6 +7,7 @@ import re
 Initialize the tables
 '''
 
+
 class DatabaseTask(Task, ABC):
     _db = None
 
@@ -27,11 +28,6 @@ def initialize_guild(guild_id):
     conn.commit()
     c.close()
     return
-
-
-@app.task(bind=True, ignore_result=False)
-def test(self):
-    return 1+1
 
 
 '''
@@ -56,8 +52,7 @@ def is_user_indb(user_name, user_id, guild_id):
 def on_error(guild_id, error):
     conn = on_error.db
     c = conn.cursor()
-    error = (base64.b64encode(str(error).encode("utf8"))).decode("utf8")
-    c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', '{error}')")
+    c.execute(f"INSERT into Error (guild_id, error) VALUES ('{guild_id}', %s)", (error,))
     conn.commit()
     c.close()
     return
@@ -171,7 +166,6 @@ def edit_settings_role(guild_id, role_id, field_name):
     conn.commit()
     c.close()
     return
-
 
 
 '''
@@ -330,3 +324,38 @@ def insert_message(guild_id, userid, messageid, channelid, message):
     c.close()
     return
 
+
+@app.task(base=DatabaseTask, ignore_result=True)
+def insert_reaction(guild_id, message_id, roleid, emoji):
+    """
+
+    :param guild_id: id of the guild the data is for
+    :param message_id: the id of the message
+    :param roleid: the role a user should get if the user reacts
+    :param emoji: the emoji the bot reacted with
+    :return:
+    """
+    conn = insert_message.db
+    c = conn.cursor()
+    c.execute(f"INSERT INTO `reactions`(`guild_id`, `message_id`, `role_id`, `emoji`) VALUES ('{guild_id}',"
+              f"'{message_id}','{roleid}', %s)", (emoji,))
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
+def update_role_name(guild_id, roleid, name):
+    """
+
+    :param guild_id: id of the guild the data is for
+    :param roleid: the role that should be updated
+    :param name: the new name of the role
+    :return:
+    """
+    conn = update_role_name.db
+    c = conn.cursor()
+    c.execute(f"UPDATE `roles` SET `guild_id`={guild_id},`role_id`={roleid},`role_name`={name} WHERE 1")
+    conn.commit()
+    c.close()
+    return
