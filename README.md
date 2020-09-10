@@ -71,6 +71,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Advanced permission system, that uses groups of accepted roles and banned roles per command
   - unittests
   - Web interface but I will open a seperate repository for that
+    - basic api
 - Chatbot features
   - Discord bridge 
   - maybe more but idk now yet
