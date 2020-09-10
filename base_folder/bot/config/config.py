@@ -7,14 +7,14 @@ import discord.embeds
 '
 Confi
 
-BOT_TOKEN = "NjY0MTc3MDI4MTE5MDAzMTM2.XhTRDw.dYPCwu370hJWRpWw2Zs_hGLUORs"
 
 
 
 
-SQL_passwd = "ljTivC9TBcIAoYFT"
-SQL_DB = "M3E5"
-SQL_AUTH_PLUGIN = "caching_sha2_password"
+
+SQL_passwd = ""
+SQL_DB =E5"
+SQL_AUTH_PLUGIN = "caching_"
 
 
 
