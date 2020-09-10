@@ -46,8 +46,8 @@ class ModerationAdmin(commands.Cog):
             e.description = f"You have been banned from {ctx.guild.name} for {reason}."\
                             f"If you think this is wrong then message an admin but shit happens"\
                             f" when you don't have the name."
-            await log.guild.ban(member, reason=reason)
             await member.send(embed=e)
+            await log.guild.ban(member, reason=reason)
             e.description = f"{member.mention} has been successfully banned for {reason}."
             await log.send(embed=e)
             edit_banned_at.delay(ctx.message.created_at)
