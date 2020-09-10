@@ -329,7 +329,6 @@ def insert_message(guild_id, userid, messageid, channelid, message):
     conn.commit()
     c.close()
     return
-<<<<<<< Updated upstream
 
 
 @app.task(base=DatabaseTask, ignore_result=True)

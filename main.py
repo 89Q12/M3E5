@@ -1,7 +1,9 @@
 from threading import Thread
-from base_folder.api.bot_api import runbot, runapi
+from base_folder.api import runapi
+from base_folder.bot import runbot
 
-extensions = ["base_folder.bot.modules.test",
+extensions = [
+              "base_folder.bot.modules.test",
               "base_folder.bot.modules.listener.listener_member",
               "base_folder.bot.modules.listener.listener_roles",
               "base_folder.bot.modules.listener.levelsystem",
@@ -17,9 +19,9 @@ extensions = ["base_folder.bot.modules.test",
               "base_folder.bot.modules.reaction_roles",
               "base_folder.bot.modules.music"
               ]
+null = [ ]
 
-
-Bot = Thread(target=runbot, args=[extensions])
+Bot = Thread(target=runbot, args=[null])
 Bot.start()
 
 Api = Thread(target=runapi)
