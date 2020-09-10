@@ -1,9 +1,14 @@
 import base64
+from threading import Thread, RLock
+from time import sleep
 from discord.ext import commands
+from flask_restplus import Resource
+
 from base_folder.bot.config.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
 from base_folder.bot.utils.logger import Log as stdout
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from base_folder.api.api import TodoSimple
 import base_folder.bot.utils.helper as helper
 '''
 Helper functions
@@ -55,4 +60,19 @@ for extension in extensions:
 '''
 Run bots main loop
 '''
-client.run(BOT_TOKEN)
+
+
+def run():
+    client.run(BOT_TOKEN)
+
+
+def api():
+    sleep(10)
+    TodoSimple(client, Resource).main()
+
+
+t1 = Thread(target=run)
+t1.start()
+
+t2 = Thread(target=api)
+t2.start()

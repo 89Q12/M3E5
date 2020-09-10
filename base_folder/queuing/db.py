@@ -2,6 +2,7 @@ import base64
 from abc import ABC
 from base_folder.queuing.worker import app, Task
 from base_folder.bot.config.config import sql
+from mysql import connector
 import re
 '''
 Initialize the tables
@@ -14,6 +15,11 @@ class DatabaseTask(Task, ABC):
     @property
     def db(self):
         if self._db is None:
+            self._db = sql()
+        try:
+            conn = self._db
+            conn.cursor()
+        except Exception:
             self._db = sql()
         return self._db
 
@@ -330,6 +336,7 @@ def insert_reaction(guild_id, message_id, roleid, emoji):
     """
 
     :param guild_id: id of the guild the data is for
+    :param channelid: the channel id the reaction message was sent in
     :param message_id: the id of the message
     :param roleid: the role a user should get if the user reacts
     :param emoji: the emoji the bot reacted with
