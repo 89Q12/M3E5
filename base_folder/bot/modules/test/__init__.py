@@ -1,6 +1,11 @@
+import collections
 import datetime
+import multiprocessing as mp
+import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
+
+Msg = collections.namedtuple('Msg', ['event', 'args'])
 
 
 class Test(commands.Cog):
@@ -27,9 +32,9 @@ class Test(commands.Cog):
         await ctx.send(embed=messages)
 
     @commands.command()
-    async def log(self, ctx, *, text: str):
+    async def log(self, text: str):
         channel = self.client.get_channel(716691056707764266)
-        await self.client.log.stdout(channel, ctx.message.content, ctx)
+        await self.client.log.stdout(channel, text)
 
 
 def setup(bot):

@@ -2,6 +2,7 @@ import base64
 from abc import ABC
 from base_folder.queuing.worker import app, Task
 from base_folder.bot.config.config import sql
+from mysql import connector
 import re
 '''
 Initialize the tables
@@ -14,6 +15,11 @@ class DatabaseTask(Task, ABC):
     @property
     def db(self):
         if self._db is None:
+            self._db = sql()
+        try:
+            conn = self._db
+            conn.cursor()
+        except Exception:
             self._db = sql()
         return self._db
 
@@ -323,6 +329,7 @@ def insert_message(guild_id, userid, messageid, channelid, message):
     conn.commit()
     c.close()
     return
+<<<<<<< Updated upstream
 
 
 @app.task(base=DatabaseTask, ignore_result=True)
@@ -330,6 +337,7 @@ def insert_reaction(guild_id, message_id, roleid, emoji):
     """
 
     :param guild_id: id of the guild the data is for
+    :param channelid: the channel id the reaction message was sent in
     :param message_id: the id of the message
     :param roleid: the role a user should get if the user reacts
     :param emoji: the emoji the bot reacted with
@@ -355,7 +363,7 @@ def update_role_name(guild_id, roleid, name):
     """
     conn = update_role_name.db
     c = conn.cursor()
-    c.execute(f"UPDATE `roles` SET `guild_id`={guild_id},`role_id`={roleid},`role_name`={name} WHERE 1")
+    c.execute(f"UPDATE `roles` SET `role_name`={name} WHERE 'guild_id' = {guild_id} and 'roleid' = {roleid}")
     conn.commit()
     c.close()
     return
