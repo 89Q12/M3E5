@@ -1,23 +1,23 @@
-import mysql.connector
-from discord.embeds import EmptyEmbed
-import datetime
+
+Wimport mysql.connector
+
+impo
 import discord.embeds
 
-'''
-Config
-'''
+'
+Confi
+
 BOT_TOKEN = "NjY0MTc3MDI4MTE5MDAzMTM2.XhTRDw.dYPCwu370hJWRpWw2Zs_hGLUORs"
 
-# Sql config
-SQL_IP = "xamh.de"
-SQL_USER = "zofi"
+
+
+
 SQL_passwd = "ljTivC9TBcIAoYFT"
 SQL_DB = "M3E5"
 SQL_AUTH_PLUGIN = "caching_sha2_password"
 
-# Celery config
-broker_url = 'amqp://zofi:brdfat65mc@172.17.0.1:5672/m3e5'
-result_backend = 'amqp://zofi:brdfat65mc@172.17.0.1:5672/m3e5'
+
+
 broker_connection_max_retries = True
 broker_connection_retry = 0
 imports = ('base_folder.queuing.db',)
