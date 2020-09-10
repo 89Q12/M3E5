@@ -329,6 +329,7 @@ def insert_message(guild_id, userid, messageid, channelid, message):
     conn.commit()
     c.close()
     return
+<<<<<<< Updated upstream
 
 
 @app.task(base=DatabaseTask, ignore_result=True)
@@ -362,7 +363,7 @@ def update_role_name(guild_id, roleid, name):
     """
     conn = update_role_name.db
     c = conn.cursor()
-    c.execute(f"UPDATE `roles` SET `guild_id`={guild_id},`role_id`={roleid},`role_name`={name} WHERE 1")
+    c.execute(f"UPDATE `roles` SET `role_name`={name} WHERE 'guild_id' = {guild_id} and 'roleid' = {roleid}")
     conn.commit()
     c.close()
     return
