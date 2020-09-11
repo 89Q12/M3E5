@@ -19,9 +19,9 @@ extensions = [
               "base_folder.bot.modules.reaction_roles",
               "base_folder.bot.modules.music"
               ]
-null = [ ]
+null = []
 
-Bot = Thread(target=runbot, args=[null])
+Bot = Thread(target=runbot, args=[extensions])
 Bot.start()
 
 Api = Thread(target=runapi)

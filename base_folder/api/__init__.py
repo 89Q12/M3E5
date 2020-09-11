@@ -1,24 +1,11 @@
 from flask import Flask
-from flask_restplus import Api, Resource, fields
+import base_folder.api.apis
 from asyncio import run_coroutine_threadsafe
 from time import sleep
+
+from base_folder.api import apiv1
 from base_folder.bot import client
 
-
-'''
-API 
-'''
-app = Flask(__name__)
-api = Api(app)
-
-'''
-Models of the api 
-'''
-Saymodel = api.model('Model', {
-    'guild_id': fields.Integer(),
-    'channel_id': fields.Integer(),
-    'message': fields.String("Some message or link etc, No files")
-})
 
 
 def runapi():
@@ -28,17 +15,8 @@ def runapi():
     app.run()
 
 
-@api.route('/api/')
-class Say(Resource):
-
-    @api.marshal_with(Saymodel)
-    def get(self):
-        return
-
-    @api.expect(Saymodel)
-    def post(self):
-        channel = client.get_channel(api.payload['channel_id'])
-        run_coroutine_threadsafe(channel.send(api.payload['message']), client.loop)
-        return {"With message": api.payload['message']}
-
-
+'''
+API 
+'''
+app = Flask(__name__)
+app.register_blueprint(apiv1.blueprint)

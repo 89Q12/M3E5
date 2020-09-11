@@ -362,7 +362,7 @@ def update_role_name(guild_id, roleid, name):
     """
     conn = update_role_name.db
     c = conn.cursor()
-    c.execute(f"UPDATE `roles` SET `role_name`={name} WHERE 'guild_id' = {guild_id} and 'roleid' = {roleid}")
+    c.execute(f"UPDATE roles SET role_name= '{str(name)}' WHERE role_id= '{roleid}' and guild_id='{str(guild_id)}'")
     conn.commit()
     c.close()
     return
