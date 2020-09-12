@@ -1,3 +1,5 @@
+import asyncio
+
 from discord.ext import commands
 from base_folder.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
@@ -27,5 +29,4 @@ def runbot(modules):
     '''
     Run the bots main loop
     '''
-    client.run(BOT_TOKEN)
-
+    asyncio.run(client.start(BOT_TOKEN))

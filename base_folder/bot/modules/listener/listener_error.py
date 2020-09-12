@@ -2,10 +2,9 @@ import discord
 from discord.ext import commands
 from base_folder.config import error_embed
 from base_folder.celery.db import on_error
-from base_folder.bot.utils.exceptions import Youtubedl
 
 
-class ErrorHandler(commands.Cog, Youtubedl):
+class ErrorHandler(commands.Cog):
     def __init__(self, client):
         self.client = client
 
