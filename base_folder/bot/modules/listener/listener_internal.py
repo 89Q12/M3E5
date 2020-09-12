@@ -1,9 +1,7 @@
-import datetime
 import discord
 from discord.ext import commands
-from base_folder.bot.config.config import build_embed
+from base_folder.config import build_embed
 from base_folder.celery.db import initialize_guild, is_user_indb, insert_message, roles_to_db
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 # TODO: Automod

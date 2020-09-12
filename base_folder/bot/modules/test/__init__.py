@@ -1,9 +1,7 @@
 import collections
 import datetime
-import multiprocessing as mp
-import discord
 from discord.ext import commands
-from base_folder.bot.config.config import build_embed
+from base_folder.config import build_embed
 
 Msg = collections.namedtuple('Msg', ['event', 'args'])
 

@@ -1,8 +1,8 @@
 import datetime
 from discord.ext import commands
 import discord
-from base_folder.bot.config.config import build_embed, success_embed
-from base_folder.bot.config.Permissions import Auth
+from base_folder.config import build_embed, success_embed
+from base_folder.bot.utils.Permissions import Auth
 
 
 class UserCmds(commands.Cog):

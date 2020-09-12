@@ -1,11 +1,8 @@
 # Ignored files
-base_folder/nmt
-base_folder/assistant
-base_folder/bot/config/config.py
-tests/*
+/base_folder/config/
 .idea/*
 *.pyc
 *.pyo
 README.md
 requirements.txt
-/base_folder/monitoring/
+

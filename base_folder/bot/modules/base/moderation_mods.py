@@ -4,8 +4,8 @@ import logging
 import discord
 from discord.ext import commands
 import discord.utils
-from base_folder.bot.config.Permissions import Auth
-from base_folder.bot.config.config import success_embed, error_embed
+from base_folder.bot.utils.Permissions import Auth
+from base_folder.config import success_embed, error_embed
 from base_folder.celery.db import *
 
 

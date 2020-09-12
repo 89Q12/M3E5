@@ -1,7 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands
-from base_folder.bot.config.config import error_embed, success_embed
+from base_folder.config import error_embed, success_embed
 import youtube_dl
 from base_folder.bot.utils import YTDLSource, Video, add_reaction_controls, pause_audio, queue_text, \
     in_voice_channel, audio_playing

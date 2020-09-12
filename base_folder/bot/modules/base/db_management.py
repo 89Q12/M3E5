@@ -1,6 +1,4 @@
-import base64
-import datetime
-from base_folder.bot.config.config import sql
+from base_folder.config import sql
 
 '''
 Class to create db management as class
