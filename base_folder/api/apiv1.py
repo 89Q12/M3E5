@@ -2,6 +2,7 @@ from flask import Blueprint
 from flask_restplus import Api
 
 from base_folder.api.apis.namespace_say import api as say
+
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
 
 api = Api(blueprint,
