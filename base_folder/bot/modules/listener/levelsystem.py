@@ -1,5 +1,5 @@
 from discord.ext import commands
-from base_folder.config import success_embed
+from base_folder.config import success_embed, build_embed
 from base_folder.celery.db import update_text_lvl, update_xp_text
 
 

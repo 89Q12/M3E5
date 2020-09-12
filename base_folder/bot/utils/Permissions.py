@@ -1,4 +1,5 @@
-# TODO: Rewrite the permission system so that it uses groups with permissions instead of roles. Current version: 1.0
+# TODO: Rewrite the permission system so that it uses groups with permissions instead of roles.
+#  Current version: 1.1
 class Auth(object):
     def __init__(self, client, ctx):
         self.ctx = ctx

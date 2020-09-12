@@ -1,5 +1,7 @@
 import collections
 import datetime
+import multiprocessing as mp
+import discord
 from discord.ext import commands
 from base_folder.config import build_embed
 
