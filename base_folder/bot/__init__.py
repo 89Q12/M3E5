@@ -29,4 +29,4 @@ def runbot(modules):
     '''
     Run the bots main loop
     '''
-    asyncio.run(client.start(BOT_TOKEN))
+    client.run(BOT_TOKEN)
