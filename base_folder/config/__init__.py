@@ -16,8 +16,8 @@ SQL_DB = "DB_name"
 SQL_AUTH_PLUGIN = "mysql_native_password"
 
 # Celery config
-broker_url = 'amqp://username:password@ipaddress of your server:5672/vhost'
-result_backend = 'amqp://username:password@ipaddress of your server:5672/vhost'
+broker_url = 'redis://defautl:yourpasword@172.17.0.1:6000/0'
+result_backend = 'redis://default:yourpassword@172.17.0.1:6000/1'
 imports = ('base_folder.celery.db',)
 include = ['base_folder.celery']
 task_cls = 'base_folder.celery.db:DatabaseTask'

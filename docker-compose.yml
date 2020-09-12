@@ -11,11 +11,27 @@ services:
     volumes:
       - .:/usr/src/app
 
+  redis:
+    image: "redis:alpine"
+    command: redis-server --requirepass SoMsEcUrEpassword
+    environment:
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - "0.0.0.0:5672:5672"
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
+
   celery:
     container_name: celery
     build:
       context: .
       dockerfile: dockerfiles/DockerfileCelery
+    depends_on:
+      - redis
     command: celery -A base_folder.celery.worker worker --loglevel=info
     volumes:
       - .:/usr/src/app
+
+volumes:
+  redis_data:
+    driver: local

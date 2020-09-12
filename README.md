@@ -13,7 +13,7 @@ Like a real AI and some other features.
 ## What M3E5 loves and uses
 
 - Docker/Docker-compose
-- rabbitmq
+- redis
 - celery
 - mysql
 - discord.py
@@ -86,36 +86,13 @@ For a list with all commands and there usage look at [commands](https://github.c
  You need to install a few things and I assume that you're using linux:
  - Docker
  - Docker-compose
- - rabbitmq
  - mysql-server
  
  ### First things first:<br>
  - I assume that you're using Linux<br>
  - clone the repo and cd into the cloned repo
  - Install, for docker [goto](https://docs.docker.com/get-docker/) for docker-compose [goto](https://docs.docker.com/compose/install/).
- 
- ### For rabbitmq follow these steps:<br>
-- Add the ppa repo to your source list<br>
-```echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list ```<br>
-- Get the signing key<br>
-```wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add - ```<br>
-- Then update your system<br>
-```sudo apt-get update ```<br>
-- Install the rabbitmq server<br>
-```sudo apt-get install rabbitmq-server```<br>
-- Enable the server as a service<br>
-```sudo systemctl enable rabbitmq-server```<br>
-- Start the server<br>
-```sudo systemctl start rabbitmq-server```<br>
- Now we need to configure a few things<br>
-- Create a user<br>
-```sudo rabbitmqctl add_user myuser somepassword```<br>
-- Create a vhost the name doesn't really matter for us but remember the name cause you need the name a few times<br>
-```sudo rabbitmqctl add_vhost myvhost ```<br>
-- Create a tag, I used administrator <br>
-```sudo rabbitmqctl set_user_tags myuser mytag```<br>
-- Setting the permissions for the user<br>
-```sudo rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*" ```<br>
+
 ### For mysql follow these steps:<br>
 - Install mysql-server<br>
 ```sudo apt install mysql-server```<br>
@@ -147,9 +124,10 @@ For a list with all commands and there usage look at [commands](https://github.c
 -That's it, exit the sql server<br>
 ```exit ```<br>
 ### Setup the config file
-- Navigate to base_folder/bot/config and open the config.py
-- Now enter your bot token and all other things.
-- Note that you only need to change the rabbitmq server address, username and vhost for celery
+- Change the Somepassword argument in the docker-compose file to your choice it should be very long
+- Change the flowering things in base_folder/config
+    - Now enter your bot token and all other things.
+    - Note that you only need to change "yourpassword" value for the brocker/backend address to the value you set in your docker compose file
 - Then run ``` docker-compose up``` and look if everything works if so hit ctrl+c and run ``` docker-compose up -d``` that runs it in detached mode.
 
 ### run instructions

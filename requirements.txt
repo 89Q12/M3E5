@@ -4,7 +4,7 @@ asyncio
 aiohttp~=3.6.2
 pillow~=7.2.0
 mysql-connector-python~=8.0.18
-celery~=4.4.6
+celery[redis]
 PyNaCl
 youtube-dl
 apscheduler~=3.6.0
