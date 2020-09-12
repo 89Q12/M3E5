@@ -21,15 +21,16 @@ class Log:
         :param ex: the exception when given else its none
         :return: nothing
         """
-        if not iserror:
-            self.log.info(msg + " command issued by " + str(ctx.author)
-                          if ctx is not None else msg + " command issued by guild")
-            await channel.send("Server time:" + str(datetime.datetime.now()) +
-                               ":INFO.commands: " + msg + " command issued by "
-                               + str(ctx.author) if ctx is not None else "Server time:" + str(datetime.datetime.now()) +
-                               ":INFO.commands: " + msg + " command issued by guild")
-        else:
+        if iserror:
             self.log.error(msg + " command issued by " + str(ctx.author) + " The exception was: " + str(ex))
             await channel.send("Server time:" + str(datetime.datetime.now()) +
                                ":ERROR.commands: " + msg + " command issued by " +
                                str(ctx.author) + " " + str(ctx.guild.owner.mention) + " The exception was: " + str(ex))
+            return
+
+        self.log.info(msg + " command issued by " + str(ctx.author)
+                      if ctx is not None else msg + " command issued by guild")
+        await channel.send("Server time:" + str(datetime.datetime.now()) +
+                           ":INFO.commands: " + msg + " command issued by "
+                           + str(ctx.author) if ctx is not None else "Server time:" + str(datetime.datetime.now()) +
+                           ":INFO.commands: " + msg + " command issued by guild")

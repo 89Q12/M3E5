@@ -1,6 +1,6 @@
 import base64
 from abc import ABC
-from base_folder.queuing.worker import app, Task
+from base_folder.celery.worker import app, Task
 from base_folder.bot.config.config import sql
 from mysql import connector
 import re

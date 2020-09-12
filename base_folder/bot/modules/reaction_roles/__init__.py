@@ -2,7 +2,7 @@ import asyncio
 
 from discord.ext import commands
 import discord
-from base_folder.queuing.db import insert_reaction
+from base_folder.celery.db import insert_reaction
 """
 This will be for custom reaction roles on messages for this to work somethings are neeeded:
     - guild id of the guild 

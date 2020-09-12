@@ -12,6 +12,6 @@ services:
   celery:
     container_name: celery
     build: .
-    command: celery -A base_folder.queuing.worker worker --loglevel=info
+    command: celery -A base_folder.celery.worker worker --loglevel=info
     volumes:
       - .:/usr/src/app

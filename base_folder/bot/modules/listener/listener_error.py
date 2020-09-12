@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import error_embed
-from base_folder.queuing.db import on_error
+from base_folder.celery.db import on_error
 from base_folder.bot.utils.exceptions import Youtubedl
 
 

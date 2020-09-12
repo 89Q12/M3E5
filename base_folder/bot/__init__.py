@@ -6,7 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import base_folder.bot.utils.helper as helper
 
 '''
-Bot
+Bot and bot object extensions
 '''
 client = commands.Bot(command_prefix=helper.prefix)
 conn = Db()

@@ -8,3 +8,5 @@ celery~=4.4.6
 PyNaCl
 youtube-dl
 apscheduler~=3.6.0
+flask~=1.1.2
+flask-restplus

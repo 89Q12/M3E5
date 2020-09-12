@@ -1,6 +1,6 @@
 from discord.ext import commands
 from base_folder.bot.config.config import success_embed
-from base_folder.queuing.db import update_text_lvl, update_xp_text
+from base_folder.celery.db import update_text_lvl, update_xp_text
 
 
 async def update_data(ctx, xp):
@@ -25,6 +25,8 @@ class Levelsystem(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.guild is None:
+            return
         if message.content is None:
             return
         if not await _enabled(self.client, message.guild.id):

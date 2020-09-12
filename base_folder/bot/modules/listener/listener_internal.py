@@ -2,8 +2,10 @@ import datetime
 import discord
 from discord.ext import commands
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import initialize_guild, is_user_indb, insert_message, roles_to_db
+from base_folder.celery.db import initialize_guild, is_user_indb, insert_message, roles_to_db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+
 # TODO: Automod
 
 
@@ -18,7 +20,6 @@ class Internal(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.client.change_presence(activity=discord.Game(name="Crushing data..."))
-
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
@@ -42,12 +43,16 @@ class Internal(commands.Cog):
     """
     Logging the guilds follows
     """
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.message):
         """
         Logs every message the bot gets into the db with channel id message id user id guild id timestamp
         :parameter message is the message object returned by the api
         """
+        # Todo: log to the table for private messages
+        if message.guild is None:
+            return
         if message.author.id == self.client.user.id:
             return
         guildid = message.guild.id
@@ -80,6 +85,7 @@ class Internal(commands.Cog):
             if not user.bot:
                 await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted"
                                                             f" Content: {content[1]} in Channel: {channel.name}")
+
     '''
     Automated background tasks
     '''

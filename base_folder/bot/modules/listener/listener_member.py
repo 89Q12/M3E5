@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from base_folder.bot.config.Permissions import Auth
 from base_folder.bot.config.config import build_embed
-from base_folder.queuing.db import *
+from base_folder.celery.db import *
 
 
 class ListenerMember(commands.Cog):

@@ -1,4 +1,4 @@
-from base_folder.queuing.db import *
+from base_folder.celery.db import *
 import discord
 from discord.ext import commands
 
