@@ -2,7 +2,6 @@ import base64
 from abc import ABC
 from base_folder.celery.worker import app, Task
 from base_folder.config import sql
-
 '''
 Initialize the tables
 '''
