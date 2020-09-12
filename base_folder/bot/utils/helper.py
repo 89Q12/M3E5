@@ -10,10 +10,12 @@ class Ctx:
         self.guild = member.guild
         self.author = member
 
+
 def prefix(objclient, ctx):
     r = objclient.sql.prefix_lookup(ctx.guild.id)
     pre = (base64.b64decode(str(r).encode("utf8"))).decode("utf8")
     return pre
+
 
 def loadmodules(modules, client):
     for extension in modules:
