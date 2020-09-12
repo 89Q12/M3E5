@@ -1,5 +1,5 @@
 from discord.ext import commands
-from base_folder.bot.config.config import BOT_TOKEN
+from base_folder.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
 from base_folder.bot.utils.logger import Log as stdout
 from apscheduler.schedulers.asyncio import AsyncIOScheduler

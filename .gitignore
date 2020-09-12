@@ -1,7 +1,9 @@
 # Ignored files
+/base_folder/config
 .idea/*
 *.pyc
 *.pyo
 README.md
 requirements.txt
+discord.log
 
