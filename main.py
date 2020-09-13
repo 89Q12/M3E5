@@ -1,6 +1,5 @@
-import asyncio
 from threading import Thread
-from base_folder.api import runapi
+from base_folder.restapi import runapi
 from base_folder.bot import runbot
 '''
 Extensions
@@ -28,7 +27,7 @@ Null extensions, good for testing
 null = []
 
 '''
-Runs the api in a second thread
+Runs the restapi in a second thread
 '''
 Api = Thread(target=runapi)
 Api.start()

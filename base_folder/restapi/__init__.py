@@ -2,11 +2,11 @@ from flask import Flask
 from asyncio import run_coroutine_threadsafe
 from time import sleep
 
-from base_folder.api import apiv1
+from base_folder.restapi import apiv1
 from base_folder.bot import client
 
 '''
-Runs the api with a 10 secs offset to the bot, so that the bot object is ready to use
+Runs the restapi with a 10 secs offset to the bot, so that the bot object is ready to use
 '''
 
 

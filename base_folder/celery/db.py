@@ -313,7 +313,7 @@ def insert_message(guild_id, userid, messageid, channelid, message):
     """
 
     :param guild_id: id of the guild the data is for
-    :param userid: the id of the user given by the api
+    :param userid: the id of the user given by the restapi
     :param messageid: the id of the message
     :param channelid: the channel id the message was sent in
     :param message: message content itself

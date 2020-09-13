@@ -1,7 +1,7 @@
 from asyncio import run_coroutine_threadsafe
 from flask_restplus import Resource, fields
 
-from base_folder.api.apiv1 import api
+from base_folder.restapi.apiv1 import api
 from base_folder.bot import client
 from base_folder.bot.modules.test import Test
 

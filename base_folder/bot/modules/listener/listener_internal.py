@@ -48,7 +48,7 @@ class Internal(commands.Cog):
     async def on_message(self, message: discord.message):
         """
         Logs every message the bot gets into the db with channel id message id user id guild id timestamp
-        :parameter message is the message object returned by the api
+        :parameter message is the message object returned by the restapi
         """
         # Todo: log to the table for private messages
         if message.guild is None:

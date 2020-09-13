@@ -1,9 +1,9 @@
 from flask import Blueprint
 from flask_restplus import Api
 
-from base_folder.api.apis.namespace_say import api as say
+from base_folder.restapi.apis.namespace_say import api as say
 
-blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
+blueprint = Blueprint('restapi', __name__, url_prefix='/restapi/v1')
 
 api = Api(blueprint,
           title='Web to Discord API',

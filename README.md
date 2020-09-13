@@ -44,9 +44,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - On server join the owner gets a message with all setup commands that need to be executed
   - celery
   - reaction roles
-- Chatbot 
-  - trained
-  - Answers to messages like a real human but in stupid
+
 
 ![Status](https://img.shields.io/badge/status-in_progress-red.svg)
 
@@ -61,20 +59,19 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Auto tasks
   - Alerts for various services like Twitch and Reddit
   - Music player
-    - youtube playlist
+    - youtube playlists
     - Spotify
     - youtube-dl implementation needs a rework
   - custom messaging design 
   - Recording meetings ( Voice recording to an mp3 file)
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
+  - Ticket/Support system 
   - Advanced permission system, that uses groups of accepted roles and banned roles per command
   - unittests
   - Web interface but I will open a seperate repository for that
     - basic api
-- Chatbot features
-  - Discord bridge 
-  - maybe more but idk now yet
+
  
 # Critical bugs
 
@@ -144,38 +141,3 @@ For a list with all commands and there usage look at [commands](https://github.c
 - -set_admin
  
  If you encounter any bugs or errors please open an issue with steps to reproduce and as much details about the bug or error as you have. Thank you <3
-
-# Chatbot
-
-As I stated earlier I'm using Google's nmt but a modified version by [daniel-kukiela](https://github.com/daniel-kukiela), the repo can be found [here](https://github.com/daniel-kukiela/nmt-chatbot).
-All credits for the chatbot goes to Google and [daniel-kukiela](https://github.com/daniel-kukiela).
-
-# Examples
-
-## Screenshots of the message design of some commands:
-serverinfo command<br>
-![serverinfo command](https://cdn.discordapp.com/attachments/712041605753733152/722159106013528135/unknown.png)<br>
-profile command<br>
-![profile command](https://cdn.discordapp.com/attachments/680655385102909441/722188507564605520/unknown.png)<br>
-command not found error<br>
-![not found command error](https://cdn.discordapp.com/attachments/680655385102909441/722188706265563146/unknown.png)<br>
-internal error on command<br>
-![internal error](https://cdn.discordapp.com/attachments/680655448042504232/722189322174070896/unknown.png)<br>
-## Here are some examples of the chatbot:
-
-Question: Can you sing me a song?<br>
-Answer: I'll post it.
-
-Question: You are cute<br>
-Answer: I'm so confused.
-
-Question: <3<br>
-Answer: <3
-
-Question: i have to get an invite to grab some food from the fridge<br>
-Answer: I'll go ahead and get it.
-
-Question: What do you think about the human race?<br>
-Answer: I think it's a bit of a dick.
-
-Cute or? isn't it
