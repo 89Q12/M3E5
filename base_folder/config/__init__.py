@@ -6,14 +6,14 @@ import discord.embeds
 '''
 Config
 '''
-BOT_TOKEN = "NjY0MTc3MDI4MTE5MDAzMTM2.XhTRDw.uzKRDhi80R8tlcqLAXnSBz56ST0"
+BOT_TOKEN = "Token"
 
 # Sql config
-SQL_IP = "xamh.de"
-SQL_USER = "zofi"
-SQL_passwd = "ljTivC9TBcIAoYFT"
-SQL_DB = "M3E5"
-SQL_AUTH_PLUGIN = "caching_sha2_password"
+SQL_IP = "xadsase"
+SQL_USER = "asdas"
+SQL_passwd = "sd"asdasd
+SQL_DB = "adas"
+SQL_AUTH_PLUGIN = "aSDDasfa"
 
 # Celery config
 broker_url = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/0'
