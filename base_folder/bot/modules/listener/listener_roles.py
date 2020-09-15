@@ -27,7 +27,7 @@ class ListenerRoles(commands.Cog):
     async def on_guild_role_update(self, before, after):
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(before.guild.id))
         if before.name != after.name:
-            await self.client.log.stdout(stdoutchannel, f"Role {after.name} got updated froo {before.name} to {after.name}")
+            await self.client.log.stdout(stdoutchannel, f"Role {after.name} got updated from {before.name} to {after.name}")
             update_role_name.delay(before.guild.id, before.id, after.name)
 
 def setup(client):

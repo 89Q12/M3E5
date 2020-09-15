@@ -17,10 +17,9 @@ class ErrorHandler(commands.Cog):
         :return: logs the error to the db if it wasn't a commands.* error and sends a log entry in the stdout channel
         regardless of the error
         """
-        await ctx.channel.purge(limit=1)
         if hasattr(ctx.command, 'on_error'):
             return
-
+        await ctx.channel.purge(limit=1)
         error = getattr(ex, 'original', ex)
         embed = error_embed(self.client)
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))

@@ -76,7 +76,7 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="clears a givien amount of messages")
     @commands.guild_only()
-    async def clear(self, ctx, arg):
+    async def delete(self, ctx, arg):
         await ctx.channel.purge(limit=int(arg))
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)

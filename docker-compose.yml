@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/DockerfileBot
+    ports:
+      - "0.0.0.0:5000:5000"
     command: python main.py
     volumes:
       - .:/usr/src/app
@@ -17,7 +19,7 @@ services:
     environment:
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
-      - "0.0.0.0:5672:5672"
+      - "0.0.0.0:6000:6379"
     volumes:
       - 'redis_data:/bitnami/redis/data'
 
@@ -31,6 +33,15 @@ services:
     command: celery -A base_folder.celery.worker worker --loglevel=info
     volumes:
       - .:/usr/src/app
+
+  lavalink:
+    container_name: lavalink
+    build:
+      context: .
+      dockerfile: dockerfiles/DockerfileLavalink
+    ports:
+      - "0.0.0.0:2333:2333"
+    command: lavalink
 
 volumes:
   redis_data:

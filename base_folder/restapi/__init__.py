@@ -12,9 +12,7 @@ Runs the restapi with a 10 secs offset to the bot, so that the bot object is rea
 
 def runapi():
     sleep(10)
-    user = client.get_user(322822954796974080)  # Sends a message to me replace with your own ID
-    run_coroutine_threadsafe(user.send("API up and running"), client.loop)
-    app.run()
+    app.run(host='0.0.0.0', debug=False, port=5000)
 
 
 '''

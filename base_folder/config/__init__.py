@@ -6,18 +6,20 @@ import discord.embeds
 '''
 Config
 '''
-BOT_TOKEN = "TOKEN"
+BOT_TOKEN = "NjY0MTc3MDI4MTE5MDAzMTM2.XhTRDw.uzKRDhi80R8tlcqLAXnSBz56ST0"
 
 # Sql config
-SQL_IP = "the address of your server. it should be localhost"
-SQL_USER = "username"
-SQL_passwd = "yourpassword"
-SQL_DB = "DB_name"
-SQL_AUTH_PLUGIN = "mysql_native_password"
+SQL_IP = "xamh.de"
+SQL_USER = "zofi"
+SQL_passwd = "ljTivC9TBcIAoYFT"
+SQL_DB = "M3E5"
+SQL_AUTH_PLUGIN = "caching_sha2_password"
 
 # Celery config
-broker_url = 'redis://defautl:yourpasword@172.17.0.1:6000/0'
-result_backend = 'redis://default:yourpassword@172.17.0.1:6000/1'
+broker_url = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/0'
+result_backend = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/1'
+broker_connection_max_retries = True
+broker_connection_retry = 0
 imports = ('base_folder.celery.db',)
 include = ['base_folder.celery']
 task_cls = 'base_folder.celery.db:DatabaseTask'
@@ -30,11 +32,11 @@ SQL
 
 def sql():
     mydb = mysql.connector.connect(
-        host=SQL_IP,
-        user=SQL_USER,
-        passwd=SQL_passwd,
-        database=SQL_DB,
-        auth_plugin=SQL_AUTH_PLUGIN
+      host=SQL_IP,
+      user=SQL_USER,
+      passwd=SQL_passwd,
+      database=SQL_DB,
+      auth_plugin=SQL_AUTH_PLUGIN
     )
     return mydb
 

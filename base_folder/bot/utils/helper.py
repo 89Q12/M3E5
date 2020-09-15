@@ -25,3 +25,8 @@ def loadmodules(modules, client):
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
+
+'''
+This class is designed to hold all data that the bot uses extensively and the class is designed in a way that it can
+reload the data on change.
+'''
