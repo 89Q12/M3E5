@@ -6,14 +6,14 @@ import discord.embeds
 '''
 Config
 '''
-BOT_TOKEN = "NjY0MTc3MDI4MTE5MDAzMTM2.XhTRDw.uzKRDhi80R8tlcqLAXnSBz56ST0"
+BOT_TOKEN = "TOKEN"
 
 # Sql config
-SQL_IP = "xamh.de"
-SQL_USER = "zofi"
-SQL_passwd = "ljTivC9TBcIAoYFT"
+SQL_IP = ""
+SQL_USER = ""
+SQL_passwd = ""
 SQL_DB = "M3E5"
-SQL_AUTH_PLUGIN = "caching_sha2_password"
+SQL_AUTH_PLUGIN = ""
 
 # Celery config
 broker_url = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/0'
@@ -23,7 +23,7 @@ broker_connection_retry = 0
 imports = ('base_folder.celery.db',)
 include = ['base_folder.celery']
 task_cls = 'base_folder.celery.db:DatabaseTask'
-timezone = 'Europe/Berlin'
+timezone = ''
 
 '''
 SQL
