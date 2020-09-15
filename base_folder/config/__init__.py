@@ -6,21 +6,16 @@ import discord.embeds
 '''
 Config
 '''
-BOT_TOKEN = "Token"
+BOT_TOKEN = "Toasdasdfken"
 
 # Sql config
-SQL_IP = "xadsase"
-SQL_USER = "asdas"
-SQL_passwd = "sd"asdasd
-SQL_DB = "adas"
-SQL_AUTH_PLUGIN = "aSDDasfa"
-
-# Celery config
-broker_url = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/0'
-result_backend = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/1'
-broker_connection_max_retries = True
-broker_connection_retry = 0
-imports = ('base_folder.celery.db',)
+SQL_IP = "xadsaasfvsd<fgvsdse"
+vxgv
+SQLsd_gv "sd"asdasd
+SQL_DB = "adas"gddvDasfa"v
+# Celery configgxvlt:SoMsdEpassword@172.17.0.1:6000/0'
+result_backend = 'redissdetries = Trusd
+imports = ('base_folder.celery.dbxgcv
 include = ['base_folder.celery']
 task_cls = 'base_folder.celery.db:DatabaseTask'
 timezone = 'Europe/Berlin'
