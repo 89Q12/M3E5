@@ -112,7 +112,7 @@ class Queue:
         return self._queue[:self.position]
 
     @property
-    def len(self):
+    def length(self):
         return len(self._queue)
 
     @property
@@ -220,7 +220,7 @@ class Player(wavelink.Player):
             title="Choose a song",
             description=(
                 "\n".join(
-                    f"**{i + 1}.** {t.title} ({t.len // 60000}:{str(t.len % 60).zfill(2)})"
+                    f"**{i + 1}.** {t.title} ({t.length // 60000}:{str(t.length % 60).zfill(2)})"
                     for i, t in enumerate(tracks[:5])
                 )
             ),
@@ -308,9 +308,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     async def start_nodes(self):
         await self.bot.wait_until_ready()
 
-        await self.wavelink.initiate_node(host="127.0.0.1",
+        await self.wavelink.initiate_node(host="0.0.0.0",
                                           port=2333,
-                                          rest_uri="http://127.0.0.1:2333",
+                                          rest_uri="http://0.0.0.0:2333",
                                           password="brdfat60814630",
                                           identifier="MAIN",
                                           region="europe")
@@ -451,7 +451,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         )
         embed.set_author(name="Query Results")
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
-        embed.add_field(name="Number of songs", value=player.queue.len, inline=False)
+        embed.add_field(name="Number of songs", value=player.queue.length, inline=False)
         embed.add_field(name="Looping", value=player.queue.get_loop[player.queue.get_loop[3]], inline=False)
         embed.add_field(name="Shuffling", value=player.queue.shuffle[player.queue.shuffle[2]], inline=False)
         embed.add_field(name="Currently playing", value=player.queue.current_track, inline=False)
