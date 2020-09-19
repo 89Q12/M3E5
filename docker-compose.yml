@@ -12,8 +12,8 @@ services:
     command: python main.py
     volumes:
       - .:/usr/src/app
-  API:
-    container_name: API
+  api:
+    container_name: api
     build:
       context: .
       dockerfile: dockerfiles/DockerfileBot
