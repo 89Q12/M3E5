@@ -9,6 +9,10 @@ services:
       dockerfile: dockerfiles/DockerfileBot
     networks:
       - default
+    environment:
+      - lhost=lavalink
+      - lport=2333
+      - lpass=TTT
     command: python main.py
     volumes:
       - .:/usr/src/app
