@@ -1,10 +1,13 @@
 """
-This is helper script like creating the ctx object out of the member object etc
+This helper script is helpful in some situations  like creating the ctx object out of the member object etc
 """
 import base64
 
 
 class Ctx:
+    """
+    Not the fully featured ctx object but its doing the job
+    """
     def __init__(self, member):
         self.member = member
         self.guild = member.guild
@@ -26,7 +29,15 @@ def loadmodules(modules, client):
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
+
 '''
 This class is designed to hold all data that the bot uses extensively and the class is designed in a way that it can
 reload the data on change.
 '''
+
+
+# TODO: Look above
+
+class DbCache:
+    def __init__(self):
+        pass

@@ -1,25 +1,40 @@
 version: '3.7'
 
 services:
-
-  m3e5:
-    container_name: m3e5
+  # Bot container
+  bot:
+    container_name: bot
+    build:
+      context: .
+      dockerfile: dockerfiles/DockerfileBot
+    networks:
+      - default
+    command: python main.py
+    volumes:
+      - .:/usr/src/app
+  API:
+    container_name: API
     build:
       context: .
       dockerfile: dockerfiles/DockerfileBot
     ports:
-      - "0.0.0.0:5000:5000"
-    command: python main.py
+      - "5000:5000"
+    networks:
+      - default
+    command: python main.py api
     volumes:
       - .:/usr/src/app
 
+  # All other container
   redis:
     image: "redis:alpine"
     command: redis-server --requirepass SoMsEcUrEpassword
     environment:
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
     ports:
-      - "0.0.0.0:6000:6379"
+      - "6000:6379"
+    networks:
+      - default
     volumes:
       - 'redis_data:/bitnami/redis/data'
 
@@ -30,6 +45,8 @@ services:
       dockerfile: dockerfiles/DockerfileCelery
     depends_on:
       - redis
+    networks:
+      - default
     command: celery -A base_folder.celery.worker worker --loglevel=info
     volumes:
       - .:/usr/src/app
@@ -40,9 +57,14 @@ services:
       context: .
       dockerfile: dockerfiles/DockerfileLavalink
     ports:
-      - "0.0.0.0:2333:2333"
+      - "2333:2333"
     command: lavalink
 
 volumes:
   redis_data:
     driver: local
+
+networks:
+  default:
+    external:
+      name: bot-network

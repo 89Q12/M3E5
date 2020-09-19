@@ -85,7 +85,7 @@ class ReactionRoles(commands.Cog):
         :return:nothing
         """
         pass
-
+    # TODO: Refactor following event so that it doesnt raise anything
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if not payload.member.bot:
@@ -110,7 +110,6 @@ class ReactionRoles(commands.Cog):
                 await member.remove_roles(role, reason="reaction removed", atomic=True)
             except TypeError:
                 return
-
 
 
 def setup(client):

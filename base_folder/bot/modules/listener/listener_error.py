@@ -3,6 +3,59 @@ from discord.ext import commands
 from base_folder.config import error_embed
 from base_folder.celery.db import on_error
 
+cmds = [
+    "server_info",
+    "roles_in_db",
+    "builddb",
+    "stop",
+    "show_roles",
+    "help",
+    "roleinfo",
+    "kick",
+    "profile",
+    "next",
+    "prefix",
+    "unban",
+    "set_leave",
+    "previous",
+    "delete",
+    "set_lvl",
+    "queue",
+    "set_cmd",
+    "played",
+    "tempmute",
+    "give_role",
+    "add_reaction",
+    "connect",
+    "clear",
+    "loop",
+    "mute",
+    "set_default",
+    "shuffle",
+    "slowmode",
+    "disconnect",
+    "play",
+    "set_admin",
+    "jumpqueue",
+    "unmute",
+    "set_dev",
+    "imgwelcome",
+    "warn",
+    "xx",
+    "del_reaction",
+    "pause",
+    "ban",
+    "set_mod",
+    "infractions",
+    "tempban",
+    "unload",
+    "log",
+    "load",
+    "set_welcome",
+    "clear_infractions",
+    "reload"
+]
+
 
 class ErrorHandler(commands.Cog):
     def __init__(self, client):
@@ -26,9 +79,12 @@ class ErrorHandler(commands.Cog):
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, ex)
 
         if isinstance(error, commands.CommandNotFound):
-            embed.description = "I have never seen this command in my entire life"
-            await ctx.send(embed=embed)
-            return
+            if ctx.command in cmds:
+                return
+            else:
+                embed.description = "I have never seen this command in my entire life"
+                await ctx.send(embed=embed)
+                return
 
         if isinstance(error, commands.errors.CheckFailure):
             embed.description = "You do not have permission to use this command." \

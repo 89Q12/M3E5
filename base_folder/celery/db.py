@@ -48,6 +48,7 @@ def is_user_indb(user_name, user_id, guild_id):
         c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
                   f"VALUES ('{str(user_name)} ', '{str(user_id)}', '{str(guild_id)}')")
         conn.commit()
+        c.close()
     except:
         return
 
@@ -142,11 +143,14 @@ def roles_to_db(guild_id, role_name, role_id):
     c.execute(f"SELECT role_id FROM roles WHERE role_id={str(role_id)} and guild_id={str(guild_id)}")
     sq = c.fetchone()
     if sq:
+        conn.commit()
+        c.close()
         return True
     else:
         c.execute(f"INSERT INTO roles (guild_id, role_name, role_id) "
                   f"VALUES ('{guild_id}', '{str(role_name)}', '{str(role_id)}')")
         conn.commit()
+        c.close()
         return
 
 

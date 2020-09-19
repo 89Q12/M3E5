@@ -1,11 +1,6 @@
-from threading import Thread
-from base_folder.restapi import runapi
-from base_folder.bot import runbot
-'''
-Extensions
-'''
-extensions = [
-              "base_folder.bot.modules.test",
+from base_folder.bot import MainBot
+
+extensions = ["base_folder.bot.modules.test",
               "base_folder.bot.modules.listener.listener_member",
               "base_folder.bot.modules.listener.listener_roles",
               "base_folder.bot.modules.listener.levelsystem",
@@ -19,19 +14,11 @@ extensions = [
               "base_folder.bot.modules.listener.listener_error",
               "base_folder.bot.modules.listener.listener_internal",
               "base_folder.bot.modules.reaction_roles",
-              "base_folder.bot.modules.music.lavalink_music",
+              "base_folder.bot.modules.music",
               ]
-'''
-Null extensions, good for testing
-'''
-null = []
-
-'''
-Runs the restapi in a second thread
-'''
-Api = Thread(target=runapi)
-Api.start()
 '''
 Runs the bot in the main thread
 '''
-runbot(extensions)
+
+bot = MainBot()
+bot.run(extensions)
