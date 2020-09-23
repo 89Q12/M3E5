@@ -13,7 +13,7 @@ async def update_data(ctx, xp):
 
 
 async def _enabled(client, guildid):
-    if await client.sql.get_levelsystem(guildid) == 1:
+    if await client.cache.states[guildid].get_levelsystem == 1:
         return True
     else:
         return False
@@ -33,8 +33,9 @@ class Levelsystem(commands.Cog):
             return
         if message.author.id == self.client.user.id:
             return
-        channel_id = await self.client.sql.get_lvl_channel(message.guild.id)
-        if channel_id == 0 or None:
+        channel_id = self.client.cache.states[message.guild.id].get_channel("lvl")
+        print(channel_id)
+        if channel_id is None or channel_id == 0:
             channel = message.guild.system_channel
         else:
             channel = self.client.get_channel(channel_id)
@@ -42,10 +43,10 @@ class Levelsystem(commands.Cog):
         xp_after = await update_data(message, xp_before)
         e = success_embed(self.client)
         lvl_start = await self.client.sql.get_lvl_text(message.guild.id, message.author.id)
-        lvl_end = int(float(str(xp_after)) ** (1 / 4))
+        lvl_end = int(float(int(xp_after) ** (1 / 4)))
         if lvl_start < lvl_end:
             e.title = "LEEVEEL UP"
-            e.description = f"{message.author.mention} reached level {lvl_end} and has now {xp_after}xp"
+            e.description = f"{message.author.mention} reached level {lvl_end} and has now {xp_after}XP"
             await channel.send(embed=e)
             update_text_lvl.delay(message.guild.id, message.author.id, lvl_end)
             update_xp_text.delay(message.guild.id, message.author.id, xp_after)

@@ -1,22 +1,21 @@
-from flask import Flask
-from asyncio import run_coroutine_threadsafe
+import threading
 from time import sleep
+from flask import Flask
+from discord.ext import commands
 
+from base_folder.config import API_BOT_TOKEN
 from base_folder.restapi import apiv1
-from base_folder.bot import client
+
+client = commands.Bot(command_prefix="!API#", case_insensitive=True)
 
 '''
-Runs the restapi with a 10 secs offset to the bot, so that the bot object is ready to use
-'''
-
-
-def runapi():
-    sleep(10)
-    app.run(host='0.0.0.0', debug=False, port=5000)
-
-
-'''
-API 
+API app config
 '''
 app = Flask(__name__)
 app.register_blueprint(apiv1.blueprint)
+
+
+def runapp():
+    t = threading.Thread(target=app.run(host='0.0.0.0', debug=False, port=5000))
+    t.start()
+    client.run(API_BOT_TOKEN)

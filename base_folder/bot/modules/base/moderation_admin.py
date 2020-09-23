@@ -1,7 +1,7 @@
 import datetime
 import discord.utils
 from discord.ext import commands
-from base_folder.bot.utils.Permissions import Auth
+from base_folder.bot.utils.Permissions import admin
 from base_folder.config import success_embed, build_embed
 from base_folder.celery.db import *
 
@@ -12,14 +12,12 @@ class ModerationAdmin(commands.Cog):
 
     @commands.command(pass_context=True, brief="gives a member a role( @role, @member)")
     @commands.guild_only()
+    @admin()
     async def give_role(self, ctx, member: discord.Member, role: discord.Role):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_admin() >= 3:
-            pass
-        else:
-            raise commands.errors.CheckFailure
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
         if log is None:
             log = ctx
@@ -30,15 +28,13 @@ class ModerationAdmin(commands.Cog):
 
     @commands.command(pass_context=True, brief="bans a given member")
     @commands.guild_only()
+    @admin()
     async def ban(self, ctx, member: discord.Member = None, reason: str = "Because you are naughty. We banned you."):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_admin() >= 3:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         e = success_embed(self.client)
@@ -57,14 +53,11 @@ class ModerationAdmin(commands.Cog):
 
     @commands.command(pass_context=True, brief="bans a given member for a time ( in hours), ban @member time e.g. 2 ")
     @commands.guild_only()
+    @admin()
     async def tempban(self, ctx, member: discord.Member = None, time=2):
         await ctx.channel.purge(limit=1)
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_admin() >= 3:
-            pass
-        else:
-            raise commands.errors.CheckFailure
         reason = "Tempban"
         log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
         if log is None:
@@ -84,14 +77,11 @@ class ModerationAdmin(commands.Cog):
 
     @commands.command(pass_context=True, aliases=["clear-all-infractions"], brief="clear all infractions of a user!!")
     @commands.guild_only()
+    @admin()
     async def clear_infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
         stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_admin() >= 3:
-            pass
-        else:
-            raise commands.errors.CheckFailure
         log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
         if log is None:
             log = ctx

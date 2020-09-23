@@ -14,12 +14,11 @@ class DatabaseTask(Task, ABC):
     def db(self):
         if self._db is None:
             self._db = sql()
-        try:
-            conn = self._db
-            conn.cursor()
-        except Exception:
+        if self._db.is_connected():
+            return self._db
+        else:
             self._db = sql()
-        return self._db
+            return self._db
 
 
 @app.task(base=DatabaseTask, ignore_result=False)

@@ -23,6 +23,11 @@ Permission level admin or higher required
 | set_welcome| sets the welcome channel s |et_welcom channel id |
 | set_cmd  |sets the command channel where the bot logs commands  |set_cmd channel id |
 | set_lvl | sets the leave channel  |set_lvl channel id |
+| imgwelcome toggle | turns the img welcome on and off | imgwelcome toggle |
+| imgwelcome text | the welcome text that the use sees on join | imgwelcome text  |
+| imgwelcome img | the image that should be used | imgwelcome img |
+| imgwelcome test | test the img welcome on you | imgwelcome test  |
+| levelsystem toggle | turns the  levelsystem on and off | levelsystem toggle |
 | add_reaction | Adds a reaction role to any message that the command author wrote| message id channel id then follow the instructions|
 
 ## Moderation commands
@@ -64,6 +69,8 @@ more commands will follow
 |:-------------|:----|:----|
 | profile | shows the profile of the member like text xp etc| profile |
 | roleinfo |Shows the color of role and how many members's the role has and some other things | roleinfo @role |
+| leaderboard | Shows the leaderboard of the server sorted by level dsc | leaderboard |
+| leaderboard | Shows the leaderboard of the server sorted by level dsc | leaderboard |
 | server_info | Shows info about the current guild e.g created at etc | server_info |
 
 ## Music

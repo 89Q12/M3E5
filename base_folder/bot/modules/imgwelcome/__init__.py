@@ -38,8 +38,7 @@ class IMGWelcome(commands.Cog):
         self.client = bot
 
     async def __is_enabled(self, guild: int):
-        toggle = await self.client.sql.get_img(guild)
-        if int(toggle) == 1:
+        if self.client.cache.states[guild].get_imgtoggle == 1:
             return True
         else:
             return False
@@ -55,10 +54,11 @@ class IMGWelcome(commands.Cog):
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcome"""
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         toggle = int(await self.client.sql.get_img(ctx.guild.id))
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
         if log is None:
             log = ctx
         if 0 == toggle:
@@ -72,8 +72,9 @@ class IMGWelcome(commands.Cog):
     async def imgwelcome_img(self, ctx):
         """Set the image"""
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("Enable imgwelcoming with n!imgwelcome toggle")
 
@@ -122,7 +123,9 @@ class IMGWelcome(commands.Cog):
         Example:
             n!imgwelcome text Welcome user to server!
         """
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("imgwelcome is not enabled")
@@ -134,7 +137,6 @@ class IMGWelcome(commands.Cog):
     @imgwelcome.command(name="test")
     async def imgwelcome_test(self, ctx):
         member: discord.member = ctx.author
-        await ctx.send(member.name)
         await self.on_member_join(member)
 
     def _circle_border(self, circle_img_size: tuple):
@@ -146,25 +148,26 @@ class IMGWelcome(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         guild = member.guild
-        channel_id = await self.client.sql.get_welcome_channel(member.guild.id)
-        channel = self.client.get_channel(channel_id.get())
+        channel = self.client.get_channel(self.client.cache.states[member.guild.id].get_channel("welcome"))
+        print("test")
         if not channel:
             return
         if await self.__is_enabled(member.guild.id):
             pass
         else:
             r = await self.client.sql.get_img_text(guild.id)
-            content = base64.b64decode(str(r.encode("utf8"))).decode("utf8")\
+            print(r)
+            content = base64.b64decode(str(r).encode("utf8")).decode("utf8")\
                 .replace("user", member.mention)\
                 .replace("server", guild.name)
             await channel.send(content)
             return
         await channel.trigger_typing()
 
-        if os.path.exists(f"data/imgwelcome/{guild.id}.png"):
-            background = Image.open(f"data/imgwelcome/{guild.id}.png").convert("RGBA")
+        if os.path.exists(f"base_folder/bot/data/imgwelcome/{guild.id}.png"):
+            background = Image.open(f"base_folder/bot/data/imgwelcome/{guild.id}.png").convert("RGBA")
         else:
-            background = Image.open("data/imgwelcome/transparent.png")
+            background = Image.open(os.path.realpath("base_folder/bot/data/imgwelcome/transparent.png"))
 
         async with aiohttp.ClientSession() as cs:
             async with cs.get(str(member.avatar_url_as(format="png"))) as res:
@@ -215,15 +218,15 @@ class IMGWelcome(commands.Cog):
 
             drawtwo.text(op, text, font=font, fill=(textoutline))
 
-        welcome_font = ImageFont.truetype("data/fonts/UniSansHeavy.otf", 50)
+        welcome_font = ImageFont.truetype("base_folder/bot/data/fonts/UniSansHeavy.otf", 50)
 
         _outline((150, 16), "Welcome", 1, welcome_font, (0, 0, 0, 255))
         drawtwo.text((150, 16), "Welcome", font=welcome_font, fill=(255, 255, 255, 230))
-        name_font = ImageFont.truetype("data/fonts/UniSansHeavy.otf", 30)
-        name_font_medium = ImageFont.truetype("data/fonts/UniSansHeavy.otf", 22)
-        name_font_small = ImageFont.truetype("data/fonts/UniSansHeavy.otf", 18)
-        name_font_smallest = ImageFont.truetype("data/fonts/UniSansHeavy.otf", 12)
-        server_font = ImageFont.truetype("data/fonts/UniSansHeavy.otf", 22)
+        name_font = ImageFont.truetype("base_folder/bot/data/fonts/UniSansHeavy.otf", 30)
+        name_font_medium = ImageFont.truetype("base_folder/bot/data/fonts/UniSansHeavy.otf", 22)
+        name_font_small = ImageFont.truetype("base_folder/bot/data/fonts/UniSansHeavy.otf", 18)
+        name_font_smallest = ImageFont.truetype("base_folder/bot/data/fonts/UniSansHeavy.otf", 12)
+        server_font = ImageFont.truetype("base_folder/bot/data/fonts/UniSansHeavy.otf", 22)
 
         if len(uname) <= 17:
             _outline((152, 63), uname, 1, name_font, (0, 0, 0, 255))
@@ -247,17 +250,17 @@ class IMGWelcome(commands.Cog):
         _outline((152, 100), server_text, 1, server_font, (0, 0, 0, 255))
         drawtwo.text((152, 100), server_text, font=server_font, fill=(255, 255, 255, 230))
 
-        welcome_picture.save("data/welcome.png")
+        welcome_picture.save(os.path.realpath("base_folder/bot/data/welcome.png"))
 
         try:
             r = await self.client.sql.get_img_text(guild.id)
-            content = base64.b64decode(str(r.encode("utf8"))).decode("utf8")\
+            content = base64.b64decode(str(r).encode("utf8")).decode("utf8")\
                 .replace("user", member.mention)\
                 .replace("server", guild.name)
         except:
             content = "Welcome {} to {}!".format(member.name, guild.name)
 
-        file = discord.File("data/welcome.png", filename="welcome.png")
+        file = discord.File("base_folder/bot/data/welcome.png", filename="welcome.png")
 
         await channel.send(file=file, content=content)
 

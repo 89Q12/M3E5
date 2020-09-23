@@ -29,7 +29,10 @@ For a list with all commands and there usage look at [commands](https://github.c
   - basic Moderation commands
   - profile shows you your writer rank/xp and warnings
   - Music player has still some bugs 
+      - youtube/playlists
+      - Soundcloud/playlists
   - Welcome image
+  - custom Join and leave messages
   - welcome/leave channel 
   - Auto roles
   - tempmute
@@ -49,7 +52,6 @@ For a list with all commands and there usage look at [commands](https://github.c
 ![Status](https://img.shields.io/badge/status-in_progress-red.svg)
 
 - Discord features
-  - custom Join and leave messages
   - custom help command
   - tempban
   - anti spam
@@ -59,9 +61,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Auto tasks
   - Alerts for various services like Twitch and Reddit
   - Music player
-    - youtube playlists
     - Spotify
-    - youtube-dl implementation needs a rework
   - custom messaging design 
   - Recording meetings ( Voice recording to an mp3 file)
   - Custom voice channels 

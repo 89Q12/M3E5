@@ -1,13 +1,12 @@
 import datetime
 import logging
-
-import discord
 from discord.ext import commands
 import discord.utils
-from base_folder.bot.utils.Permissions import Auth
-from base_folder.config import success_embed, build_embed
-from base_folder.celery.db import *
 
+from base_folder.bot.utils.Permissions import mod
+from base_folder.config import success_embed, error_embed
+from base_folder.celery.db import *
+# TODO: Add kicked add (date)
 
 class ModerationMod(commands.Cog):
     def __init__(self, client):
@@ -18,15 +17,14 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="kicks a givien member")
     @commands.guild_only()
+    @mod()
     async def kick(self, ctx, member: discord.Member = None, reason: str = "Because you were bad. We kicked you."):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         e = success_embed(self.client)
@@ -45,15 +43,13 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="unbans a givien member")
     @commands.guild_only()
+    @mod()
     async def unban(self, ctx, member: str = "", reason: str = "You have been unbanned. Time is over. Please behave"):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         e = success_embed(self.client)
@@ -76,15 +72,13 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="clears a givien amount of messages")
     @commands.guild_only()
+    @mod()
     async def delete(self, ctx, arg):
         await ctx.channel.purge(limit=int(arg))
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         e = success_embed(self.client)
@@ -93,15 +87,13 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.guild_only()
+    @mod()
     async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=0):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         muteduntil = ctx.message.created_at + datetime.timedelta(hours=time)
@@ -116,15 +108,13 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="mutes a user")
     @commands.guild_only()
+    @mod()
     async def mute(self, ctx, member: discord.Member = None, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         role = discord.utils.get(ctx.guild.roles, name="Muted")  # retrieves muted role returns none if there isn't
@@ -149,16 +139,14 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="enables slowmode with custom delay")
     @commands.guild_only()
+    @mod()
     async def slowmode(self, ctx, seconds: int = 0):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         e = success_embed(self.client)
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         if seconds > 120:
@@ -175,39 +163,16 @@ class ModerationMod(commands.Cog):
             await ctx.channel.edit(slowmode_delay=seconds)
             await log.send(embed=e)
 
-    async def demute(self, ctx,  member: discord.Member = None):
-        await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        """Unmutes a muted user"""
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
-        if log is None:
-            log = ctx
-        e = success_embed(self.client)
-        try:
-            e.description = f"{member.mention} has been unmuted "
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted"))  # removes muted role
-            await log.send(embed=e)
-        except discord.DiscordException:
-            e.description = f"{member.mention} already unmuted or {member.mention} was never muted"
-            await log.send(embed=e)
-
     @commands.command(pass_context=True, brief="unmutes a user")
     @commands.guild_only()
+    @mod()
     async def unmute(self, ctx,  member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         """Unmutes a muted user"""
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         e = success_embed(self.client)
@@ -221,41 +186,39 @@ class ModerationMod(commands.Cog):
 
     @commands.command(pass_context=True, brief="warns a user")
     @commands.guild_only()
-    async def warn(self, ctx, member: discord.Member = None):
+    @mod()
+    async def warn(self, ctx, member: discord.Member = None, *, reason="you made a mistake"):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         warnings = await self.client.sql.get_warns(ctx.guild.id, member.id)
         e = success_embed(self.client)
         if warnings == 0:
-            amount = 1
-            edit_warns.delay(ctx.guild.id, member.id, amount)
-            e.description = f"{member.mention} you have been warned this is your first infraction keep it at this"
+            warnings += 1
+            edit_warns.delay(ctx.guild.id, member.id, warnings)
+            e.description = f"{member.mention} you have been warned this is your first infraction keep it at this, reason {reason}"
+            await member.send(embed=e)
             await log.send(embed=e)
         else:
             warnings += 1
             e.description = f"{member.mention} you have been warned, you have now {warnings} warning(s)"
             edit_warns.delay(ctx.guild.id, member.id, warnings)
+            await member.send(embed=e)
             await log.send(embed=e)
 
     @commands.command(pass_context=True, brief="shows how many infractions a user has")
     @commands.guild_only()
+    @mod()
     async def infractions(self, ctx, member: discord.Member = None):
         await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        log = self.client.get_channel(await self.client.sql.get_cmd_channel(ctx.guild.id))
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
         if log is None:
             log = ctx
         e = success_embed(self.client)

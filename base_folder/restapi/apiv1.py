@@ -3,7 +3,7 @@ from flask_restplus import Api
 
 from base_folder.restapi.apis.namespace_say import api as say
 
-blueprint = Blueprint('restapi', __name__, url_prefix='/restapi/v1')
+blueprint = Blueprint('restapi', __name__, url_prefix='/api/v1')
 
 api = Api(blueprint,
           title='Web to Discord API',

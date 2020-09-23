@@ -2,7 +2,7 @@ import datetime
 from discord.ext import commands
 import discord
 from base_folder.config import success_embed, build_embed
-from base_folder.bot.utils.Permissions import Auth
+from base_folder.bot.utils.Permissions import user, mod
 
 
 class UserCmds(commands.Cog):
@@ -10,23 +10,28 @@ class UserCmds(commands.Cog):
         self.client = client
 
     @commands.command(pass_context=True)
+    @user()
     async def profile(self, ctx):
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         xp = await self.client.sql.get_text_xp(ctx.guild.id, ctx.author.id)
         lvl = await self.client.sql.get_lvl_text(ctx.guild.id, ctx.author.id)
         warnings = await self.client.sql.get_warns(ctx.guild.id, ctx.author.id)
         e = success_embed(self.client)
         e.title = "Your profile"
         e.description = ctx.author.mention
-        e.add_field(name="Writer rank", value=f"**#{lvl}** with {xp}/{(lvl+1)**(1/float(1/4))}XP", inline=False)
+        e.add_field(name="Writer rank", value=f"**#{lvl}** with {xp}/{int((lvl+1)**(1/float(1/4)))}XP", inline=False)
         e.add_field(name="Warnings", value=f"You have {warnings} warning(s)!")
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True)
+    @commands.guild_only()
+    @user()
     async def server_info(self, ctx):
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         e = build_embed(title=ctx.guild.name,
                         author=self.client.user.name,
                         author_img=self.client.user.avatar_url,
@@ -46,20 +51,48 @@ class UserCmds(commands.Cog):
         e.add_field(name="Filesize limit", value=ctx.guild.filesize_limit)
         await ctx.send(embed=e)
 
+    @commands.command(pass_context=True)
+    @user()
+    async def leaderboader(self, ctx):
+        lvl = []
+        xp = []
+        userlist = []
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        ranks = await self.client.sql.leaderboard(ctx.guild.id)
+        print(ranks)
+        print(ranks[0][0])
+        for user in ranks:
+            userlist.append(user[0])
+            lvl.append(user[1])
+            xp.append(user[2])
+        embed = discord.Embed(
+            colour=ctx.author.colour,
+            timestamp=datetime.datetime.utcnow()
+        )
+        embed.set_author(name="Leaderboard for the server")
+        embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
+        for index, u in enumerate(zip(userlist, lvl, xp), start=1):
+            print(index, u[0], u[1], u[2])
+            embed.add_field(
+                name=f"Rank {index} ",
+                value=f"User:\t**{ self.client.get_user(u[0])}**\n Level:{str(u[1])} xp:{str(u[2])}",
+                inline=False
+            )
+        await ctx.send(embed=embed)
+
     @commands.command(pass_context=True,
                       brief="Show the color of role and how many user's the role have ")
     @commands.guild_only()
+    @mod()
     async def roleinfo(self, ctx, role: discord.Role = None):
-        stdoutchannel = self.client.get_channel(await self.client.sql.get_stdout_channel(ctx.guild.id))
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        if await Auth(self.client, ctx).is_mod() >= 2:
-            pass
-        else:
-            raise commands.errors.CheckFailure
-        await ctx.channel.purge(limit=1)
+        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         counter = 0
-        for user in self.client.get_all_members():
-            for i in user.roles:
+        for members in self.client.get_all_members():
+            for i in members.roles:
                 if role == i:
                     counter = counter + 1
         e = success_embed(self.client)

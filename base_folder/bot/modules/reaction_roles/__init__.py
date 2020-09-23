@@ -86,6 +86,7 @@ class ReactionRoles(commands.Cog):
         """
         pass
     # TODO: Refactor following event so that it doesnt raise anything
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if not payload.member.bot:

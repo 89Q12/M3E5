@@ -1,7 +1,7 @@
 from asyncio import run_coroutine_threadsafe
 from flask_restplus import Resource, fields, Namespace
 
-from base_folder.bot import client
+from base_folder.restapi import client
 
 api = Namespace('Say', description='Say something via the API in any channel the bot can write')
 

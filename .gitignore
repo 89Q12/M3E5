@@ -1,8 +1,5 @@
 # Ignored files
-/base_folder/config/*
-base_folder/config/*
-base_folder/config/__init__.py
-/base_folder/config/__init__.py
+/base_folder/config
 .idea/*
 *.pyc
 *.pyo
