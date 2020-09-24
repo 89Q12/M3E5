@@ -54,13 +54,15 @@ class Internal(commands.Cog):
 
         insert_message.delay(message.guild.id, message.author.id, message.id, message.channel.id, message.content)
     # TODO: FIX GUILD ID etc
+
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
-        if payload.data["guild_id?"]:
-            content = await self.client.sql.get_message(payload.data["guild_id?"], payload.message_id)
+        if payload.data["guild_id"]:
+            guildid = payload.data["guild_id"]
+            content = await self.client.sql.get_message(guildid, payload.message_id)
             if content is False:
                 return
-            stdoutchannel = self.client.get_channel(self.client.cache.states[payload.data["guild_id"]].get_channel())
+            stdoutchannel = self.client.get_channel(self.client.cache.states[int(guildid)].get_channel())
             if stdoutchannel is None:
                 return
             channel = self.client.get_channel(payload.channel_id)

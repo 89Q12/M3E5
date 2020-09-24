@@ -1,6 +1,8 @@
 from discord.ext import commands
+
+from base_folder.bot.utils.Permissions import user
 from base_folder.config import success_embed, build_embed
-from base_folder.celery.db import update_text_lvl, update_xp_text
+from base_folder.celery.db import update_text_lvl, update_xp_text, edit_settings_levelsystem
 
 
 async def update_data(ctx, xp):
@@ -13,7 +15,7 @@ async def update_data(ctx, xp):
 
 
 async def _enabled(client, guildid):
-    if await client.cache.states[guildid].get_levelsystem == 1:
+    if client.cache.states[guildid].get_levelsystem == 1:
         return True
     else:
         return False
@@ -22,6 +24,15 @@ async def _enabled(client, guildid):
 class Levelsystem(commands.Cog):
     def __init__(self, client):
         self.client = client
+
+    @commands.command(name="levelsystemtoggle", aliases=["lvltoggle"])
+    @user()
+    async def levelsystemtoggle(self, ctx):
+        if self.client.cache.states[ctx.guild.id].get_levelsystem == 1:
+            edit_settings_levelsystem.delay(ctx.guild.id, 0)
+        else:
+            edit_settings_levelsystem.delay(ctx.guild.id, 1)
+        await self.client.cache.states[ctx.guild.id].set_lvltoggle()
 
     @commands.Cog.listener()
     async def on_message(self, message):

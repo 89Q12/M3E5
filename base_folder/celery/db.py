@@ -229,7 +229,7 @@ def set_leave_text(guild_id, text):
 
 @app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_lvl(guild_id, channel_id):
-    # sets the leave_channel to the given channel id
+    # sets the lvl_channel to the given channel id
     conn = edit_settings_leave.db
     c = conn.cursor()
     c.execute(f"UPDATE settings SET lvl_channel_id ={str(channel_id)} WHERE guild_id ='{guild_id}'")
@@ -247,7 +247,6 @@ Welcomeimg
 
 @app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_img(guild_id, img):
-    # Unused for now but it will be used for the welcome image function
     # sets the column imgwelcome to 1/enabled or 0/disabled
     conn = edit_settings_img.db
     c = conn.cursor()
@@ -301,7 +300,6 @@ def update_text_lvl(guild_id, user_id, amount=1):
 
 @app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_levelsystem(guild_id, toggler):
-    # Unused for now but it will be used for the welcome image function
     # sets the column level system to 1/enabled or 0/disabled
     conn = edit_settings_levelsystem.db
     c = conn.cursor()

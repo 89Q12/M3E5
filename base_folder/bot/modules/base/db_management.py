@@ -241,7 +241,7 @@ class Db:
         c.execute(f"SELECT user_id FROM `blacklist` WHERE user_id = {user_id}")
         user = c.fetchall()
         self.conn.commit()
-        if user is None:
+        if user[0] is None:
             return False
         else:
             return True

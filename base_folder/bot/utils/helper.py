@@ -96,14 +96,21 @@ class GuildStates:
     @property
     def get_levelsystem(self):
         if self._levelsystem_toggle is None:
-            self._levelsystem_toggle = self.db.get_levelsystem(self.guild.id)
+            run_coroutine_threadsafe(self.set_lvltoggle(), self.loop)
         return self._levelsystem_toggle
 
     @property
     def get_imgtoggle(self):
         if self._get_imgtoggle is None:
-            self._get_imgtoggle = self.db.get_img(self.guild.id)
+            run_coroutine_threadsafe(self.set_imgtoggle(), self.loop)
         return self._get_imgtoggle
+
+    @property
+    def get_perm_list(self):
+        role_list = []
+        for r in self._permisson_roles:
+            role_list.append(self._permisson_roles[r])
+        return role_list
 
     def get_role(self, rolename="admin"):
         role_id = self._permisson_roles[rolename]
@@ -119,15 +126,10 @@ class GuildStates:
         self._prefix = newprefix
 
     async def set_permission_roles(self):
-        # TODO: make it better
-        mod = await self.db.get_settings_role(self.guild.id, "mod_role_id")
-        admin = await self.db.get_settings_role(self.guild.id, "admin_role_id")
-        dev = await self.db.get_settings_role(self.guild.id, "dev_role_id")
-        default = await self.db.get_settings_role(self.guild.id, "standard_role_id")
-        self._permisson_roles['mod'] = mod
-        self._permisson_roles['admin'] = admin
-        self._permisson_roles['dev'] = dev
-        self._permisson_roles['default'] = default
+        self._permisson_roles['mod'] = await self.db.get_settings_role(self.guild.id, "mod_role_id")
+        self._permisson_roles['admin'] = await self.db.get_settings_role(self.guild.id, "admin_role_id")
+        self._permisson_roles['dev'] = await self.db.get_settings_role(self.guild.id, "dev_role_id")
+        self._permisson_roles['default'] = await self.db.get_settings_role(self.guild.id, "standard_role_id")
 
     async def set_channels(self):
         self._channels['leave'] = await self.db.get_leave_channel(self.guild.id)
@@ -135,6 +137,12 @@ class GuildStates:
         self._channels['stdout'] = await self.db.get_stdout_channel(self.guild.id)
         self._channels['lvl'] = await self.db.get_lvl_channel(self.guild.id)
         self._channels['cmd'] = await self.db.get_cmd_channel(self.guild.id)
+
+    async def set_imgtoggle(self):
+        self._get_imgtoggle = await self.db.get_img(self.guild.id)
+
+    async def set_lvltoggle(self):
+        self._levelsystem_toggle = await self.db.get_levelsystem(self.guild.id)
 
     async def update_channel(self, channelname, channelid):
         self._channels[channelname] = channelid

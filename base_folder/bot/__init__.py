@@ -35,6 +35,9 @@ class MainBot(commands.Bot):
         if self.cache is None:
             self.cache = self.helper.DbCache(self.guilds, self.loop)
             self.cache.make_states()
+            for guild in self.guilds:
+                await self.cache.states[guild.id].set_permission_roles()
+                await self.cache.states[guild.id].set_channels()
         print(f" Connected to Discord (latency: {self.latency*1000:,.0f} ms).")
 
     async def on_resumed(self):
@@ -52,9 +55,6 @@ class MainBot(commands.Bot):
     async def on_ready(self):
         if not self.scheduler.running:
             self.scheduler.start()
-        for guild in self.guilds:
-            await self.cache.states[guild.id].set_permission_roles()
-            await self.cache.states[guild.id].set_channels()
         self.client_id = (await self.application_info()).id
         await self.change_presence(activity=discord.Game(name="Crushing data..."))
         print("Bot ready.")
