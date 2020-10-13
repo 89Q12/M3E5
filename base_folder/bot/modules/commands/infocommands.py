@@ -1,6 +1,8 @@
 import datetime
 from discord.ext import commands
 import discord
+import platform
+
 from base_folder.config import success_embed, build_embed
 from base_folder.bot.utils.Permissions import user, mod
 
@@ -104,6 +106,29 @@ class UserCmds(commands.Cog):
         e.add_field(name="Shown on the right", value=f"{role.hoist}", inline=True)
         e.add_field(name="Is mentionable", value=f"{role.mentionable}", inline=True)
         await ctx.send(embed=e)
+
+    @commands.command(name='stats', description='Sends some bot stats')
+    @user()
+    async def stats(self, ctx):
+        pythonVersion = platform.python_version()
+        dpyVersion = discord.__version__
+        serverCount = str(len(self.client.guilds))
+        memberCount = str(len(set(self.client.get_all_members())))
+        embed = discord.Embed(title=f'{self.client.user.name} Stats', description='\uFEFF', colour=ctx.author.colour)
+        embed.add_field(name='Bot Version:', value=self.client.Version)
+        embed.add_field(name='Python Version:', value=pythonVersion)
+        embed.add_field(name='Discord.Py Version', value=dpyVersion)
+        embed.add_field(name='Total Guilds:', value=serverCount)
+        embed.add_field(name='Total Users:', value=memberCount)
+        embed.add_field(name='Bot Developers:', value="<@271612318947868673> and <@387138288231907329>")
+        embed.set_footer(text=f"Carpe Noctem | {self.client.user.name}")
+        embed.set_author(name=self.client, icon_url=self.client.user.avatar_url)
+        await ctx.send(embed=embed)
+
+    @commands.command(name='ping', description='Gets and sends bot latency')
+    @user()
+    async def ping(self, ctx):
+        await ctx.send(f"Bot ping: **{round((self.client.latency) * 1000)}ms**")
 
 
 def setup(client):
