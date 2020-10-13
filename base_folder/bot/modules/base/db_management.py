@@ -9,7 +9,7 @@ Under construction moving to sqlalchemy
 
 '''
 Base = declarative_base()
-engine = create_engine("mysqlconnector://zofi:ljTivC9TBcIAoYFT@xamh.de/M3E5")
+engine = create_engine("connectionstring")
 class Db:
     def __init__(self, conn):
         self.conn = conn
