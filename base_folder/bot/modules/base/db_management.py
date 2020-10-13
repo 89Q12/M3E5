@@ -1,14 +1,20 @@
-from base_folder.config import sql
+from sqlalchemy.dialects.mysql import mysqlconnector
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, VARCHAR, Float, create_engine
+
+
 
 '''
-Class to create db management as class
+Under construction moving to sqlalchemy
+
 '''
-
-
+Base = declarative_base()
+engine = create_engine("mysqlconnector://zofi:ljTivC9TBcIAoYFT@xamh.de/M3E5")
 class Db:
     def __init__(self, conn):
         self.conn = conn
         self.cursor = conn.cursor()
+        super().__init__()
 
     def prefix_lookup(self, guild_id):
         """
@@ -313,3 +319,64 @@ class Db:
         ranks = c.fetchall()
         self.conn.commit()
         return ranks
+
+    def get_spam_settings(self, guild_id):
+        """
+
+        :param guild_id: the id of the given guild
+        :return: list of tuples with all spam settings
+        =============================
+        tuple contents
+        =============================
+        warnThreshold : int, optional
+            This is the amount of messages in a row that result in a warning within the messageInterval
+        kickThreshold : int, optional
+            The amount of 'warns' before a kick occurs
+        banThreshold : int, optional
+            The amount of 'kicks' that occur before a ban occurs
+        messageInterval : int, optional
+            Amount of time a message is kept before being discarded.
+            Essentially the amount of time (In milliseconds) a message can count towards spam
+        warnMessage : str, optional
+            The message to be sent upon warnThreshold being reached
+        kickMessage : str, optional
+            The message to be sent up kickThreshold being reached
+        banMessage : str, optional
+            The message to be sent up banThreshold being reached
+        messageDuplicateCount : int, optional
+            Amount of duplicate messages needed to trip a punishment
+        messageDuplicateKick : int, optional
+            Amount of duplicate messages needed within messageInterval to trip a kick
+        messageDuplicateBan : int, optional
+            Amount of duplicate messages needed within messageInterval to trip a ban
+        messageDuplicateAccuracy : float, optional
+            How 'close' messages need to be to be registered as duplicates (Out of 100)
+        ignorePerms : list, optional
+            The perms (ID Form), that bypass anti-spam
+        ignoreUsers : list, optional
+            The users (ID Form), that bypass anti-spam
+        ignoreBots : bool, optional
+            Should bots bypass anti-spam?
+        """
+        c = self.cursor
+        c.execute(f"SELECT warnThreshold, kickThreshold, banThreshold,"
+                  f"messageInterval, warnMessage, kickMessage, banMessage,"
+                  f"messageDuplicateCount, messageDuplicateAccuracy FROM "
+                  f"settings WHERE guild_id = {guild_id}")
+        settings = c.fetchall()
+        self.conn.commit()
+        return settings
+
+    async def get_kick_count(self, guild_id, user_id):
+        """
+
+        :param guild_id: the id of the guild
+        :param user_id: the ID of the user
+        :returns: the warnings for the given user, can be 0
+        """
+        c = self.cursor
+        c.execute("SELECT kickCount FROM user_info WHERE user_id="
+                  f"{str(user_id)} and guild_id={str(guild_id)}")
+        kickcount = c.fetchone()
+        self.conn.commit()
+        return kickcount[0]
