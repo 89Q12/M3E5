@@ -82,7 +82,6 @@ class Dev(commands.Cog):
             conn.commit()
         except Exception:
             await ctx.send("Already in the database!")
-            return
         for user in ctx.guild.members:
             print(user)
             c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
