@@ -18,7 +18,7 @@ class Internal(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
-        initialize_guild.delay(guild.id)
+        self.client.sql.updatedb(guild)
         message = build_embed(author=self.client.user.name, title="Hey!",
                               description="Thanks for choosing me!"
                                           "here are some commands you need to execute:")
@@ -30,10 +30,6 @@ class Internal(commands.Cog):
                                               "sets the default role a user should have on join\n "
                                               "sets the dev role\n sets the mod role\n sets the admin role")
         await guild.owner.send(embed=message)
-        for user in guild.members:
-            is_user_indb.delay(user.name, user.id, guild.id)
-        for role in guild.roles:
-            roles_to_db.delay(guild.id, role.name, role.id)
         self.client.cache.create_state(guild.id)
 
     """
