@@ -72,6 +72,8 @@ more commands will follow
 | leaderboard | Shows the leaderboard of the server sorted by level dsc | leaderboard |
 | leaderboard | Shows the leaderboard of the server sorted by level dsc | leaderboard |
 | server_info | Shows info about the current guild e.g created at etc | server_info |
+| stats | shows the stats of the like cpu times, server count etc | stats |
+| ping |shows the ping from the host datacenter to the discord datacenter | ping |
 
 ## Music
 Permission level member or higher required
