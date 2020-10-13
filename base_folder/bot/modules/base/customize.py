@@ -90,7 +90,7 @@ class Custom(commands.Cog):
         e = success_embed(self.client)
         e.description = f"{arg} is now the bot prefix"
         await ctx.send(embed=e)
-        await self.client.cache[ctx.guild.id].set_prefix(arg)
+        await self.client.cache.states[ctx.guild.id].set_prefix(arg)
         set_prefix.delay(ctx.guild.id, arg)
 
     @commands.command(pass_context=True, brief="sets default role set_default @role")
@@ -104,7 +104,7 @@ class Custom(commands.Cog):
         edit_settings_role.delay(ctx.guild.id, role.id, "standard_role_id")
         e = success_embed(self.client)
         e.description = f"{role} is now the default role"
-        await self.client.cache[ctx.guild.id].update_permission_role("default", role.id)
+        await self.client.cache.states[ctx.guild.id].update_permission_role("default", role.id)
         await ctx.send(embed=e)
 
     @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
@@ -118,7 +118,7 @@ class Custom(commands.Cog):
         e = success_embed(self.client)
         e.description = f"{role} is now the admin role"
         await ctx.send(embed=e)
-        await self.client.cache[ctx.guild.id].update_permission_role("admin", role.id)
+        await self.client.cache.states[ctx.guild.id].update_permission_role("admin", role.id)
         edit_settings_role.delay(ctx.guild.id, role.id, "admin_role_id")
 
     @commands.command(pass_context=True, brief="sets dev rule set_dev @role")
@@ -132,7 +132,7 @@ class Custom(commands.Cog):
         e = success_embed(self.client)
         e.description = f"{role} is now the dev role"
         await ctx.send(embed=e)
-        await self.client.cache[ctx.guild.id].update_permission_role("dev", role.id)
+        await self.client.cache.states[ctx.guild.id].update_permission_role("dev", role.id)
         edit_settings_role.delay(ctx.guild.id, role.id, "dev_role_id")
 
     @commands.command(pass_context=True, brief="sets mod rule set_mod @role")
@@ -146,7 +146,7 @@ class Custom(commands.Cog):
         e = success_embed(self.client)
         e.description = f"{role} is now the mod role"
         await ctx.send(embed=e)
-        await self.client.cache[ctx.guild.id].update_permission_role("mod", role.id)
+        await self.client.cache.states[ctx.guild.id].update_permission_role("mod", role.id)
         edit_settings_role.delay(ctx.guild.id, role.id, "mod_role_id")
 
 
