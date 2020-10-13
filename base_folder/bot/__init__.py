@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from base_folder.AntiSpam import AntiSpamHandler
 
 from base_folder.config import MAIN_BOT_TOKEN, sql
 from base_folder.bot.modules.base.db_management import Db
@@ -13,10 +14,12 @@ class MainBot(commands.Bot):
         super().__init__(command_prefix=helper.prefix, case_insensitive=True)
         self.client_id = 0
         self.log = stdout()
-        self.sql = Db(sql())
         self.scheduler = AsyncIOScheduler()
         self.helper = helper
-        self.cache = None
+        self.cache = self.helper.DbCache(self.loop)
+        self.conn = sql()
+        self.sql = Db(self.conn if self.conn.is_connected() else sql())
+        self.handler = AntiSpamHandler(self)
 
     def run(self, modules):
         helper.loadmodules(modules, self)
@@ -32,12 +35,6 @@ class MainBot(commands.Bot):
         await self.shutdown()
 
     async def on_connect(self):
-        if self.cache is None:
-            self.cache = self.helper.DbCache(self.guilds, self.loop)
-            self.cache.make_states()
-            for guild in self.guilds:
-                await self.cache.states[guild.id].set_permission_roles()
-                await self.cache.states[guild.id].set_channels()
         print(f" Connected to Discord (latency: {self.latency*1000:,.0f} ms).")
 
     async def on_resumed(self):
@@ -46,13 +43,14 @@ class MainBot(commands.Bot):
     async def on_disconnect(self):
         print("Bot disconnected.")
 
-    # async def on_error(self, err, *args, **kwargs):
-    #     raise
-
-    # async def on_command_error(self, ctx, exc):
-    #     raise getattr(exc, "original", exc)
-
     async def on_ready(self):
+        self.cache.make_states(self.guilds)
+        for guild in self.guilds:
+            if guild.id == 616609333832187924:
+                await self.cache.states[guild.id].set_permission_roles()
+                await self.cache.states[guild.id].set_channels()
+                await self.cache.states[guild.id].set_users()
+                print(self.cache.states[guild.id].users, self.cache.states[guild.id])
         if not self.scheduler.running:
             self.scheduler.start()
         self.client_id = (await self.application_info()).id
@@ -64,5 +62,7 @@ class MainBot(commands.Bot):
         await self.invoke(ctx)
 
     async def on_message(self, msg):
+        self.handler.propagate(msg)
+        print(msg.content)
         if not msg.author.bot:
             await self.process_commands(msg)
