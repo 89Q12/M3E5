@@ -6,7 +6,11 @@ from io import BytesIO
 import textwrap
 import base64
 from discord.ext import commands
+
+from base_folder.bot.utils.Permissions_checks import admin, mod
 from base_folder.celery.db import edit_settings_img_text, edit_settings_img
+from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel
+
 
 '''
 MIT License
@@ -51,30 +55,27 @@ class IMGWelcome(commands.Cog):
             return await ctx.send_help(ctx.command)
 
     @imgwelcome.command(name="toggle")
+    @admin()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def imgwelcome_toggle(self, ctx):
         """Toggle on/off the imgwelcome"""
-        await ctx.channel.purge(limit=1)
-        log = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel("cmd"))
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         toggle = int(await self.client.sql.get_img(ctx.guild.id))
-        if log is None:
-            log = ctx
         if 0 == toggle:
-            await log.send("Welcome image is now enabled")
+            await ctx.send("Welcome image is now enabled")
             edit_settings_img.delay(ctx.guild.id, 1)
         else:
-            await log.send("Welcome image is now disabled")
+            await ctx.send("Welcome image is now disabled")
             edit_settings_img.delay(ctx.guild.id, 0)
 
     @imgwelcome.command(name="img")
+    @mod()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def imgwelcome_img(self, ctx):
         """Set the image"""
-        await ctx.channel.purge(limit=1)
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("Enable imgwelcoming with n!imgwelcome toggle")
 
@@ -116,6 +117,10 @@ class IMGWelcome(commands.Cog):
             await ctx.send("Reset Image.")
 
     @imgwelcome.command(name="text")
+    @mod()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def imgwelcome_text(self, ctx, *, text: str):
         """Change the welcome text,
             user = the user's name
@@ -123,10 +128,6 @@ class IMGWelcome(commands.Cog):
         Example:
             n!imgwelcome text Welcome user to server!
         """
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         if not await self.__is_enabled(ctx.guild.id):
             return await ctx.send("imgwelcome is not enabled")
 
@@ -135,6 +136,10 @@ class IMGWelcome(commands.Cog):
         edit_settings_img_text.delay(ctx.guild.id, text)
 
     @imgwelcome.command(name="test")
+    @mod()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def imgwelcome_test(self, ctx):
         member: discord.member = ctx.author
         await self.on_member_join(member)

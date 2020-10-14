@@ -4,6 +4,8 @@ from inspect import signature
 import discord
 from discord.ext.commands import BadArgument, MissingRequiredArgument
 
+from base_folder.bot.utils.helper import contains_explicit_return
+
 
 def check_args_datatyp(func):
     """
@@ -32,8 +34,9 @@ def check_args_datatyp(func):
         for index, arg in enumerate(args):
             if type(arg) != parametertypes[index]:
                 if type(arg) is None:
-                    """ This can't be triggered because discord.py checks for MissingRequiredArgument
-                        but just in case discord.py didn't caught it
+                    """ 
+                    This can't be triggered because discord.py checks for MissingRequiredArgument
+                    but just in case discord.py didn't caught it
                      """
                     raise MissingRequiredArgument
                 raise BadArgument
@@ -82,14 +85,22 @@ def logging_to_channel_stdout(func):
     async def predicate(self, ctx, *args, **kwargs):
         """
         :param self: the cog the command is in e.g Music or Custom
-        :param ctx: the context object of the current invoked command
+        :param ctx: the context object of the current invoked command should always contain the bot object
         :param args: the arguments a command can take e.g channel_id
         :param kwargs: in case a commands gets kwargs but idk a case where this could happen
         :return: returns the awaited command
         """
-        stdoutchannel = ctx.bot.get_channel(ctx.bot.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await ctx.bot.log.stdout(stdoutchannel, ctx.message.content, ctx)
+        if ctx.bot:
+            stdoutchannel = ctx.bot.get_channel(ctx.bot.cache.states[ctx.guild.id].get_channel())
+            sig = signature(func)
+            if stdoutchannel is not None:
+                try:
+                    if sig.parameters["ex"]:
+                        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, args[0])
+                        return await func(self, ctx, *args, **kwargs)
+                except KeyError:
+                    pass
+                await ctx.bot.log.stdout(stdoutchannel, ctx.message.content, ctx)
         return await func(self, ctx, *args, **kwargs)
     return predicate
 
