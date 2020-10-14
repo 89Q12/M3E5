@@ -1,8 +1,4 @@
 from discord.ext.commands import check, MissingRole
-from base_folder.bot.modules.base.db_management import Db
-from base_folder.config import sql
-
-db = Db(sql())
 
 
 def admin():
