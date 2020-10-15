@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
+from discord import Intents
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from base_folder.AntiSpam import AntiSpamHandler
 
-from base_folder.config import MAIN_BOT_TOKEN, sql
+from base_folder.config import MAIN_BOT_TOKEN, Session
 from base_folder.bot.modules.base.db_management import Db
 from base_folder.bot.utils.logger import Log as stdout
 import base_folder.bot.utils.helper as helper
@@ -11,15 +12,14 @@ import base_folder.bot.utils.helper as helper
 
 class MainBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix=helper.prefix, case_insensitive=True)
+        super().__init__(command_prefix=helper.prefix, case_insensitive=True, guild_subscriptions=True, fetch_offline_members=True, intents=Intents.all())
         self.client_id = 0
+        self.Version = 2.9
         self.log = stdout()
         self.scheduler = AsyncIOScheduler()
         self.helper = helper
         self.cache = self.helper.DbCache(self.loop)
-        self.conn = sql()
-        self.sql = Db(self.conn if self.conn.is_connected() else sql())
-        self.handler = AntiSpamHandler(self)
+        self.sql = Db()
 
     def run(self, modules):
         helper.loadmodules(modules, self)
@@ -62,7 +62,8 @@ class MainBot(commands.Bot):
         await self.invoke(ctx)
 
     async def on_message(self, msg):
-        self.handler.propagate(msg)
-        print(msg.content)
         if not msg.author.bot:
+            self.cache.states[msg.guild.id].users[msg.author.id].propagate(msg)
+            print(f"Propagating message for: {msg.author.name}")
+            print(msg.content)
             await self.process_commands(msg)
