@@ -3,7 +3,7 @@ from discord.ext import commands
 from base_folder.config import build_embed
 from base_folder.celery.db import initialize_guild, is_user_indb, insert_message, roles_to_db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+from base_folder.bot.utils.checks import logging_to_channel_stdout, purge_command_in_channel
 
 # TODO: Automod
 
@@ -56,33 +56,40 @@ class Internal(commands.Cog):
         if payload.data["guild_id"]:
             guildid = payload.data["guild_id"]
             content = await self.client.sql.get_message(guildid, payload.message_id)
-            if content is False:
+            if not content:
                 return
             stdoutchannel = self.client.get_channel(self.client.cache.states[int(guildid)].get_channel())
             if stdoutchannel is None:
                 return
             channel = self.client.get_channel(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)
-            user = self.client.get_user(content[0])
+            if payload.cached_message:
+                user = payload.cached_message.author
+            else:
+                user = self.client.get_user(content[0][1])
             if not user.bot:
-                if content[1] != message.content:
+                if content[0][0] != message.content:
                     await self.client.log.stdout(stdoutchannel, f"Message from {message.author.name} was changed from: "
-                                                                f"'{str(content[1]).replace('@', '')}' to '{str(message.content).replace('@', '')}'")
+                                                                f"'{str(content[0][0]).replace('@', '')}' to "
+                                                                f"'{str(message.content).replace('@', '')}'")
 
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload):
         if payload.guild_id:
             content = await self.client.sql.get_message(payload.guild_id, payload.message_id)
-            if content is False:
+            if not content:
                 return
             stdoutchannel = self.client.get_channel(self.client.cache.states[payload.guild_id].get_channel())
             if stdoutchannel is None:
                 return
             channel = self.client.get_channel(payload.channel_id)
-            user = self.client.get_user(content[0])
+            if payload.cached_message:
+                user = payload.cached_message.author
+            else:
+                user = self.client.get_user(content[0][1])
             if not user.bot:
                 await self.client.log.stdout(stdoutchannel, f"Message from {user.name}#{user.discriminator} was deleted"
-                                                            f" Content: {content[1]} in Channel: {channel.name}")
+                                                            f" Content: {content[0][0]} in Channel: {channel.name}")
 
     '''
     Automated background tasks
