@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands
+
 from base_folder.config import error_embed
 from base_folder.celery.db import on_error
+from base_folder.bot.utils.checks import logging_to_channel_stdout, purge_command_in_channel
 
 
 class ErrorHandler(commands.Cog):
@@ -9,9 +11,10 @@ class ErrorHandler(commands.Cog):
         self.client = client
 
     @commands.Cog.listener()
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def on_command_error(self, ctx, ex):
         """
-
         :param ctx: context of the command that caused the error
         :param ex: the exception itself
         :return: logs the error to the db if it wasn't a commands.* error and sends a log entry in the stdout channel
@@ -19,12 +22,9 @@ class ErrorHandler(commands.Cog):
         """
         if hasattr(ctx.command, 'on_error'):
             return
-        await ctx.channel.purge(limit=1)
         error = getattr(ex, 'original', ex)
         embed = error_embed(self.client)
-        print(error)
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, ex)
+        print(error) # Printing the error for debugging reasons
 
         if isinstance(error, commands.CommandNotFound):
             embed.description = "I have never seen this command in my entire life"
@@ -38,7 +38,12 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.BadArgument):
-            embed.description = "You gave me an wrong input check the command usage"
+            embed.description = "You gave me an wrong input, check the command usage"
+            await ctx.send(embed=embed)
+            return
+
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed.description = "You need to give the required arguments, check the command usage"
             await ctx.send(embed=embed)
             return
 

@@ -4,8 +4,9 @@ import discord
 import platform
 
 from base_folder.config import success_embed, build_embed
-from base_folder.bot.utils.Permissions import user, mod
-
+from base_folder.bot.utils.Permissions_checks import user, mod
+from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel, \
+    logging_to_channel_cmd
 
 class UserCmds(commands.Cog):
     def __init__(self, client):
@@ -13,10 +14,10 @@ class UserCmds(commands.Cog):
 
     @commands.command(pass_context=True)
     @user()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def profile(self, ctx):
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         xp = await self.client.sql.get_text_xp(ctx.guild.id, ctx.author.id)
         lvl = await self.client.sql.get_lvl_text(ctx.guild.id, ctx.author.id)
         warnings = await self.client.sql.get_warns(ctx.guild.id, ctx.author.id)
@@ -30,10 +31,10 @@ class UserCmds(commands.Cog):
     @commands.command(pass_context=True)
     @commands.guild_only()
     @user()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def server_info(self, ctx):
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         e = build_embed(title=ctx.guild.name,
                         author=self.client.user.name,
                         author_img=self.client.user.avatar_url,
@@ -55,20 +56,20 @@ class UserCmds(commands.Cog):
 
     @commands.command(pass_context=True)
     @user()
-    async def leaderboader(self, ctx):
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
+    async def leaderboard(self, ctx):
         lvl = []
         xp = []
         userlist = []
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         ranks = await self.client.sql.leaderboard(ctx.guild.id)
         print(ranks)
         print(ranks[0][0])
         for user in ranks:
-            userlist.append(user[0])
+            userlist.append(user[2])
             lvl.append(user[1])
-            xp.append(user[2])
+            xp.append(user[0])
         embed = discord.Embed(
             colour=ctx.author.colour,
             timestamp=datetime.datetime.utcnow()
@@ -79,7 +80,7 @@ class UserCmds(commands.Cog):
             print(index, u[0], u[1], u[2])
             embed.add_field(
                 name=f"Rank {index} ",
-                value=f"User:\t**{ self.client.get_user(u[0])}**\n Level:{str(u[1])} xp:{str(u[2])}",
+                value=f"User:\t** <@{ u[0]}> **\n Level:{str(u[1])} xp:{str(u[2])}",
                 inline=False
             )
         await ctx.send(embed=embed)
@@ -88,10 +89,10 @@ class UserCmds(commands.Cog):
                       brief="Show the color of role and how many user's the role have ")
     @commands.guild_only()
     @mod()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def roleinfo(self, ctx, role: discord.Role = None):
-        stdoutchannel = self.client.get_channel(self.client.cache.states[ctx.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx)
         counter = 0
         for members in self.client.get_all_members():
             for i in members.roles:
@@ -109,24 +110,31 @@ class UserCmds(commands.Cog):
 
     @commands.command(name='stats', description='Sends some bot stats')
     @user()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def stats(self, ctx):
         pythonVersion = platform.python_version()
         dpyVersion = discord.__version__
-        serverCount = str(len(self.client.guilds))
-        memberCount = str(len(set(self.client.get_all_members())))
+        serverCount = len(self.client.guilds)
+        memberCount = len(list(self.client.get_all_members()))
         embed = discord.Embed(title=f'{self.client.user.name} Stats', description='\uFEFF', colour=ctx.author.colour)
         embed.add_field(name='Bot Version:', value=self.client.Version)
         embed.add_field(name='Python Version:', value=pythonVersion)
         embed.add_field(name='Discord.Py Version', value=dpyVersion)
         embed.add_field(name='Total Guilds:', value=serverCount)
         embed.add_field(name='Total Users:', value=memberCount)
-        embed.add_field(name='Bot Developers:', value="<@271612318947868673> and <@387138288231907329>")
-        embed.set_footer(text=f"Carpe Noctem | {self.client.user.name}")
-        embed.set_author(name=self.client, icon_url=self.client.user.avatar_url)
+        embed.add_field(name='Bot Developers:', value="<@322822954796974080>")
+        embed.add_field(name="Intetnts", value=self.client.intents)
+        embed.set_footer(text=f"11tuvork28 | {self.client.user.name}")
+        embed.set_author(name=self.client.user, icon_url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
     @commands.command(name='ping', description='Gets and sends bot latency')
     @user()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
     async def ping(self, ctx):
         await ctx.send(f"Bot ping: **{round((self.client.latency) * 1000)}ms**")
 
