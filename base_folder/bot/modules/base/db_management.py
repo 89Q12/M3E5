@@ -1,20 +1,152 @@
-from sqlalchemy.dialects.mysql import mysqlconnector
+import base64
+
+from sqlalchemy.dialects.mysql import CHAR
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, VARCHAR, Float, create_engine
+from sqlalchemy import Column, Integer, String, FLOAT, BIGINT, DATETIME, ForeignKey, VARCHAR, TEXT, BOOLEAN
+from sqlalchemy.orm import relationship
 
-
+from base_folder.config import Session
 
 '''
-Under construction moving to sqlalchemy
+The following classes represent there corresponding database table
 
 '''
 Base = declarative_base()
-engine = create_engine("connectionstring")
+
+
+class Banlist(Base):
+    __tablename__ = "blacklist"
+
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
+    user_id = Column(BIGINT)
+
+
+class Errors(Base):
+    __tablename__ = "Error"
+
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
+    guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'))
+    error = Column(VARCHAR)
+    date = Column(DATETIME)
+
+    guilds = relationship("Guild", back_populates="Error")
+
+
+class Guild(Base):
+    __tablename__ = "guilds"
+
+    guild_id = Column(BIGINT, primary_key=True)
+    Error = relationship("Errors", back_populates="guilds")
+    user_info = relationship("UserInfo", back_populates="guilds")
+    messages = relationship("Messages", back_populates="guilds")
+    reactions = relationship("Reaction", back_populates="guilds")
+    roles = relationship("Roles", back_populates="guilds")
+    settings = relationship("Settings", back_populates="guilds")
+
+
+class Messages(Base):
+    __tablename__ = "messages"
+
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
+    guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'))
+    user_id = Column(BIGINT, ForeignKey('user_info.user_id'))
+    message_id = Column(BIGINT)
+    message = Column(TEXT)
+    time = Column(DATETIME)
+
+    guilds = relationship("Guild", back_populates="messages")
+    user_info = relationship("UserInfo", back_populates="messages")
+    reactions = relationship("Reaction", back_populates="messages")
+
+
+class Reaction(Base):
+    __tablename__ = "reactions"
+
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
+    guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'))
+    message_id = Column(BIGINT, ForeignKey("messages.message_id"))
+    role_id = Column(BIGINT, ForeignKey("roles.role_id"))
+    emoji = Column(CHAR)
+
+    guilds = relationship("Guild", back_populates="reactions")
+    roles = relationship("Roles", back_populates="reactions")
+    messages = relationship("Messages", back_populates="reactions")
+
+
+class Roles(Base):
+    __tablename__ = "roles"
+
+    guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'))
+    role_id = Column(BIGINT, primary_key=True, autoincrement=True)
+    role_name = Column(VARCHAR(length=255))
+
+    guilds = relationship("Guild", back_populates="roles")
+    reactions = relationship("Reaction", back_populates="roles")
+
+
+class Settings(Base):
+    __tablename__ = "settings"
+
+    guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'), primary_key=True, autoincrement=True, nullable=False)
+    standard_role_id = Column(BIGINT, default=0)
+    dev_role_id = Column(BIGINT, default=0)
+    mod_role_id = Column(BIGINT, default=0)
+    admin_role_id = Column(BIGINT, default=0)
+    imgwelcome_toggle = Column(BOOLEAN, default=False)
+    imgwelcome_text = Column(VARCHAR(length=2000), default="V2VsY29tZSB0byB0aGUgc2VydmVyIHlvdSBsaXR0bGUgdXNlcg==")
+    levelsystem_toggle = Column(BOOLEAN, default=False)
+    welcome_channel_id = Column(BIGINT, default=0)
+    leave_channel_id = Column(BIGINT, default=0)
+    lvl_channel_id = Column(BIGINT, default=0)
+    cmd_channel_id = Column(BIGINT, default=0)
+    stdout_channel_id = Column(BIGINT, default=0)
+    prefix = Column(VARCHAR(length=20), default="LQ==")
+    Color = Column(VARCHAR(length=25), default="default()")
+    leave_text = Column(VARCHAR(2000), default="VXNlciB1c2VyIGxlZnQgdGhlIHNlcnZlci4uLg==")
+    warnThreshold = Column(Integer, default=3)
+    kickThreshold = Column(Integer, default=2)
+    banThreshold = Column(Integer, default=2)
+    messageInterval = Column(Integer, default=2500)
+    warnMessage = Column(VARCHAR(length=2000), default="Hey $MENTIONUSER, please stop spamming/"
+                                                       "sending duplicate messages.")
+    kickMessage = Column(VARCHAR(length=2000), default="$USERNAME was kicked for spamming/sending duplicate messages.")
+    banMessage = Column(VARCHAR(length=2000), default="$USERNAME was banned for spamming/sending duplicate messages.")
+    messageDuplicateCount = Column(Integer, default=5)
+    messageDuplicateAccuracy = Column(FLOAT, default=90)
+    ignoreBots = Column(BOOLEAN, default=True)
+
+    guilds = relationship("Guild", back_populates="settings")
+
+
+class UserInfo(Base):
+    __tablename__ = 'user_info'
+
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
+    user_id = Column(BIGINT)
+    username = Column(String)
+    guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'))
+    warnings = Column(Integer)
+    kickCount = Column(Integer)
+    text_xp = Column(BIGINT)
+    text_lvl = Column(Integer)
+    voice_xp = Column(Integer)
+    voice_lvl = Column(Integer)
+    banned_at = Column(DATETIME)
+    banned_until = Column(DATETIME)
+    muted_at = Column(DATETIME)
+    muted_until = Column(DATETIME)
+
+    guilds = relationship("Guild", back_populates="user_info")
+    messages = relationship("Messages", back_populates="user_info")
+
+
 class Db:
-    def __init__(self, conn):
-        self.conn = conn
-        self.cursor = conn.cursor()
-        super().__init__()
+    """
+    This class is more or less a layer on top of sqlalchemy,
+    that can read data from the database and represent it in useful forms.
+    """
+    def __init__(self, ):
+        self.session = Session()
 
     def prefix_lookup(self, guild_id):
         """
@@ -22,35 +154,60 @@ class Db:
         :param guild_id: the id of the guild
         :returns: the prefix for the given guild
         """
-        c = self.cursor
-        c.execute(f"SELECT prefix FROM settings WHERE guild_id = {guild_id}")
-        prefix = c.fetchone()
-        self.conn.commit()
-        return prefix[0]
+        prefix = self.session.query(Settings.prefix).filter_by(guild_id=guild_id).one()
+        prefix = (base64.b64decode(str(prefix[0]).encode("utf8"))).decode("utf8")
+        self.session.commit()
+        return prefix
 
     async def roles_from_db(self, guild_id):
         # returns a tuple with all role name's and id's
 
-        c = self.cursor
-        c.execute(f"SELECT role_id, role_name FROM roles WHERE guild_id={str(guild_id)}")
-        roles = c.fetchall()
-        self.conn.commit()
+        roles = self.session.query(Roles.role_name, Roles.role_id).filter_by(guild_id=guild_id).all()
+        self.session.commit()
         return roles
 
-    async def get_settings_role(self, guild_id, field_name):
+    async def get_admin_role(self, guild_id):
         """
 
         :param guild_id: the id of the guild
-        :param field_name: the name of the role admin_role dev_role etc
         :returns: the role id of the e.g. admin role for the given guild
         """
 
-        c = self.cursor
-        c.execute(f"SELECT {str(field_name)} FROM settings WHERE guild_id={str(guild_id)}")
-        role_id = c.fetchone()
-        self.conn.commit()
-        if role_id is None:
-            return 0
+        role_id = self.session.query(Settings.admin_role_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return role_id[0]
+
+    async def get_dev_role(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the role id of the e.g. admin role for the given guild
+        """
+
+        role_id = self.session.query(Settings.dev_role_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return role_id[0]
+
+    async def get_mod_role(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the role id of the e.g. admin role for the given guild
+        """
+
+        role_id = self.session.query(Settings.mod_role_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return role_id[0]
+
+    async def get_standard_role(self, guild_id):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the role id of the e.g. admin role for the given guild
+        """
+
+        role_id = self.session.query(Settings.standard_role_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return role_id[0]
 
     async def get_warns(self, guild_id, user_id):
@@ -60,12 +217,12 @@ class Db:
         :param user_id: the ID of the user
         :returns: the warnings for the given user, can be 0
         """
-        c = self.cursor
-        c.execute("SELECT warnings FROM user_info WHERE user_id="
-                  f"{str(user_id)} and guild_id={str(guild_id)}")
-        warnings = c.fetchone()
-        self.conn.commit()
-        return warnings[0]
+        warnings = self.session.query(UserInfo.warnings).filter(UserInfo.guild_id == guild_id,
+                                                                UserInfo.user_id == user_id).all()
+        self.session.commit()
+        if not warnings:
+            return 0
+        return warnings[0][0]
 
     async def get_welcome_channel(self, guild_id):
         """
@@ -74,12 +231,8 @@ class Db:
         :returns: the welcome channel for the given guild
         """
 
-        c = self.cursor
-        c.execute(f"SELECT welcome_channel_id FROM settings WHERE guild_id={str(guild_id)}")
-        welcome_channel = c.fetchone()
-        self.conn.commit()
-        if welcome_channel is None:
-            return 0
+        welcome_channel = self.session.query(Settings.welcome_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return welcome_channel[0]
 
     async def get_cmd_channel(self, guild_id):
@@ -88,12 +241,9 @@ class Db:
         :param guild_id: the id of the guild
         :returns: the command channel for the given guild
         """
-        c = self.cursor
-        c.execute(f"SELECT cmd_channel_id FROM settings WHERE guild_id={guild_id}")
-        cmd_channel = c.fetchone()
-        self.conn.commit()
-        if cmd_channel is None:
-            return 0
+
+        cmd_channel = self.session.query(Settings.cmd_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return cmd_channel[0]
 
     async def get_lvl_channel(self, guild_id):
@@ -103,12 +253,8 @@ class Db:
         :returns: the level channel for the given guild
         """
 
-        c = self.cursor
-        c.execute(f"SELECT lvl_channel_id FROM settings WHERE guild_id={str(guild_id)}")
-        lvl_channel = c.fetchone()
-        self.conn.commit()
-        if lvl_channel is None:
-            return 0
+        lvl_channel = self.session.query(Settings.lvl_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return lvl_channel[0]
 
     async def get_leave_channel(self, guild_id):
@@ -118,12 +264,8 @@ class Db:
         :returns: the leave channel for the given guild
         """
 
-        c = self.cursor
-        c.execute(f"SELECT leave_channel_id FROM settings WHERE guild_id={str(guild_id)}")
-        leave_channel = c.fetchone()
-        self.conn.commit()
-        if leave_channel is None:
-            return 0
+        leave_channel = self.session.query(Settings.leave_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return leave_channel[0]
 
     async def get_stdout_channel(self, guild_id):
@@ -132,12 +274,9 @@ class Db:
         :param guild_id: the id of the guild
         :returns: the stdout(logging) channel for the given guild
         """
-        c = self.cursor
-        c.execute(f"SELECT stdout_channel_id FROM settings WHERE guild_id={str(guild_id)}")
-        stdout_channel = c.fetchone()
-        self.conn.commit()
-        if stdout_channel is None:
-            return 0
+
+        stdout_channel = self.session.query(Settings.stdout_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return stdout_channel[0]
 
     async def get_leave_text(self, guild_id):
@@ -146,11 +285,10 @@ class Db:
         :param guild_id: the id of the guild
         :returns: the leave text for the given guild
         """
-        c = self.cursor
-        c.execute(f"SELECT leave_text FROM settings WHERE guild_id={str(guild_id)}")
-        leave_text = c.fetchall()
-        self.conn.commit()
-        return leave_text[0][0]
+
+        leave_text = self.session.query(Settings.leave_text).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return leave_text[0]
 
     async def get_img(self, guild_id):
         """
@@ -159,10 +297,8 @@ class Db:
         :returns: wether the welcome image is on or off for the given guild
         """
 
-        c = self.cursor
-        c.execute(f"SELECT imgwelcome_toggle FROM settings WHERE guild_id={str(guild_id)};")
-        img = c.fetchone()
-        self.conn.commit()
+        img = self.session.query(Settings.imgwelcome_toggle).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return img[0]
 
     async def get_img_text(self, guild_id):
@@ -171,10 +307,9 @@ class Db:
         :param guild_id: the id of the guild
         :returns: the welcome text for the image  for the given guild
         """
-        c = self.cursor
-        c.execute(f"SELECT imgwelcome_text FROM settings WHERE guild_id={str(guild_id)};")
-        text = c.fetchone()
-        self.conn.commit()
+
+        text = self.session.query(Settings.imgwelcome_text).filter_by(guild_id=guild_id).one()
+        self.session.commit()
         return text[0]
 
     async def get_text_xp(self, guild_id, user_id):
@@ -185,11 +320,9 @@ class Db:
         :returns: the xp amount for the given user
         """
 
-        c = self.cursor
-        c.execute("SELECT text_xp FROM user_info WHERE user_id="
-                  f"{str(user_id)} and guild_id={str(guild_id)} LIMIT 1")
-        xp = c.fetchone()
-        self.conn.commit()
+        xp = self.session.query(UserInfo.text_xp).filter(UserInfo.guild_id == guild_id,
+                                                         UserInfo.user_id == user_id).one()
+        self.session.commit()
         return xp[0]
 
     async def get_lvl_text(self, guild_id, user_id):
@@ -200,11 +333,9 @@ class Db:
         :returns: the text lvl for the given user
         """
 
-        c = self.cursor
-        c.execute("SELECT text_lvl FROM user_info WHERE user_id="
-                  f"{str(user_id)} and guild_id={str(guild_id)}")
-        lvl = c.fetchone()
-        self.conn.commit()
+        lvl = self.session.query(UserInfo.text_lvl).filter(UserInfo.guild_id == guild_id,
+                                                           UserInfo.user_id == user_id).one()
+        self.session.commit()
         return lvl[0]
 
     async def get_levelsystem(self, guild_id):
@@ -214,27 +345,22 @@ class Db:
         :returns: if the levelsytem is on or off for the specific guild
         """
 
-        c = self.cursor
-        c.execute(f"SELECT levelsystem_toggle FROM settings WHERE guild_id =  {str(guild_id)};")
-        img = c.fetchone()
-        self.conn.commit()
-        return img[0]
+        lvl_toggle = self.session.query(Settings.levelsystem_toggle).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return lvl_toggle[0]
 
-    async def get_banned_until(self, user_id):
+    async def get_banned_until(self, user_id, guild_id):
         """
 
+        :param guild_id: the id of the guild
         :param user_id: the ID of the user
         :returns: the date the user is allowed to get unbanned if none the user wasn't temp banned
         """
 
-        c = self.cursor
-        c.execute(f"SELECT banned_until FROM `user_info` WHERE user_id = {user_id} and banned_until IS NOT NULL")
-        date = c.fetchone()
-        self.conn.commit()
-        if date is None:
-            return None
-        else:
-            return date[0]
+        date = self.session.query(Settings.levelsystem_toggle).filter(Settings.guild_id == guild_id,
+                                                                      UserInfo.user_id == user_id).one()
+        self.session.commit()
+        return date[0]
 
     async def get_blacklist(self, user_id):
         """
@@ -243,53 +369,36 @@ class Db:
         :returns: if the user is in the blacklist if false the user isnt blacklisted
         """
 
-        c = self.cursor
-        c.execute(f"SELECT user_id FROM `blacklist` WHERE user_id = {user_id}")
-        user = c.fetchall()
-        self.conn.commit()
-        if user[0] is None:
-            return False
-        else:
+        user = self.session.query(Banlist.user_id).filter_by(user_id=user_id).one()
+        self.session.commit()
+        if user_id in user:
             return True
+        else:
+            return False
 
     async def get_message(self, guild_id, message_id):
         """
 
         :param guild_id: the id of the guild
         :param message_id: the requested message id
-        :return: the message and the user_id can be none
+        :return: the message content and the user_id in a list, can be none
         """
 
-        c = self.cursor
-        c.execute(f"SELECT user_id, message FROM `messages` WHERE message_id = {message_id} and guild_id = {guild_id}")
-        message = c.fetchone()
-        self.conn.commit()
-        try:
-            if message is None:
-                return False
-            else:
-                return message
-        except IndexError:
-            return None
+        message = self.session.query(Messages.message, Messages.user_id).filter(Messages.message_id == message_id,
+                                                                                Messages.guild_id == guild_id).all()
+        self.session.commit()
+        return message
 
     async def get_guild(self, user_id):
         """
 
         :param user_id: the id of the user
-        :return: list with a tuple with all guilds inside
+        :return: list with all guild ids inside
         """
 
-        c = self.cursor
-        c.execute(f"SELECT guild_id FROM `user_info` WHERE user_id = {user_id}")
-        guilds = c.fetchall()
-        self.conn.commit()
-        try:
-            if guilds is None:
-                return False
-            else:
-                return guilds
-        except IndexError:
-            return None
+        guilds = self.session.query(UserInfo.guild_id).filter_by(user_id=user_id).all()
+        self.session.commit()
+        return guilds
 
     async def get_reaction_role(self, guild_id, message_id, emoji):
         """
@@ -299,25 +408,24 @@ class Db:
         :param emoji: the added emoji
         :return: the role id that the user should get
         """
-        c = self.cursor
-        c.execute(f"SELECT role_id FROM `reactions` WHERE message_id = {message_id} and emoji = %s", (emoji,))
-        roleid = c.fetchone()
-        self.conn.commit()
-        if roleid is None:
-            return None
-        else:
-            return roleid[0]
+
+        roleid = self.session.query(Reaction.role_id).filter(Reaction.message_id == message_id,
+                                                             Reaction.guild_id == guild_id,
+                                                             Reaction.emoji == emoji).one()
+        self.session.commit()
+        return roleid[0]
 
     async def leaderboard(self, guild_id):
         """
 
         :param guild_id:  the id of the guild
-        :return: the leaderboard by rank/level with xp
+        :return: the leaderboard by rank/level with xp type list with tuples inside
         """
-        c = self.cursor
-        c.execute(f"SELECT user_id, text_lvl, text_xp FROM user_info WHERE guild_id ={guild_id}  ORDER BY text_lvl DESC LIMIT 10")
-        ranks = c.fetchall()
-        self.conn.commit()
+
+        ranks = self.session.query(UserInfo.text_lvl, UserInfo.text_xp,
+                                   UserInfo.user_id).filter(UserInfo.guild_id == guild_id).order_by(
+            UserInfo.text_xp.desc())[0:10]
+        self.session.commit()
         return ranks
 
     def get_spam_settings(self, guild_id):
@@ -358,13 +466,12 @@ class Db:
         ignoreBots : bool, optional
             Should bots bypass anti-spam?
         """
-        c = self.cursor
-        c.execute(f"SELECT warnThreshold, kickThreshold, banThreshold,"
-                  f"messageInterval, warnMessage, kickMessage, banMessage,"
-                  f"messageDuplicateCount, messageDuplicateAccuracy FROM "
-                  f"settings WHERE guild_id = {guild_id}")
-        settings = c.fetchall()
-        self.conn.commit()
+
+        settings = self.session.query(Settings.warnThreshold, Settings.kickThreshold, Settings.banThreshold,
+                         Settings.messageInterval, Settings.warnMessage, Settings.kickMessage,Settings.banMessage,
+                         Settings.messageDuplicateCount, Settings.messageDuplicateAccuracy
+                         ).filter(UserInfo.guild_id==guild_id)
+        self.session.commit()
         return settings
 
     async def get_kick_count(self, guild_id, user_id):
@@ -374,9 +481,10 @@ class Db:
         :param user_id: the ID of the user
         :returns: the warnings for the given user, can be 0
         """
-        c = self.cursor
-        c.execute("SELECT kickCount FROM user_info WHERE user_id="
-                  f"{str(user_id)} and guild_id={str(guild_id)}")
-        kickcount = c.fetchone()
-        self.conn.commit()
-        return kickcount[0]
+
+        kickcount = self.session.query(UserInfo.kickCount).filter(UserInfo.guild_id == guild_id,
+                                                                  UserInfo.user_id == user_id).all()
+        self.session.commit()
+        if not kickcount:
+            return 0
+        return kickcount[0][0]
