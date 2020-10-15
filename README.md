@@ -74,8 +74,9 @@ For a list with all commands and there usage look at [commands](https://github.c
  
 # Critical bugs
 
-  - maybe some bugs in the music cog will be fixed when lavalink is integrated
+  - You will get IP banned from youtube if you use the music cog, therefore its deprecated for now and shouldn't be used
   - Not well documented
+  - The antispam system has some bugs
   
 # Install instructions 
  
