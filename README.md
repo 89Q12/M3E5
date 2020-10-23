@@ -27,7 +27,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - the standard prefix is - but it's changeable with -prefix arg 
   - basic Moderation commands
   - profile shows you your writer rank/xp and warnings
-  - Music player has still some bugs 
+  - Music player has still some bugs DEPRECATED!
       - youtube/playlists
       - Soundcloud/playlists
   - Welcome image
@@ -65,7 +65,7 @@ For a list with all commands and there usage look at [commands](https://github.c
   - Recording meetings ( Voice recording to an mp3 file)
   - Custom voice channels 
   - poke admins/moderators via Telegram or Email if they aren't online
-  - Ticket/Support system 
+  - Ticket/Support system maybe 
   - Advanced permission system, that uses groups of accepted roles and banned roles per command
   - unittests
   - Web interface but I will open a seperate repository for that
