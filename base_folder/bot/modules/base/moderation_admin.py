@@ -57,7 +57,7 @@ class ModerationAdmin(commands.Cog):
     @logging_to_channel_stdout
     @purge_command_in_channel
     @logging_to_channel_cmd
-    async def tempban(self, ctx, member: discord.Member = None, time=2):
+    async def tempban(self, ctx, member: discord.Member = None, time: int=2):
         reason = "Tempban"
         e = success_embed(self.client)
         if member is not None:

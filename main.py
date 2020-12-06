@@ -14,7 +14,7 @@ extensions = ["base_folder.bot.modules.test",
               "base_folder.bot.modules.listener.listener_error",
               "base_folder.bot.modules.listener.listener_internal",
               "base_folder.bot.modules.reaction_roles",
-              "base_folder.bot.modules.music",
+              #"base_folder.bot.modules.music",
               ]
 '''
 Runs the bot in the main thread

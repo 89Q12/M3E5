@@ -1,20 +1,18 @@
 """
 This helper script is helpful in some situations  like creating the ctx object out of the member object etc
 """
-import ast
+from asyncio import run_coroutine_threadsafe
+from string import Template
+import logging
 import asyncio
 import datetime
-import inspect
-from asyncio import run_coroutine_threadsafe
-import base64
-import time
+from copy import deepcopy
 import discord
-from string import Template
 from fuzzywuzzy import fuzz
 
-from base_folder.bot.modules.base.db_management import Db
-from base_folder.AntiSpam.Exceptions import DuplicateObject, ObjectMismatch, LogicError
 
+from base_folder.bot.modules.base.db_management import Db
+from base_folder.bot.utils.exceptions import DuplicateObject, ObjectMismatch, LogicError, MissingGuildPermissions
 
 class Ctx:
     """
@@ -49,9 +47,8 @@ def loadmodules(modules, client):
 This class is designed to hold all data that the bot uses extensively and the class is designed in a way that it can
 reload the data on change.
 '''
-
-
 # TODO: Look above
+
 
 class DbCache:
     def __init__(self, loop=None):
@@ -65,10 +62,9 @@ class DbCache:
         else:
             return self._states[guild.id]
 
-    def make_states(self, guilds):
+    def make_states(self, guilds, logger):
         for guild in guilds:
-            if guild.id == 616609333832187924:
-                self._states[guild.id] = GuildStates(guild, self.loop)
+            self._states[guild.id] = GuildStates(guild, self.loop, logger)
 
     def create_state(self, guild):
         self._states[guild.id] = GuildStates(guild, self.loop)
@@ -78,17 +74,24 @@ class DbCache:
 
 
 class GuildStates:
-    def __init__(self, guild, loop):
+    def __init__(self, guild, loop, logger):
         self.loop = loop
         self.db = Db()
         self.guild = guild
-        self.options = self.spamsettings
+        self.logger = logger
+        self.options = {}
         self.users = {}
         self._permisson_roles = {}
         self._prefix = None
         self._levelsystem_toggle = None
         self._get_imgtoggle = None
         self._channels = {}
+        self.banned_channels_cmd = []
+        self.banned_roles_cmd = []
+        self.banned_users_cmd = []
+        self.banned_channels_spam = []
+        self.banned_roles_spam = []
+        self.banned_users_spam = []
 
     @property
     def get_prefix(self):
@@ -115,9 +118,8 @@ class GuildStates:
             role_list.append(self._permisson_roles[r])
         return role_list
 
-    @property
-    def spamsettings(self):
-        opts = self.db.get_spam_settings(self.guild.id)
+    async def set_spamsettings(self):
+        opts = await self.db.get_spam_settings(self.guild.id)
         options = {
             "warnThreshold": opts[0][0],
             "kickThreshold": opts[0][1],
@@ -128,20 +130,20 @@ class GuildStates:
             "banMessage": opts[0][6],
             "messageDuplicateCount": opts[0][7],
             "messageDuplicateAccuracy": opts[0][8],
-            "ignorePerms": [8], # TODO: make this customizable
-            "ignoreUsers": [], # TODO: make this customizable too
+            "ignorePerms": [8],  # TODO: make this customizable
+            "ignoreUsers": [],  # TODO: make this customizable too
             "ignoreBots": True,
+            "dc_channel": self._channels["stdout"]
         }
-        return options
+        self.options = options
 
     async def set_users(self):
-       async for user in self.guild.fetch_members():
-            print(user)
+        for user in self.guild.members:
             user_data = {
                 'warnCount': await self.db.get_warns(self.guild.id, user.id),
                 'kickCount': await self.db.get_kick_count(self.guild.id, user.id),
             }
-            self.users[user.id] = User(user.id, self.guild.id, self.options, user_data)
+            self.users[user.id] = User(user.id, self.guild.id, self.options, user_data, self.logger)
 
     def get_role(self, rolename="admin"):
         role_id = self._permisson_roles[rolename]
@@ -169,6 +171,14 @@ class GuildStates:
         self._channels['lvl'] = await self.db.get_lvl_channel(self.guild.id)
         self._channels['cmd'] = await self.db.get_cmd_channel(self.guild.id)
 
+    async def set_banned_lists(self):
+        self.banned_channels_cmd = await self.db.get_banned_channels_cmd(self.guild.id)
+        self.banned_roles_cmd = await self.db.get_banned_roles_cmd(self.guild.id)
+        self.banned_users_cmd = await self.db.get_banned_users_cmd(self.guild.id)
+        self.banned_channels_spam = await self.db.get_banned_channels_spam(self.guild.id)
+        self.banned_roles_spam = await self.db.get_banned_roles_spam(self.guild.id)
+        self.banned_users_spam = await self.db.get_banned_users_spam(self.guild.id)
+
     async def set_imgtoggle(self):
         self._get_imgtoggle = await self.db.get_img(self.guild.id)
 
@@ -181,12 +191,12 @@ class GuildStates:
     async def update_permission_role(self, rolename, roleid):
         self._permisson_roles[rolename] = roleid
 
+    async def destruct_User(self, userid):
+        del self.users[userid]
+
 
 class User:
     """
-    The overall handler & entry point from any discord bot,
-    this is responsible for handling interaction with Guilds etc
-
     I modified the code but most of the code belongs to:
 
     MIT License
@@ -211,47 +221,52 @@ class User:
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
     """
-    """A class dedicated to maintaining a user, and any relevant messages in a single guild.
-
+    """A class dedicated to maintaining a member, and any relevant messages in a single guild.
     """
 
     __slots__ = [
         "_id",
-        "_guildId",
+        "_guild_id",
         "_messages",
         "options",
-        "warnCount",
-        "kickCount",
-        "bot",
-        "duplicateCounter",
+        "warn_count",
+        "kick_count",
+        "duplicate_counter",
+        "logger",
+        "BAN",
+        "KICK",
     ]
 
-    def __init__(self, id, guildId, options, user_data):
+    def __init__(self, id, guild_id, options, user_data,logger):
         """
         Set the relevant information in order to maintain
         and use a per User object for a guild
-
         Parameters
         ==========
+        bot : commands.bot
+            Bot instance
         id : int
-            The relevant user id
-        guildId : int
-            The guild (id) this user is belonging to
+            The relevant member id
+        guild_id : int
+            The guild (id) this member is belonging to
         options : Dict
             The options we need to check against
         """
         self.id = int(id)
-        self.guildId = int(guildId)
+        self.guild_id = int(guild_id)
         self._messages = []
         self.options = options
-        self.warnCount = user_data["warnCount"]
-        self.kickCount = user_data["kickCount"]
-        self.duplicateCounter = 1
+        self.warn_count = user_data["warnCount"]
+        self.kick_count = user_data["kickCount"]
+        self.duplicate_counter = 1
+        self.logger = logger
+        self.KICK = "kick"
+        self.BAN = "ban"
 
     def __repr__(self):
         return (
-            f"{self.__class__.__name__} object. User id: {self.id}, Guild id: {self.guildId}, "
-            f"Len Stored Message {len(self._messages)}"
+            f"'{self.__class__.__name__} object. User id: {self.id}, Guild id: {self.guild_id}, "
+            f"Len Stored Messages {len(self._messages)}'"
         )
 
     def __str__(self):
@@ -260,29 +275,25 @@ class User:
     def __eq__(self, other):
         """
         This is called with a 'obj1 == obj2' comparison object is made
-
         Checks against stored id's to figure out if they are
         representing the same User or not
-
         Parameters
         ----------
         other : User
             The object to compare against
-
         Returns
         -------
         bool
             `True` or `False` depending on whether they are the same or not
-
         Raises
         ======
         ValueError
-            When the comparison object is not of type `Message`
+            When the comparison object is not of ignore_type `Message`
         """
         if not isinstance(other, User):
             raise ValueError("Expected two User objects to compare")
 
-        if self.id == other.id and self.guildId == other.guildId:
+        if self.id == other.id and self.guild_id == other.guild_id:
             return True
         return False
 
@@ -290,181 +301,316 @@ class User:
         """
         Given we create a __eq__ dunder method, we also needed
         to create one for __hash__ lol
-
         Returns
         -------
         int
             The hash of all id's
         """
-        return hash((self.id, self.guildId))
+        return hash((self.id, self.guild_id))
 
     def propagate(self, value: discord.Message):
         """
         This method handles a message object and then adds it to
-        the relevant user
-
+        the relevant member
         Parameters
         ==========
         value : discord.Message
             The message that needs to be propagated out
         """
         if not isinstance(value, discord.Message):
-            raise ValueError("Expected message of type: discord.Message")
+            raise ValueError("Expected message of ignore_type: discord.Message")
 
-        message = Message(
-            value.id,
-            value.clean_content,
-            value.author.id,
-            value.channel.id,
-            value.guild.id,
-        )
-        for messageObj in self.messages:
-            if message == messageObj:
-                raise DuplicateObject
+        self.clean_up(datetime.datetime.now(datetime.timezone.utc))
 
-        # TODO Add checks for if there isn't any content. If there isn't
-        #      we shouldn't bother saving them
-
-        # TODO Compare incoming message to other messages in order
-        relationToOthers = []
-        for messageObj in self.messages[::-1]:
-            # This calculates the relation to each other
-            relationToOthers.append(
-                fuzz.token_sort_ratio(message.content, messageObj.content)
+        # No point saving empty messages, although discord shouldn't allow them anyway
+        if not bool(value.content and value.content.strip()):
+            return
+        else:
+            message = Message(
+                value.id,
+                value.clean_content,
+                value.author.id,
+                value.channel.id,
+                value.guild.id,
             )
 
-        self.messages = message
+        for message_obj in self.messages:
+            # This calculates the relation to each other
+            if message == message_obj:
+                raise DuplicateObject
 
-        # Check if this message is a duplicate of the most recent messages
-        for i, proportion in enumerate(relationToOthers):
-            if proportion >= self.options["messageDuplicateAccuracy"]:
+            elif (
+                fuzz.token_sort_ratio(message.content, message_obj.content)
+                >= self.options["message_duplicate_accuracy"]
+            ):
                 """
                 The handler works off an internal message duplicate counter 
                 so just increment that and then let our logic process it
                 """
-                self.duplicateCounter += 1
-                message.isDuplicate = True
-                break  # we don't want to increment to much
+                self.duplicate_counter += 1
+                message.is_duplicate = True
 
-        if self.duplicateCounter >= self.options["messageDuplicateCount"]:
-            print("Punish time")
-            # We need to punish the user with something
+                if self.duplicate_counter >= self.options["message_duplicate_count"]:
+                    break
 
-            # TODO Figure out why the logic likes having +1 of the actual count
-            #      before it decides its time to actually punish the user properly
+        # We check this again, because theoretically the above can take awhile to process etc
+
+        self.messages = message
+        self.logger.log.info(f"Created Message: {message.id}")
+
+        if self.duplicate_counter >= self.options["message_duplicate_count"]:
+            self.logger.log.debug(
+                f"Message: ({message.id}) requires some form of punishment"
+            )
+            # We need to punish the member with something
 
             if (
-                    self.duplicateCounter >= self.options["warnThreshold"]
-                    and self.warnCount < self.options["kickThreshold"]
-                    and self.kickCount < self.options["banThreshold"]
+                self.duplicate_counter >= self.options["warn_threshold"]
+                and self.warn_count < self.options["kick_threshold"]
+                and self.kick_count < self.options["ban_threshold"]
             ):
-                print("Warn time")
+                self.logger.log.debug(f"Attempting to warn: {message.author_id}")
                 """
-                The user has yet to reach the warn threshold,
+                The member has yet to reach the warn threshold,
                 after the warn threshold is reached this will
                 then become a kick and so on
                 """
                 # We are still in the warning area
                 channel = value.channel
-                message = Template(self.options["warnMessage"]).safe_substitute(
-                    {
-                        "MENTIONUSER": value.author.mention,
-                        "USERNAME": value.author.display_name,
-                    }
+                guild_message = transform_message(
+                    self.options["guild_warn_message"],
+                    value,
+                    {"warn_count": self.warn_count, "kick_count": self.kick_count},
                 )
 
-                asyncio.ensure_future(self.SendToObj(channel, message))
-                self.warnCount += 1
+                asyncio.ensure_future(send_to_obj(channel, guild_message))
+                self.warn_count += 1
 
             elif (
-                    self.warnCount >= self.options["kickThreshold"]
-                    and self.kickCount < self.options["banThreshold"]
+                self.warn_count >= self.options["kick_threshold"]
+                and self.kick_count < self.options["ban_threshold"]
             ):
-                print("kick time")
-                # We should kick the user
-                dcChannel = value.channel
-                message = Template(self.options["kickMessage"]).safe_substitute(
-                    {
-                        "MENTIONUSER": value.author.mention,
-                        "USERNAME": value.author.display_name,
-                    }
+                # Set this to False here to stop processing other messages, we can revert on failure
+
+                self.logger.log.debug(f"Attempting to kick: {message.author_id}")
+                # We should kick the member
+                guild_message = transform_message(
+                    self.options["guild_kick_message"],
+                    value,
+                    {"warn_count": self.warn_count, "kick_count": self.kick_count},
+                )
+                user_message = transform_message(
+                    self.options["user_kick_message"],
+                    value,
+                    {"warn_count": self.warn_count, "kick_count": self.kick_count},
                 )
                 asyncio.ensure_future(
-                    self.KickFromGuild(
-                        value.guild,
-                        value.author,
-                        dcChannel,
-                        f"You were kicked from {value.guild.name} for spam.",
-                        message,
-                    )
+                    self._punish_user(value, user_message, guild_message, self.KICK,)
                 )
-                self.kickCount += 1
+                self.kick_count += 1
 
-            elif self.kickCount >= self.options["banThreshold"]:
-                print("ban time")
-                # We should ban the user
-                pass
+            elif self.kick_count >= self.options["ban_threshold"]:
+                # Set this to False here to stop processing other messages, we can revert on failure
+
+                self.logger.log.debug(f"Attempting to ban: {message.author_id}")
+                # We should ban the member
+                guild_message = transform_message(
+                    self.options["guild_ban_message"],
+                    value,
+                    {"warn_count": self.warn_count, "kick_count": self.kick_count},
+                )
+                user_message = transform_message(
+                    self.options["user_ban_message"],
+                    value,
+                    {"warn_count": self.warn_count, "kick_count": self.kick_count},
+                )
+                asyncio.ensure_future(
+                    self._punish_user(value, user_message, guild_message, self.BAN,)
+                )
+                self.kick_count += 1
 
             else:
-                print("else?")
                 raise LogicError
 
-    async def SendToObj(self, messageableObj, message):
+    async def _punish_user(self, value, user_message, guild_message, method):
         """
-        Send a given message to an abc.messageable object
-
-        This does not handle exceptions, they should be handled
-        on call as I did not want to overdo this method with
-        the required params to notify users.
-
+        A generic method to handle multiple methods of punishment for a user.
+        Currently supports: kicking, banning
+        TODO: mutes
         Parameters
         ----------
-        messageableObj : abc.Messageable
-            Where to send message
-        message : String
-            The message to send
-
+        value : discord.Message
+            Where we get everything from :)
+        user_message : str
+            A message to send to the user who is being punished
+        guild_message : str
+            A message to send in the guild for whoever is being punished
+        method : str
+            A string denoting the ignore_type of punishment
         Raises
-        ------
-        discord.HTTPException
-            Failed to send
-        discord.Forbidden
-            Lacking permissions to send
-
+        ======
+        LogicError
+            If you do not pass a support punishment method
         """
-        await messageableObj.send(message)
+        guild = value.guild
+        member = value.author
+        dc_channel = self.options["dc_channel"]
+        if method != self.KICK and method != self.BAN:
+            raise LogicError(f"{method} is not a recognized punishment method.")
 
-    async def KickFromGuild(self, guild, user, dcChannel, userMessage, guildMessage):
+        # Check we have perms to punish
+        perms = guild.me.guild_permissions
+        if not perms.kick_members and method == self.KICK:
+            raise MissingGuildPermissions(
+                f"I need kick perms to punish someone in {guild.name}"
+            )
+
+        elif not perms.ban_members and method == self.BAN:
+            raise MissingGuildPermissions(
+                f"I need ban perms to punish someone in {guild.name}"
+            )
+
+        # We also check they don't own the guild, since ya know...
+        elif guild.owner_id == member.id:
+            raise MissingGuildPermissions(
+                f"I cannot punish {member.display_name}({member.id}) "
+                f"because they own this guild. ({guild.name})"
+            )
+
+        # Ensure we can actually punish the user, for this
+        # we just check our top role is higher then them
+        elif guild.me.top_role.position < member.top_role.position:
+            self.logger.warn(
+                f"I might not be able to punish {member.display_name}({member.id}) in {guild.name}({guild.id}) "
+                "because they are higher then me, which means I could lack the ability to kick/ban them."
+            )
+
+        m = None
+
         try:
+            # Attempt to message the punished member, about their punishment
             try:
-                await self.SendToObj(user, userMessage)
+                m = await send_to_obj(member, user_message)
             except discord.HTTPException:
-                await self.SendToObj(
-                    user,
-                    f"Sending a message to {user.mention} about their kick failed.",
+                await send_to_obj(
+                    dc_channel,
+                    f"Sending a message to {member.mention} about their {method} failed.",
+                )
+                self.logger.warn(
+                    f"Failed to message User: ({member.id}) about {method}"
                 )
             finally:
+
+                # Even if we can't tell them they are being punished
+                # We still need to punish them, so try that
                 try:
-                    await guild.kick(user, reason="Spamming")
+                    if method == self.KICK:
+                        await guild.kick(
+                            member, reason="Automated punishment from DPY Anti-Spam."
+                        )
+                        self.logger.log.info(f"Kicked User: ({member.id})")
+                    elif method == self.BAN:
+                        await guild.ban(
+                            member, reason="Automated punishment from DPY Anti-Spam."
+                        )
+                        self.logger.log.info(f"Banned User: ({member.id})")
+                    else:
+                        raise NotImplementedError
                 except discord.Forbidden:
-                    await self.SendToObj(
-                        dcChannel, f"I do not have permission to kick: {user.mention}"
+                    await send_to_obj(
+                        dc_channel,
+                        f"I do not have permission to kick: {member.mention}",
                     )
+                    self.logger.log.warn(f"Required Permissions are missing for: {method}")
+                    if m is not None:
+                        await send_to_obj(
+                            member,
+                            "I failed to punish you because I lack permissions, but still you shouldn't spam.",
+                        )
+                        await m.delete()
+
                 except discord.HTTPException:
-                    await self.SendToObj(
-                        dcChannel, f"An error occurred trying to kick: {user.mention}"
+                    await send_to_obj(
+                        dc_channel,
+                        f"An error occurred trying to {method}: {member.mention}",
                     )
-                finally:
+                    self.logger.log.warn(
+                        f"An error occurred trying to {method}: {member.id}"
+                    )
+                    if m is not None:
+                        await send_to_obj(
+                            member,
+                            "I failed to punish you because I lack permissions, but still you shouldn't spam.",
+                        )
+                        await m.delete()
+
+                else:
                     try:
-                        await self.SendToObj(dcChannel, guildMessage)
+                        await send_to_obj(dc_channel, guild_message)
                     except discord.HTTPException:
-                        print(
+                        self.logger.log.error(
                             f"Failed to send message.\n"
-                            f"Guild: {dcChannel.guild.name}({dcChannel.guild.id})\n"
-                            f"Channel: {dcChannel.name}({dcChannel.id})"
+                            f"Guild: {dc_channel.guild.name}({dc_channel.guild.id})\n"
+                            f"Channel: {dc_channel.name}({dc_channel.id})"
                         )
         except Exception as e:
             raise e
+
+    def get_correct_duplicate_count(self):
+        """
+        Given the internal math has an extra number cos
+        accuracy this simply returns the correct value
+        Returns
+        -------
+        self.duplicate_counter - 1
+        """
+        return self.duplicate_counter - 1
+
+    def clean_up(self, current_time):
+        """
+        This logic works around checking the current
+        time vs a messages creation time. If the message
+        is older by the config amount it can be cleaned up
+        """
+        self.logger.debug("Attempting to remove outdated Message's")
+
+        def _is_still_valid(message):
+            """
+            Given a message, figure out if it hasnt
+            expired yet based on timestamps
+            """
+            difference = current_time - message.creation_time
+            offset = datetime.timedelta(
+                milliseconds=self.options.get("message_interval")
+            )
+
+            if difference >= offset:
+                return False
+            return True
+
+        current_messages = []
+        outstanding_messages = []
+
+        for message in self._messages:
+            if _is_still_valid(message):
+                current_messages.append(message)
+            else:
+                outstanding_messages.append(message)
+
+        self._messages = deepcopy(current_messages)
+
+        # Now if we have outstanding messages we need
+        # to process them and see if we need to deincrement
+        # the duplicate counter as we are removing them from
+        # the queue otherwise everything stacks up
+        for outstanding_message in outstanding_messages:
+            if outstanding_message.is_duplicate:
+                self.duplicate_counter -= 1
+                self.logger.log.debug(
+                    f"Removing duplicate Message: {outstanding_message.id}"
+                )
+            elif self.logger.log.isEnabledFor(logging.DEBUG):
+                self.logger.log.debug(f"Removing Message: {outstanding_message.id}")
 
     @property
     def id(self):
@@ -477,14 +623,14 @@ class User:
         self._id = value
 
     @property
-    def guildId(self):
-        return self._guildId
+    def guild_id(self):
+        return self._guild_id
 
-    @guildId.setter
-    def guildId(self, value):
+    @guild_id.setter
+    def guild_id(self, value):
         if not isinstance(value, int):
             raise ValueError("Expected integer")
-        self._guildId = value
+        self._guild_id = value
 
     @property
     def messages(self):
@@ -502,7 +648,7 @@ class User:
         if not isinstance(value, Message):
             raise ValueError("Expected Message object")
 
-        if value.authorId != self.id or value.guildId != self.guildId:
+        if value.author_id != self.id or value.guild_id != self.guild_id:
             raise ObjectMismatch
 
         for message in self._messages:
@@ -514,9 +660,6 @@ class User:
 
 class Message:
     """
-    The overall handler & entry point from any discord bot,
-    this is responsible for handling interaction with Guilds etc
-
     I modified the code but most of the code belongs to:
 
     MIT License
@@ -542,60 +685,56 @@ class Message:
     SOFTWARE.
     """
     """Represents a lower level object needed to maintain messages
-
     """
 
     __slots__ = [
         "_id",
-        "_channelId",
-        "_guildId",
+        "_channel_id",
+        "_guild_id",
         "_content",
-        "_authorId",
-        "_creationTime",
-        "_isDuplicate",
+        "_author_id",
+        "_creation_time",
+        "_is_duplicate",
     ]
 
-    def __init__(self, id, content, authorId, channelId, guildId):
+    def __init__(self, id, content, author_id, channel_id, guild_id):
         """
         Set & store a smaller object footprint then a standard
         message object for memory purposes :)
-
         Parameters
         ==========
         id : int
             The id of the message
         content : String
             The actual message content
-        authorId : int
+        author_id : int
             The author of said message
-        channelId : int
+        channel_id : int
             The channel this message is in
-        guildId : int
+        guild_id : int
             The guild this message belongs to
-
         Raises
         ======
         ValueError
-            When an item is not the correct type for conversion
-
+            When an item is not the correct ignore_type for conversion
         Notes
         =====
-        This enforces strict types by conversion and type checking
-        pass through of the correct type is required.
+        This enforces strict types by conversion and ignore_type checking
+        pass through of the correct ignore_type is required.
         """
         self.id = int(id)
         self.content = str(content)
-        self.authorId = int(authorId)
-        self.channelId = int(channelId)
-        self.guildId = int(guildId)
-        self.isDuplicate = False
-        self._creationTime = datetime.datetime.now(datetime.timezone.utc)
+        self.author_id = int(author_id)
+        self.channel_id = int(channel_id)
+        self.guild_id = int(guild_id)
+        self.is_duplicate = False
+        self._creation_time = datetime.datetime.now(datetime.timezone.utc)
 
     def __repr__(self):
         return (
             f"'{self.__class__.__name__} object. Content: {self.content}, Message Id: {self.id}, "
-            f"Author Id: {self.authorId}, Channel Id: {self.channelId}, Guild Id: {self.guildId}' "
-            f"Creation time: {self._creationTime}"
+            f"Author Id: {self.author_id}, Channel Id: {self.channel_id}, Guild Id: {self.guild_id} "
+            f"Creation time: {self._creation_time}'"
         )
 
     def __str__(self):
@@ -604,33 +743,34 @@ class Message:
     def __eq__(self, other):
         """
         This is called with a 'obj1 == obj2' comparison object is made
-
         Checks everything besides message content to figure out if a message
         is the same or not
-
         Parameters
         ----------
         other : Message
             The object to compare against
-
         Returns
         -------
         bool
             `True` or `False` depending on whether they are the same or not
-
         Raises
         ======
         ValueError
-            When the comparison object is not of type `Message`
+            When the comparison object is not of ignore_type `Message`
+        Notes
+        =====
+        Does not check creation time, because that can be different
+        and this is mainly used to ensure we don't create duplicates
+        and creation time is this class's time not the message's time
         """
         if not isinstance(other, Message):
             raise ValueError
 
         if (
-                self.id == other.id
-                and self.authorId == other.authorId
-                and self.channelId == other.channelId
-                and self.guildId == other.guildId
+            self.id == other.id
+            and self.author_id == other.author_id
+            and self.channel_id == other.channel_id
+            and self.guild_id == other.guild_id
         ):
             return True
         return False
@@ -639,13 +779,12 @@ class Message:
         """
         Given we create a __eq__ dunder method, we also needed
         to create one for __hash__ lol
-
         Returns
         -------
         int
             The hash of all id's
         """
-        return hash((self.id, self.authorId, self.guildId, self.channelId))
+        return hash((self.id, self.author_id, self.guild_id, self.channel_id))
 
     @property
     def id(self):
@@ -675,51 +814,270 @@ class Message:
             raise ValueError("Expected String")
 
     @property
-    def authorId(self):
-        return self._authorId
+    def author_id(self):
+        return self._author_id
 
-    @authorId.setter
-    def authorId(self, value):
+    @author_id.setter
+    def author_id(self, value):
         if not isinstance(value, int):
             raise ValueError("Expected integer")
-        self._authorId = value
+        self._author_id = value
 
     @property
-    def channelId(self):
-        return self._channelId
+    def channel_id(self):
+        return self._channel_id
 
-    @channelId.setter
-    def channelId(self, value):
+    @channel_id.setter
+    def channel_id(self, value):
         if not isinstance(value, int):
             raise ValueError("Expected integer")
-        self._channelId = value
+        self._channel_id = value
 
     @property
-    def guildId(self):
-        return self._guildId
+    def guild_id(self):
+        return self._guild_id
 
-    @guildId.setter
-    def guildId(self, value):
+    @guild_id.setter
+    def guild_id(self, value):
         if not isinstance(value, int):
             raise ValueError("Expected integer")
-        self._guildId = value
+        self._guild_id = value
 
     @property
-    def creationTime(self):
-        return self._creationTime
+    def creation_time(self):
+        return self._creation_time
 
-    @creationTime.setter
-    def creationTime(self, value):
+    @creation_time.setter
+    def creation_time(self, value):
         # We don't want creationTime changed
         return
 
     @property
-    def isDuplicate(self):
-        return self._isDuplicate
+    def is_duplicate(self):
+        return self._is_duplicate
 
-    @isDuplicate.setter
-    def isDuplicate(self, value):
+    @is_duplicate.setter
+    def is_duplicate(self, value):
         if not isinstance(value, bool):
             raise ValueError("isDuplicate should be a bool")
 
-        self._isDuplicate = value
+        self._is_duplicate = value
+
+
+"""
+LICENSE
+The MIT License (MIT)
+Copyright (c) 2020 Skelmis
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+LICENSE
+"""
+
+"""
+A short utility for random functions which don't fit into an object
+"""
+
+
+def embed_to_string(embed) -> str:
+    """
+    Parameters
+    ----------
+    embed : discord.Embed
+        The embed to turn into a string
+    Returns
+    -------
+    str
+        The content of the string
+    """
+    content = ""
+    embed = embed.to_dict()
+
+    if "title" in embed:
+        content += f"{embed['title']}\n"
+
+    if "description" in embed:
+        content += f"{embed['description']}\n"
+
+    if "footer" in embed:
+        if "text" in embed["footer"]:
+            content += f"{embed['footer']['text']}\n"
+
+    if "author" in embed:
+        if "name" in embed["author"]:
+            content += f"{embed['author']['name']}\n"
+
+    if "fields" in embed:
+        for field in embed["fields"]:
+            content += f"{field['name']}\n{field['value']}\n"
+
+    return content
+
+
+def dict_to_embed(data, message, counts):
+    """
+    Given a dictionary, will attempt to build a
+    valid discord.Embed object to return
+    Parameters
+    ----------
+    data : dict
+        The given item to try build an embed from
+    message : discord.Message
+        Where we get all our info from
+    counts : dict
+        Our current warn & kick counts
+    Returns
+    -------
+    discord.Embed
+    """
+    allowed_avatars = ["$USERAVATAR", "$BOTAVATAR", "$GUILDICON"]
+
+    if "title" in data:
+        data["title"] = substitute_args(data["title"], message, counts)
+
+    if "description" in data:
+        data["description"] = substitute_args(data["description"], message, counts)
+
+    if "footer" in data:
+        if "text" in data["footer"]:
+            data["footer"]["text"] = substitute_args(
+                data["footer"]["text"], message, counts
+            )
+
+        if "icon_url" in data["footer"]:
+            if data["footer"]["icon_url"] in allowed_avatars:
+                data["footer"]["icon_url"] = substitute_args(
+                    data["footer"]["icon_url"], message, counts
+                )
+
+    if "author" in data:
+        if "name" in data["author"]:
+            data["author"]["name"] = substitute_args(
+                data["author"]["name"], message, counts
+            )
+
+        if "icon_url" in data["author"]:
+            if data["author"]["icon_url"] in allowed_avatars:
+                data["author"]["icon_url"] = substitute_args(
+                    data["author"]["icon_url"], message, counts
+                )
+
+    if "fields" in data:
+        for field in data["fields"]:
+            name = substitute_args(field["name"], message, counts)
+            value = substitute_args(field["value"], message, counts)
+            field["name"] = name
+            field["value"] = value
+
+            if "inline" not in field:
+                field["inline"] = True
+
+    if "timestamp" in data:
+        data["timestamp"] = message.created_at.isoformat()
+
+    if "colour" in data:
+        data["color"] = data["colour"]
+
+    data["type"] = "rich"
+
+    return discord.Embed.from_dict(data)
+
+
+def substitute_args(message, value, counts) -> str:
+    """
+    Given the options string, return the string
+    with the relevant values substituted in
+    Parameters
+    ----------
+    message : str
+        The string to substitute with values
+    value : discord.Message
+        Where we get our values from to substitute
+    counts : dict
+        Our current warn & kick counts
+    Returns
+    -------
+    str
+        The correctly substituted message
+    """
+    return Template(message).safe_substitute(
+        {
+            "MENTIONUSER": value.author.mention,
+            "USERNAME": value.author.display_name,
+            "USERID": value.author.id,
+            "BOTNAME": value.guild.me.display_name,
+            "BOTID": value.guild.me.id,
+            "GUILDID": value.guild.id,
+            "GUILDNAME": value.guild.name,
+            "TIMESTAMPNOW": datetime.datetime.now().strftime("%I:%M:%S %p, %d/%m/%Y"),
+            "TIMESTAMPTODAY": datetime.datetime.now().strftime("%d/%m/%Y"),
+            "WARNCOUNT": counts["warn_count"],
+            "KICKCOUNT": counts["kick_count"],
+            "USERAVATAR": value.author.avatar_url,
+            "BOTAVATAR": value.guild.me.avatar_url,
+            "GUILDICON": value.guild.icon_url,
+        }
+    )
+
+
+def transform_message(item, value, counts):
+    """
+    Given an item of two possible values, create
+    and return the correct thing
+    Parameters
+    ----------
+    item : [str, dict]
+        Either a straight string or dict to turn in an embed
+    value : discord.Message
+        Where things come from
+    counts : dict
+        Our current warn & kick counts
+    Returns
+    -------
+    [str, discord.Embed]
+    """
+    if isinstance(item, str):
+        return substitute_args(item, value, counts)
+
+    return dict_to_embed(deepcopy(item), value, counts)
+
+
+async def send_to_obj(messageable_obj, message) -> discord.Message:
+    """
+    Send a given message to an abc.messageable object
+    This does not handle exceptions, they should be handled
+    on call as I did not want to overdo this method with
+    the required params to notify users.
+    Parameters
+    ----------
+    messageable_obj : abc.Messageable
+        Where to send message
+    message : str, dict
+        The message to send
+        Can either be a straight string or a discord.Embed
+    Raises
+    ------
+    discord.HTTPException
+        Failed to send
+    discord.Forbidden
+        Lacking permissions to send
+    Returns
+    =======
+    discord.Message
+        The sent messages object
+    """
+    if isinstance(message, discord.Embed):
+        return await messageable_obj.send(embed=message)
+    return await messageable_obj.send(message)

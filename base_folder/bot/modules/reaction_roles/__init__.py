@@ -85,32 +85,29 @@ class ReactionRoles(commands.Cog):
         :return:nothing
         """
         pass
-    # TODO: Refactor following event so that it doesnt raise anything
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if not payload.member.bot:
             if payload.emoji.name:
-                try:
-                    roleid = await self.client.sql.get_reaction_role(payload.guild_id, payload.message_id, payload.emoji.name)
+                roleid = await self.client.sql.get_reaction_role(payload.guild_id, payload.message_id,
+                                                                 payload.emoji.name)
+                if roleid:
                     role = discord.utils.get(payload.member.guild.roles, id=roleid)
                     await payload.member.add_roles(role, reason="reaction added", atomic=True)
-                except TypeError:
-                    return
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         if not payload.guild_id:
             return
-        guild = self.client.get_guild(payload.guild_id)
+        guild = self.client.get_guild_byuserid(payload.guild_id)
         member = guild.get_member(payload.user_id)
         if not member.bot:
-            try:
-                roleid = await self.client.sql.get_reaction_role(payload.guild_id, payload.message_id, payload.emoji.name)
+            roleid = await self.client.sql.get_reaction_role(payload.guild_id, payload.message_id, payload.emoji.name)
+            if roleid:
                 role = discord.utils.get(guild.roles, id=roleid)
                 await member.remove_roles(role, reason="reaction removed", atomic=True)
-            except TypeError:
-                return
+
 
 
 def setup(client):

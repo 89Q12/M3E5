@@ -70,7 +70,7 @@ class ModerationMod(commands.Cog):
     @purge_command_in_channel
     @logging_to_channel_cmd
     async def delete(self, ctx, limit: int):
-        await ctx.channel.purge(limit=limit)
+        await ctx.channel.purge(limit=limit+1)
         e = success_embed(self.client)
         e.description = f"cleared: {limit} messages!"
         await ctx.send(embed=e)
@@ -83,7 +83,7 @@ class ModerationMod(commands.Cog):
     @logging_to_channel_stdout
     @purge_command_in_channel
     @logging_to_channel_cmd
-    async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time=0):
+    async def tempmute(self, ctx, member: discord.Member = None, reason="you made a mistake", time: int = 0):
         muteduntil = ctx.message.created_at + datetime.timedelta(hours=time)
         role = discord.utils.get(ctx.guild.roles, name="Muted")
         e = success_embed(self.client)

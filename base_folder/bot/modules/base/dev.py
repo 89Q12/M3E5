@@ -1,7 +1,8 @@
+import discord
 from discord.ext import commands
 
 from base_folder.bot.utils.Permissions_checks import admin
-from base_folder.config import success_embed, error_embed
+from base_folder.config import success_embed, error_embed, sql
 from base_folder.celery.db import *
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel,\
     logging_to_channel_cmd
@@ -65,15 +66,16 @@ class Dev(commands.Cog):
 
     @commands.command(pass_context=True, brief="builds the database")
     @commands.is_owner()
-    @check_args_datatyp
-    @logging_to_channel_stdout
-    @purge_command_in_channel
     async def builddb(self, ctx):
         """
         Broken currently but in theory it should build the database if it somehow wasn't on guild join
         :param ctx:
         :return:
         """
+        initialize_guild.delay(ctx.guild.id)
+        async for user in ctx.guild.fetch_members():
+            print(user)
+            is_user_indb.delay(user.name, user.id, ctx.guild.id)
         e = success_embed(self.client)
         e.title = "Hey"
         e.description = f"I'm done my master {ctx.author.mention} <3"
@@ -93,6 +95,13 @@ class Dev(commands.Cog):
         e.description = f"I'm done {ctx.author.mention} <3"
         await ctx.send(embed=e)
         return e
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def leave(self, ctx, guildid: int):
+        guild = self.client.get_guild_byuserid(guildid)
+        await guild.leave()
+        await ctx.send(f":ok_hand: Left guild: {guild.name} ({guild.id})")
 
 
 def setup(client):

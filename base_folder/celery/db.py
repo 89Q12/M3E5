@@ -25,11 +25,24 @@ class DatabaseTask(Task, ABC):
 def initialize_guild(guild_id):
     conn = initialize_guild.db
     c = conn.cursor()
-    c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
-    conn.commit()
-    c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
-    conn.commit()
-    c.close()
+    try:
+        c.execute(f"SELECT * FROM guilds WHERE and guild_id= {guild_id};")
+        sql = c.fetchone()
+        if sql:
+            pass
+        else:
+            c.execute(f"INSERT INTO guilds (`guild_id`) VALUES ({guild_id});")
+            conn.commit()
+        c.execute(f"SELECT * FROM settings WHERE and guild_id= {guild_id};")
+        sql = c.fetchone()
+        if sql:
+            pass
+        else:
+            c.execute(f"INSERT INTO settings (guild_id) VALUES ({guild_id});")
+            conn.commit()
+        c.close()
+    except:
+        c.close()
     return
 
 
@@ -44,11 +57,21 @@ def is_user_indb(user_name, user_id, guild_id):
     conn = is_user_indb.db
     c = conn.cursor()
     try:
-        c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
-                  f"VALUES ('{str(user_name)} ', '{str(user_id)}', '{str(guild_id)}')")
-        conn.commit()
-        c.close()
+        c.execute(f"SELECT * FROM user_info WHERE user_id={user_id} and guild_id= {guild_id};")
+        sql = c.fetchone()
+        if not sql:
+            c.execute(f"INSERT INTO user_info (username, user_id, guild_id) "
+                      f"VALUES ('{str(user_name)} ', '{str(user_id)}', '{str(guild_id)}')")
+            conn.commit()
+        c.execute(f"SELECT * FROM profiles WHERE user_id={user_id} and guild_id= {guild_id};")
+        sql = c.fetchone()
+        if not sql:
+            c.execute(f"INSERT INTO profiles (user_id, guild_id) "
+                      f"VALUES ('{str(user_id)}', '{str(guild_id)}')")
+            conn.commit()
+            c.close()
     except:
+        c.close()
         return
 
 
@@ -78,7 +101,7 @@ def edit_warns(guild_id, user_id, amount):
     # sets warn with given amount
     conn = edit_warns.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET warnings={str(amount)} WHERE user_id="
+    c.execute(f"UPDATE profiles SET warnings={str(amount)} WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
@@ -89,7 +112,7 @@ def edit_warns(guild_id, user_id, amount):
 def edit_muted_at(guild_id, user_id, date):
     conn = edit_muted_at.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET muted_at='{date}' WHERE user_id="
+    c.execute(f"UPDATE profiles SET muted_at='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
@@ -100,7 +123,7 @@ def edit_muted_at(guild_id, user_id, date):
 def muted_until(guild_id, user_id, date):
     conn = muted_until.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET muted_until='{date}' WHERE user_id="
+    c.execute(f"UPDATE profiles SET muted_until='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
@@ -111,7 +134,7 @@ def muted_until(guild_id, user_id, date):
 def edit_banned_at(guild_id, user_id, date):
     conn = edit_banned_at.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET banned_at='{date}' WHERE user_id="
+    c.execute(f"UPDATE profiles SET banned_at='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
@@ -122,7 +145,7 @@ def edit_banned_at(guild_id, user_id, date):
 def banned_until(guild_id, user_id, date):
     conn = banned_until.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET banned_until='{date}' WHERE user_id="
+    c.execute(f"UPDATE profiles SET banned_until='{date}' WHERE user_id="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()
@@ -220,7 +243,6 @@ def set_leave_text(guild_id, text):
     # sets the leave_channel to the given channel id
     conn = edit_settings_leave.db
     c = conn.cursor()
-    text = base64.b64encode(text.encode("utf8")).decode("utf8")
     c.execute(f"UPDATE settings SET leave_text ='{str(text)}' WHERE guild_id ='{guild_id}'")
     conn.commit()
     c.close()
@@ -280,7 +302,7 @@ def update_xp_text(guild_id, user_id, amount):
     # updates the xp amount for a given user
     conn = update_xp_text.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET text_xp={str(amount)} WHERE user_id={str(user_id)} and guild_id={str(guild_id)};")
+    c.execute(f"UPDATE profiles SET text_xp={str(amount)} WHERE user_id={str(user_id)} and guild_id={str(guild_id)};")
     conn.commit()
     c.close()
     return
@@ -291,7 +313,7 @@ def update_text_lvl(guild_id, user_id, amount=1):
     # updates the text lvl for a given user
     conn = update_xp_text.db
     c = conn.cursor()
-    c.execute(f"UPDATE user_info SET text_lvl = {str(amount)}  WHERE user_id ="
+    c.execute(f"UPDATE profiles SET text_lvl = {str(amount)}  WHERE user_id ="
               f"{str(user_id)} and guild_id={str(guild_id)}")
     conn.commit()
     c.close()

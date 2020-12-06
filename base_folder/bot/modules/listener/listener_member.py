@@ -13,12 +13,14 @@ class ListenerMember(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         stdoutchannel = self.client.get_channel(self.client.cache.states[member.guild.id].get_channel())
-        if stdoutchannel is not None:
-            await self.client.log.stdout(stdoutchannel, f"Member {member.name} joined")
         blacklisted = await self.client.sql.get_blacklist(member.id)
         if blacklisted:
             await member.ban(member, reason="Blacklisted")
+            if stdoutchannel is not None:
+                await self.client.log.stdout(stdoutchannel, f"Member {member.name} was banned reason : blacklisted")
             return
+        if stdoutchannel is not None:
+            await self.client.log.stdout(stdoutchannel, f"Member {member.name} joined")
         role_id = await self.client.sql.get_settings_role(member.guild.id, "standard_role_id")
         if role_id is None or 0:
             role = member.guild.default_role
@@ -46,9 +48,13 @@ class ListenerMember(commands.Cog):
         e.description = content
         await channel.send(embed=e)
 
+    '''
+    Member tracking starts here 
+    '''
+    # TODO: Log to database
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
-        data = await self.client.sql.get_guild(before.id)
+        data = await self.client.sql.get_guild_byuserid(before.id)
         for guildID in range(len(data)):
             guild_id = data[guildID][0]
             stdoutchannel = self.client.get_channel(self.client.cache.states[guild_id].get_channel())

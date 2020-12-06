@@ -2,7 +2,7 @@ import functools
 from inspect import signature
 
 import discord
-from discord.ext.commands import BadArgument, MissingRequiredArgument
+from discord.ext.commands import BadArgument, MissingRequiredArgument, MissingRole
 
 
 def check_args_datatyp(func):
@@ -64,6 +64,7 @@ def logging_to_channel_cmd(func):
         embed = await func(self, ctx, *args, **kwargs)
         cmdchannel = ctx.bot.get_channel(ctx.bot.cache.states[ctx.guild.id].get_channel("cmd"))
         if cmdchannel is not None:
+            print(cmdchannel)
             await cmdchannel.send(embed=embed)
             await ctx.bot.log.stdout(cmdchannel, ctx.message.content, ctx)
         else:
@@ -83,7 +84,8 @@ def logging_to_channel_stdout(func):
     async def predicate(self, ctx, *args, **kwargs):
         """
         :param self: the cog the command is in e.g Music or Custom
-        :param ctx: the context object of the current invoked command should always contain the bot object
+        :param ctx: the context object of the current invoked command should always contain the bot object if none then
+        nothing will be logged as I don't see a need in logging events
         :param args: the arguments a command can take e.g channel_id
         :param kwargs: in case a commands gets kwargs but idk a case where this could happen
         :return: returns the awaited command
@@ -94,7 +96,7 @@ def logging_to_channel_stdout(func):
             if stdoutchannel is not None:
                 try:
                     if sig.parameters["ex"]:
-                        await self.client.log.stdout(stdoutchannel, ctx.message.content, ctx, True, args[0])
+                        await ctx.bot.log.stdout(stdoutchannel, ctx.message.content, ctx, True, args[0])
                         return await func(self, ctx, *args, **kwargs)
                 except KeyError:
                     pass
@@ -124,3 +126,104 @@ def purge_command_in_channel(func):
             pass
         return await func(self, ctx, *args, **kwargs)
     return predicate
+
+
+def banned_user_list_cmd(func):
+    """
+    This basically checks if a user is permitted to use a command
+    regardless of the position the user has e.g mod or admin
+    :param func: the called function, its always a coroutine
+    :return:  the original coroutine
+    """
+    @functools.wraps(func)
+    async def predicate(self, ctx, *args, **kwargs):
+        user_list = ctx.bot.cache.states[ctx.guild.id].banned_users_cmd
+        print(user_list)
+        if ctx.author in user_list:
+            return await func(self, ctx, *args, **kwargs)
+        raise Exception("Permission denied")
+    return predicate
+
+
+def banned_roles_list_cmd(func):
+    """
+    This basically checks if a user has a role that is permitted to use a command
+    regardless of the position the user has e.g mod or admin
+    :param func: the called function, its always a coroutine
+    :return:  the original coroutine
+    """
+    @functools.wraps(func)
+    async def predicate(self, ctx, *args, **kwargs):
+        role_list = ctx.bot.cache.states[ctx.guild.id].banned_roles_cmd
+        print(role_list)
+        for role in ctx.author.roles:
+            if role.id in role_list:
+                raise MissingRole(role)
+        return await func(self, ctx, *args, **kwargs)
+    return predicate
+
+
+def banned_channel_list_cmd(func):
+    """
+    This basically checks if the bot is permitted to use a command in that channel/ if users are permitted to execute
+    commands in that channel
+    :param func: the called function, its always a coroutine
+    :return:  the original coroutine
+    """
+    @functools.wraps(func)
+    async def predicate(self, ctx, *args, **kwargs):
+        channel_list = ctx.bot.cache.states[ctx.guild.id].banned_channels_cmd
+        print(channel_list)
+        if ctx.channel in channel_list:
+            raise Exception("Permission denied")
+        return await func(self, ctx, *args, **kwargs)
+    return predicate
+
+
+def banned_user_list_spam(func):
+    """
+    This basically checks if a user should be ignored in the spam system
+    :param func: the called function, its always a coroutine
+    :return:  the original coroutine
+    """
+    @functools.wraps(func)
+    async def predicate(self, ctx, *args, **kwargs):
+        user_list = ctx.bot.cache.states[ctx.guild.id].banned_users_spam
+        print(user_list)
+        if ctx.author in user_list:
+            raise Exception("Permission denied")
+        return await func(self, ctx, *args, **kwargs)
+    return predicate
+
+
+def banned_roles_list_spam(func):
+    """
+    This basically checks if a user has a role that should be ignored in the spam system
+    :param func: the called function, its always a coroutine
+    :return:  the original coroutine
+    """
+    @functools.wraps(func)
+    async def predicate(self, ctx, *args, **kwargs):
+        role_list = ctx.bot.cache.states[ctx.guild.id].banned_roles_spam
+        print(role_list)
+        for role in ctx.author.roles:
+            if role.id in role_list:
+                raise MissingRole(role)
+        return await func(self, ctx, *args, **kwargs)
+    return predicate
+
+
+def banned_channel_list_spam(func):
+    """
+    This basically checks if the bot is permitted to use check for spam in that channel
+    :param func: the called function, its always a coroutine
+    :return:  the original coroutine
+    """
+    @functools.wraps(func)
+    async def predicate(self, ctx, *args, **kwargs):
+        channel_list = ctx.bot.cache.states[ctx.guild.id].banned_channels_spam
+        if ctx.channel in channel_list:
+            raise Exception("Permission denied")
+        return await func(self, ctx, *args, **kwargs)
+    return predicate
+

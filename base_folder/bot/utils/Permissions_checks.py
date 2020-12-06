@@ -11,7 +11,6 @@ def admin():
             if role.id in role_list:
                 return True
         raise MissingRole(admin)
-
     return check(predicate)
 
 
@@ -25,7 +24,6 @@ def mod():
             if role.id in role_list:
                 return True
         raise MissingRole(mod)
-
     return check(predicate)
 
 
@@ -39,7 +37,6 @@ def dev():
             if role.id in role_list:
                 return True
         raise MissingRole(dev)
-
     return check(predicate)
 
 
@@ -53,6 +50,5 @@ def user():
             if role.id in role_list:
                 return True
         raise MissingRole(default)
-
     return check(predicate)
 
