@@ -160,8 +160,9 @@ class Messages(Base):
 class Profiles(Base):
     __tablename__ = 'profiles'
 
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
     guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'))
-    user_id = Column(BIGINT, ForeignKey('user_info.user_id'), primary_key=True)
+    user_id = Column(BIGINT, ForeignKey('user_info.user_id'))
     warnings = Column(Integer, default=0)
     kickCount = Column(Integer, default=0)
     text_xp = Column(Integer, default=0)
@@ -209,6 +210,7 @@ class Settings(Base):
 
     guild_id = Column(BIGINT, ForeignKey('guilds.guild_id'), primary_key=True, autoincrement=True, nullable=False)
     # TODO: make relations to Roles table
+    # TODO: make relations to channels table
     standard_role_id = Column(BIGINT, default=0)
     dev_role_id = Column(BIGINT, default=0)
     mod_role_id = Column(BIGINT, default=0)
@@ -221,6 +223,9 @@ class Settings(Base):
     lvl_channel_id = Column(BIGINT, default=0)
     cmd_channel_id = Column(BIGINT, default=0)
     stdout_channel_id = Column(BIGINT, default=0)
+    warn_channel_id = Column(BIGINT, default=0)
+    kick_channel_id = Column(BIGINT, default=0)
+    ban_channel_id = Column(BIGINT, default=0)
     prefix = Column(VARCHAR(length=20), default="LQ==")
     Color = Column(VARCHAR(length=25), default="default()")
     leave_text = Column(VARCHAR(2000), default="VXNlciB1c2VyIGxlZnQgdGhlIHNlcnZlci4uLg==")
@@ -400,6 +405,39 @@ class Db:
         self.session.commit()
         return stdout_channel[0]
 
+    async def get_warn_channel(self, guild_id: int):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the warn(logging) channel for the given guild
+        """
+
+        stdout_channel = self.session.query(Settings.warn_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return stdout_channel[0]
+
+    async def get_kick_channel(self, guild_id: int):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the kick(logging) channel for the given guild
+        """
+
+        stdout_channel = self.session.query(Settings.kick_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return stdout_channel[0]
+
+    async def get_ban_channel(self, guild_id: int):
+        """
+
+        :param guild_id: the id of the guild
+        :returns: the ban(logging) channel for the given guild
+        """
+
+        stdout_channel = self.session.query(Settings.ban_channel_id).filter_by(guild_id=guild_id).one()
+        self.session.commit()
+        return stdout_channel[0]
+
     async def get_leave_text(self, guild_id: int):
         """
 
@@ -409,7 +447,7 @@ class Db:
 
         leave_text = self.session.query(Settings.leave_text).filter_by(guild_id=guild_id).all()
         self.session.commit()
-        return leave_text[0]
+        return leave_text[0][0]
 
     async def get_img(self, guild_id: int):
         """
@@ -420,7 +458,7 @@ class Db:
 
         img = self.session.query(Settings.imgwelcome_toggle).filter_by(guild_id=guild_id).all()
         self.session.commit()
-        return img[0]
+        return img[0][0]
 
     async def get_img_text(self, guild_id: int):
         """
@@ -431,7 +469,7 @@ class Db:
 
         text = self.session.query(Settings.imgwelcome_text).filter_by(guild_id=guild_id).all()
         self.session.commit()
-        return text[0]
+        return text[0][0]
 
     async def get_text_xp(self, guild_id: int, user_id: int):
         """
@@ -444,7 +482,7 @@ class Db:
         xp = self.session.query(Profiles.text_xp).filter(Profiles.guild_id == guild_id,
                                                          Profiles.user_id == user_id).all()
         self.session.commit()
-        return xp[0]
+        return xp[0][0]
 
     async def get_lvl_text(self, guild_id: int, user_id: int):
         """
@@ -457,7 +495,7 @@ class Db:
         lvl = self.session.query(Profiles.text_lvl).filter(Profiles.guild_id == guild_id,
                                                            Profiles.user_id == user_id).all()
         self.session.commit()
-        return lvl[0]
+        return lvl[0][0]
 
     async def get_levelsystem(self, guild_id: int):
         """
@@ -468,7 +506,7 @@ class Db:
 
         lvl_toggle = self.session.query(Settings.levelsystem_toggle).filter_by(guild_id=guild_id).all()
         self.session.commit()
-        return lvl_toggle[0]
+        return lvl_toggle[0][0]
 
     async def get_banned_until(self, user_id: int, guild_id: int):
         """
@@ -481,7 +519,7 @@ class Db:
         date = self.session.query(Profiles.banned_until).filter(Profiles.guild_id == guild_id,
                                                                 Profiles.user_id == user_id).all()
         self.session.commit()
-        return date[0]
+        return date[0][0]
 
     async def get_bannlist(self, user_id: int):
         """
@@ -547,7 +585,7 @@ class Db:
 
         ranks = self.session.query(Profiles.text_lvl, Profiles.text_xp,
                                    Profiles.user_id).filter(Profiles.guild_id == guild_id).order_by(
-            UserInfo.text_xp.desc())[0:10]
+            Profiles.text_xp.desc())[0:10]
         self.session.commit()
         return ranks
 

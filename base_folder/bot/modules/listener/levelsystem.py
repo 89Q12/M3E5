@@ -32,11 +32,15 @@ class Levelsystem(commands.Cog):
     @logging_to_channel_stdout
     @purge_command_in_channel
     async def levelsystemtoggle(self, ctx):
+        e = success_embed(self.client)
         if self.client.cache.states[ctx.guild.id].get_levelsystem == 1:
             edit_settings_levelsystem.delay(ctx.guild.id, 0)
+            e.description = "The levelsystem is now disabled"
         else:
             edit_settings_levelsystem.delay(ctx.guild.id, 1)
+            e.description = "The levelsystem is now enabled"
         await self.client.cache.states[ctx.guild.id].set_lvltoggle()
+        await ctx.send(embed=e)
 
     @commands.Cog.listener()
     async def on_message(self, message):

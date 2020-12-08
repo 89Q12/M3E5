@@ -87,6 +87,7 @@ class ModerationAdmin(commands.Cog):
                         timestamp=datetime.datetime.now(),
                         )
         await ctx.send(embed=e)
+        self.client.cache.states[ctx.guild.id].users[ctx.author.id].warn_count = 0
         edit_warns.delay(ctx.guild.id, member.id, 0)
         return e
 

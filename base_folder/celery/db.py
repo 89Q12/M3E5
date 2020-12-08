@@ -217,6 +217,50 @@ def edit_settings_welcome(guild_id, channel_id):
 
 
 @app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_stdout(guild_id, channel_id):
+    # sets the stdout_channel to the given channel id
+    conn = edit_settings_welcome.db
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET stdout_channel_id={str(channel_id)} WHERE guild_id = '{guild_id}'")
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_warn(guild_id, channel_id):
+    # sets the warn_channel to the given channel id
+    conn = edit_settings_welcome.db
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET warn_channel_id={str(channel_id)} WHERE guild_id = '{guild_id}'")
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_kick(guild_id, channel_id):
+    # sets the  kick_channel to the given channel id
+    conn = edit_settings_welcome.db
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET kick_channel_id={str(channel_id)} WHERE guild_id = '{guild_id}'")
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
+def edit_settings_ban(guild_id, channel_id):
+    # sets the ban_channel to the given channel id
+    conn = edit_settings_welcome.db
+    c = conn.cursor()
+    c.execute(f"UPDATE settings SET ban_channel_id={str(channel_id)} WHERE guild_id = '{guild_id}'")
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_settings_leave(guild_id, channel_id):
     # sets the leave_channel to the given channel id
     conn = edit_settings_leave.db

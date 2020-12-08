@@ -64,7 +64,6 @@ def logging_to_channel_cmd(func):
         embed = await func(self, ctx, *args, **kwargs)
         cmdchannel = ctx.bot.get_channel(ctx.bot.cache.states[ctx.guild.id].get_channel("cmd"))
         if cmdchannel is not None:
-            print(cmdchannel)
             await cmdchannel.send(embed=embed)
             await ctx.bot.log.stdout(cmdchannel, ctx.message.content, ctx)
         else:
@@ -138,7 +137,6 @@ def banned_user_list_cmd(func):
     @functools.wraps(func)
     async def predicate(self, ctx, *args, **kwargs):
         user_list = ctx.bot.cache.states[ctx.guild.id].banned_users_cmd
-        print(user_list)
         if ctx.author in user_list:
             return await func(self, ctx, *args, **kwargs)
         raise Exception("Permission denied")
@@ -155,7 +153,6 @@ def banned_roles_list_cmd(func):
     @functools.wraps(func)
     async def predicate(self, ctx, *args, **kwargs):
         role_list = ctx.bot.cache.states[ctx.guild.id].banned_roles_cmd
-        print(role_list)
         for role in ctx.author.roles:
             if role.id in role_list:
                 raise MissingRole(role)
@@ -173,7 +170,6 @@ def banned_channel_list_cmd(func):
     @functools.wraps(func)
     async def predicate(self, ctx, *args, **kwargs):
         channel_list = ctx.bot.cache.states[ctx.guild.id].banned_channels_cmd
-        print(channel_list)
         if ctx.channel in channel_list:
             raise Exception("Permission denied")
         return await func(self, ctx, *args, **kwargs)
@@ -189,7 +185,6 @@ def banned_user_list_spam(func):
     @functools.wraps(func)
     async def predicate(self, ctx, *args, **kwargs):
         user_list = ctx.bot.cache.states[ctx.guild.id].banned_users_spam
-        print(user_list)
         if ctx.author in user_list:
             raise Exception("Permission denied")
         return await func(self, ctx, *args, **kwargs)
@@ -205,7 +200,6 @@ def banned_roles_list_spam(func):
     @functools.wraps(func)
     async def predicate(self, ctx, *args, **kwargs):
         role_list = ctx.bot.cache.states[ctx.guild.id].banned_roles_spam
-        print(role_list)
         for role in ctx.author.roles:
             if role.id in role_list:
                 raise MissingRole(role)

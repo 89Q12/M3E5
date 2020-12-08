@@ -100,7 +100,7 @@ class ReactionRoles(commands.Cog):
     async def on_raw_reaction_remove(self, payload):
         if not payload.guild_id:
             return
-        guild = self.client.get_guild_byuserid(payload.guild_id)
+        guild = self.client.get_guild(payload.guild_id)
         member = guild.get_member(payload.user_id)
         if not member.bot:
             roleid = await self.client.sql.get_reaction_role(payload.guild_id, payload.message_id, payload.emoji.name)

@@ -46,8 +46,69 @@ class Custom(commands.Cog):
         e = success_embed(self.client)
         e.description = f"{channel.mention} is now the leave channel"
         await ctx.send(embed=e)
-        await self.client.cache.states[ctx.guild.id].update_channel("leave",channel_id)
+        await self.client.cache.states[ctx.guild.id].update_channel("leave", channel_id)
         edit_settings_leave.delay(ctx.guild.id, channel_id)
+
+    @commands.command(pass_context=True, name="set_logs", brief="sets the standard logging channel"
+                                                                "e.g. for errors and such "
+                                                                "set_stdout/set_logs channel id")
+    @commands.guild_only()
+    @admin()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
+    async def set_stdout(self, ctx, channel_id: int):
+        channelstdout = self.client.get_channel(channel_id)
+        e = success_embed(self.client)
+        e.description = f"{channelstdout.mention} is now the standard out channel"
+        await ctx.send(embed=e)
+        await self.client.cache.states[ctx.guild.id].update_channel("stdout", channel_id)
+        edit_settings_stdout.delay(ctx.guild.id, channel_id)
+
+    @commands.command(pass_context=True, name="set_ban", brief="sets the standard banning channel"
+                                                               "only for bans set_warns channel id. Not required")
+    @commands.guild_only()
+    @admin()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
+    async def set_ban(self, ctx, channel_id: int):
+        channelban = self.client.get_channel(channel_id)
+        e = success_embed(self.client)
+        e.description = f"{channelban.mention} is now the ban channel"
+        await ctx.send(embed=e)
+        await self.client.cache.states[ctx.guild.id].update_channel("ban", channel_id)
+        edit_settings_ban.delay(ctx.guild.id, channel_id)
+
+    @commands.command(pass_context=True, name="set_warns", brief="sets the standard warning channel"
+                                                                 "only for warnings set_warns channel id. Not required")
+    @commands.guild_only()
+    @admin()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
+    async def set_warns(self, ctx, channel_id: int):
+        channelwarn = self.client.get_channel(channel_id)
+        e = success_embed(self.client)
+        e.description = f"{channelwarn.mention} is now the warn channel"
+        await ctx.send(embed=e)
+        await self.client.cache.states[ctx.guild.id].update_channel("warn", channel_id)
+        edit_settings_warn.delay(ctx.guild.id, channel_id)
+
+    @commands.command(pass_context=True, name="set_kicks", brief="sets the standard kicking channel"
+                                                                 "only for kicks set_kicks channel id. Not required")
+    @commands.guild_only()
+    @admin()
+    @check_args_datatyp
+    @logging_to_channel_stdout
+    @purge_command_in_channel
+    async def set_kicks(self, ctx, channel_id: int):
+        channelkick = self.client.get_channel(channel_id)
+        e = success_embed(self.client)
+        e.description = f"{channelkick.mention} is now the kick channel"
+        await ctx.send(embed=e)
+        await self.client.cache.states[ctx.guild.id].update_channel("kick", channel_id)
+        edit_settings_kick.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True, brief="sets the leave channel set_lvl channel id")
     @commands.guild_only()

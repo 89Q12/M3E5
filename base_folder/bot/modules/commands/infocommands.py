@@ -5,8 +5,8 @@ import platform
 
 from base_folder.config import success_embed, build_embed
 from base_folder.bot.utils.Permissions_checks import user, mod
-from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel, \
-    logging_to_channel_cmd
+from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel
+
 
 class UserCmds(commands.Cog):
     def __init__(self, client):
@@ -21,7 +21,12 @@ class UserCmds(commands.Cog):
         xp = await self.client.sql.get_text_xp(ctx.guild.id, ctx.author.id)
         lvl = await self.client.sql.get_lvl_text(ctx.guild.id, ctx.author.id)
         warnings = await self.client.sql.get_warns(ctx.guild.id, ctx.author.id)
-        e = success_embed(self.client)
+        e = build_embed(
+            author=ctx.author.display_name,
+            author_img=ctx.author.avatar_url,
+            timestamp=datetime.datetime.now(),
+            footer=self.client.user.name
+        )
         e.title = "Your profile"
         e.description = ctx.author.mention
         e.add_field(name="Writer rank", value=f"**#{lvl}** with {xp}/{int((lvl+1)**(1/float(1/4)))}XP", inline=False)
@@ -77,7 +82,6 @@ class UserCmds(commands.Cog):
         embed.set_author(name="Leaderboard for the server")
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
         for index, u in enumerate(zip(userlist, lvl, xp), start=1):
-            print(index, u[0], u[1], u[2])
             embed.add_field(
                 name=f"Rank {index} ",
                 value=f"User:\t** <@{ u[0]}> **\n Level:{str(u[1])} xp:{str(u[2])}",

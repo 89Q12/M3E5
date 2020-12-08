@@ -1,6 +1,8 @@
 import logging
 import datetime
 
+import asyncio
+
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
@@ -34,3 +36,15 @@ class Log:
                            ":INFO.commands: " + msg + " command issued by "
                            + str(ctx.author) if ctx is not None else "Server time:" + str(datetime.datetime.now()) +
                            ":INFO.commands: " + msg + " command issued by guild")
+
+    def debug(self, channel, msg):
+        self.log.debug(msg)
+        asyncio.ensure_future(channel.send("Server time:" + str(datetime.datetime.now()) + ":DEBUG.commands: " + msg))
+
+    def info(self, channel, msg):
+        self.log.info(msg)
+        asyncio.ensure_future(channel.send("Server time:" + str(datetime.datetime.now()) + ":INFO.commands: " + msg))
+
+    def warn(self, channel, msg):
+        self.log.warning(msg)
+        asyncio.ensure_future(channel.send("Server time:" + str(datetime.datetime.now()) + ":WARNING.commands: " + msg))

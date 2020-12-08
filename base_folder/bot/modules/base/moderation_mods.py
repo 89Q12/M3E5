@@ -1,5 +1,4 @@
 import datetime
-import logging
 from discord.ext import commands
 import discord.utils
 
@@ -8,7 +7,6 @@ from base_folder.config import success_embed, error_embed
 from base_folder.celery.db import *
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel, \
     logging_to_channel_cmd
-# TODO: Add kicked at (date)
 
 
 class ModerationMod(commands.Cog):
@@ -179,7 +177,8 @@ class ModerationMod(commands.Cog):
         if warnings == 0:
             warnings += 1
             edit_warns.delay(ctx.guild.id, member.id, warnings)
-            e.description = f"{member.mention} you have been warned this is your first infraction keep it at this, reason {reason}"
+            e.description = f"{member.mention} you have been warned this is your " \
+                            f"first infraction keep it at this, reason {reason}"
             await member.send(embed=e)
             await ctx.send(embed=e)
         else:
