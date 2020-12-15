@@ -105,7 +105,7 @@ class ListenerMember(commands.Cog):
                                                                     f"got unmuted by an Team member in {before.channel.name}")
                     else:
                         await self.client.log.stdout(stdoutchannel, f"Member {member.name}#{member.discriminator} "
-                                                                        f"got muted by an Team member in {before.channel.name}")
+                                                                    f"got muted by an Team member in {before.channel.name}")
                 '''
                 if before.self_mute != after.self_mute:
                     if after.self_mute:
