@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from base_folder.config import build_embed
+from base_folder.bot.utils.util_functions import build_embed
 from base_folder.celery.db import initialize_guild, is_user_indb, insert_message, roles_to_db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from base_folder.bot.utils.checks import logging_to_channel_stdout, purge_command_in_channel

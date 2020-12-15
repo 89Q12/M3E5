@@ -10,7 +10,8 @@ from fuzzywuzzy import fuzz
 
 from base_folder.bot.utils.exceptions import DuplicateObject, LogicError, MissingGuildPermissions, ObjectMismatch
 from base_folder.bot.utils.util_functions import transform_message, send_to_obj
-from base_folder.celery.db import edit_warns
+from base_folder.celery.db import edit_warns, edit_kickcount
+
 
 class User:
     """
@@ -232,6 +233,7 @@ class User:
                     self._punish_user(value, user_message, guild_message, self.KICK, )
                 )
                 self.kick_count += 1
+                edit_kickcount.delay(self.guild_id, self.id, self.kick_count)
 
             elif self.kick_count >= self.options["ban_threshold"]:
 

@@ -3,7 +3,7 @@ from discord.ext import commands
 import discord.utils
 
 from base_folder.bot.utils.Permissions_checks import mod
-from base_folder.config import success_embed, error_embed
+from base_folder.bot.utils.util_functions import success_embed, error_embed
 from base_folder.celery.db import *
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel, \
     logging_to_channel_cmd
@@ -13,7 +13,7 @@ class ModerationMod(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(pass_context=True, brief="kicks a givien member")
+    @commands.command(pass_context=True, name="kick", brief="Kicks a given member", usage="kick @member reason")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -36,7 +36,7 @@ class ModerationMod(commands.Cog):
             await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="unbans a givien member")
+    @commands.command(pass_context=True, name="unban",  brief="Unbans a given member", usage="unban @member reason")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -60,7 +60,8 @@ class ModerationMod(commands.Cog):
         await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="clears a givien amount of messages")
+    @commands.command(pass_context=True, name="delete",  brief="Clears a given amount of msg's", usage="delete number of msg's "
+                                                                                       "to be deleted")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -74,7 +75,7 @@ class ModerationMod(commands.Cog):
         await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="mutes a user")
+    @commands.command(pass_context=True, name="tempmute", brief="Mutes a user for given time", usage="tempmute @member reason time")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -93,7 +94,7 @@ class ModerationMod(commands.Cog):
         self.client.scheduler.add_job(self.unmute, "date", run_date=muteduntil, args=[ctx, member])
         return e
 
-    @commands.command(pass_context=True, brief="mutes a user")
+    @commands.command(pass_context=True, name="mute", brief="Mutes a user permanently", usage="mute @member reason")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -122,7 +123,8 @@ class ModerationMod(commands.Cog):
             await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="enables slowmode with custom delay")
+    @commands.command(pass_context=True, name="mute", brief="Enables slowmode with custom delay",
+                      usage="slowmode seconds must be < 120")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -146,7 +148,7 @@ class ModerationMod(commands.Cog):
             await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="unmutes a user")
+    @commands.command(pass_context=True, name="unmute", brief="Unmutes a user", usage="unmute @member")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -164,7 +166,7 @@ class ModerationMod(commands.Cog):
             await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="warns a user")
+    @commands.command(pass_context=True, name="warn", brief="Warns a user", usage="warn @member")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -189,7 +191,8 @@ class ModerationMod(commands.Cog):
             await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="shows how many infractions a user has")
+    @commands.command(pass_context=True, name="infractions", brief="Shows the infractions a user has",
+                      usage="infractions @member")
     @commands.guild_only()
     @mod()
     @check_args_datatyp

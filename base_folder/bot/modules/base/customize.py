@@ -3,7 +3,7 @@ from discord.ext import commands
 
 from base_folder.bot.utils.Permissions_checks import admin
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel
-from base_folder.config import success_embed
+from base_folder.bot.utils.util_functions import success_embed
 from base_folder.celery.db import *
 
 '''
@@ -21,7 +21,7 @@ class Custom(commands.Cog):
     Custom settings
     '''
 
-    @commands.command(pass_context=True, brief="sets the welcome channel set_welcome channel id")
+    @commands.command(pass_context=True, brief="sets the welcome channel", usage="set_welcome channel_id")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -35,7 +35,8 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_channel("welcome", channel_id)
         edit_settings_welcome.delay(ctx.guild.id, channel_id)
 
-    @commands.command(pass_context=True, brief="sets the leave channel set_leave channel id")
+    @commands.command(pass_context=True, brief="sets the leave channel set_leave channel id",
+                      usage="set_leave channel_id")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -50,8 +51,8 @@ class Custom(commands.Cog):
         edit_settings_leave.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True, name="set_logs", brief="sets the standard logging channel"
-                                                                "e.g. for errors and such "
-                                                                "set_stdout/set_logs channel id")
+                                                                "e.g. for errors and such ",
+                      usage="set_stdout/set_logs channel id")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -66,7 +67,7 @@ class Custom(commands.Cog):
         edit_settings_stdout.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True, name="set_ban", brief="sets the standard banning channel"
-                                                               "only for bans set_warns channel id. Not required")
+                                                               "only for bans. Not required")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -81,7 +82,8 @@ class Custom(commands.Cog):
         edit_settings_ban.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True, name="set_warns", brief="sets the standard warning channel"
-                                                                 "only for warnings set_warns channel id. Not required")
+                                                                 "only for warnings set_warns channel id. Not required",
+                      usage="set_warns channel_id")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -96,7 +98,8 @@ class Custom(commands.Cog):
         edit_settings_warn.delay(ctx.guild.id, channel_id)
 
     @commands.command(pass_context=True, name="set_kicks", brief="sets the standard kicking channel"
-                                                                 "only for kicks set_kicks channel id. Not required")
+                                                                 "only for kicks. Not required",
+                      usage="set_kicks channel_id")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -110,7 +113,9 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_channel("kick", channel_id)
         edit_settings_kick.delay(ctx.guild.id, channel_id)
 
-    @commands.command(pass_context=True, brief="sets the leave channel set_lvl channel id")
+    @commands.command(pass_context=True, name="set_lvl", brief="sets the level channel",
+                      usage="set_lvl channel_id"
+                      )
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -124,7 +129,8 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_channel("lvl", channel_id)
         edit_settings_lvl.delay(ctx.guild.id, channel_id)
 
-    @commands.command(pass_context=True, brief="sets the leave channel set_cmd channel id")
+    @commands.command(pass_context=True,  name="set_cmd", brief="sets the logging channel for commands",
+                      usage="set_cmd channel_id")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -138,7 +144,7 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_channel("cmd", channel_id)
         edit_settings_cmd.delay(ctx.guild.id, channel_id)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, name="prefix", brief="Set the prefix", usage="prefix newprefix")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -152,7 +158,8 @@ class Custom(commands.Cog):
         await ctx.send(embed=e)
         set_prefix.delay(ctx.guild.id, arg)
 
-    @commands.command(pass_context=True, brief="sets default role set_default @role")
+    @commands.command(pass_context=True, name="set_default", brief="sets default role a use should get when joined",
+                      usage="set_default @role")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -165,7 +172,7 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_permission_role("default", role.id)
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True, brief="sets admin rule set_admin @role")
+    @commands.command(pass_context=True,  name="set_admin", brief="sets admin role", usage="set_admin @role")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -177,7 +184,7 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_permission_role("admin", role.id)
         edit_settings_role.delay(ctx.guild.id, role.id, "admin_role_id")
 
-    @commands.command(pass_context=True, brief="sets dev rule set_dev @role")
+    @commands.command(pass_context=True,  name="set_dev", brief="sets dev role", usage="set_dev @role")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -190,7 +197,7 @@ class Custom(commands.Cog):
         await self.client.cache.states[ctx.guild.id].update_permission_role("dev", role.id)
         edit_settings_role.delay(ctx.guild.id, role.id, "dev_role_id")
 
-    @commands.command(pass_context=True, brief="sets mod rule set_mod @role")
+    @commands.command(pass_context=True, name="set_dev", brief="sets the mod role", usage="set_mod @role")
     @commands.guild_only()
     @admin()
     @check_args_datatyp

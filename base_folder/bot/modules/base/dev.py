@@ -1,8 +1,7 @@
-import discord
 from discord.ext import commands
 
 from base_folder.bot.utils.Permissions_checks import admin
-from base_folder.config import success_embed, error_embed, sql
+from base_folder.bot.utils.util_functions import success_embed, error_embed
 from base_folder.celery.db import *
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel,\
     logging_to_channel_cmd
@@ -12,7 +11,7 @@ class Dev(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(pass_context=True, brief="unloads a module")
+    @commands.command(pass_context=True, name="unload", brief="unloads a module", usage="unload module.submodule")
     @commands.is_owner()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -23,13 +22,13 @@ class Dev(commands.Cog):
             self.client.unload_extension(cog)
         except Exception as ex:
             e = error_embed(self.client)
-            e.description=f"{cog} could not be unloaded, here is the error:{ex}"
+            e.description = f"{cog} could not be unloaded, here is the error:{ex}"
             await ctx.send(embed=e)
         e = success_embed(self.client)
         e.description = f"{cog} unloaded"
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True, brief="loads a module")
+    @commands.command(pass_context=True, name="load", brief="loads a module", usage="load module.submodule")
     @commands.is_owner()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -46,7 +45,7 @@ class Dev(commands.Cog):
         e.description = f"{cog} loaded"
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True, brief="reloads a module")
+    @commands.command(pass_context=True, name="reload", brief="reloads a module", usage="reload module.submodule")
     @commands.is_owner()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -64,11 +63,11 @@ class Dev(commands.Cog):
         e.description = f"{cog} reloaded"
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True, brief="builds the database")
+    @commands.command(pass_context=True, brief="builds the database BROKEN")
     @commands.is_owner()
     async def builddb(self, ctx):
         """
-        Broken currently but in theory it should build the database if it somehow wasn't on guild join
+        Currently broken but in theory it should build the database if it somehow wasn't on guild join
         :param ctx:
         :return:
         """
@@ -81,7 +80,7 @@ class Dev(commands.Cog):
         e.description = f"I'm done my master {ctx.author.mention} <3"
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True, brief="Writes all roles in the db")
+    @commands.command(pass_context=True, name="roles_in_db", brief="Writes all roles in the db", usage="roles_in_db")
     @admin()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -96,7 +95,7 @@ class Dev(commands.Cog):
         await ctx.send(embed=e)
         return e
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, name="leave", brief="leaves a specific guild", usage="leave guildid")
     @commands.is_owner()
     async def leave(self, ctx, guildid: int):
         guild = self.client.get_guild_byuserid(guildid)

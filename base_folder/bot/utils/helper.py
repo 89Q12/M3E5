@@ -30,11 +30,8 @@ class DbCache:
         self._states = {}
 
     @property
-    def states(self, guild=None):
-        if not guild:
-            return self._states
-        else:
-            return self._states[guild.id]
+    def states(self):
+        return self._states
 
     def make_states(self, guilds, logger):
         for guild in guilds:
@@ -45,6 +42,9 @@ class DbCache:
 
     def destruct_state(self, guild):
         del self._states[guild.id]
+
+    def __str__(self):
+        return f"Dbcache with states { len(self._states) } in it"
 
 
 class GuildStates:
@@ -67,10 +67,13 @@ class GuildStates:
         self.banned_roles_spam = []
         self.banned_users_spam = []
 
+    def __repr__(self):
+        return str(self.guild.id)
+
     @property
     def get_prefix(self):
         if self._prefix is None:
-            self._prefix = self.db.prefix_lookup(self.guild.id)
+            self._prefix = self.db.prefix_lookup(self.guild.id)[0]
         return self._prefix
 
     @property

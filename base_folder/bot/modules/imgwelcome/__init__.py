@@ -47,14 +47,14 @@ class IMGWelcome(commands.Cog):
         else:
             return False
 
-    @commands.group(brief="imgwelcome toggle/text/img")
+    @commands.group(pass_context=True, name="imgwelcome", brief="imgwelcome toggle/text/img")
     @commands.has_permissions(administrator=True)
     async def imgwelcome(self, ctx):
         # Base command
         if ctx.invoked_subcommand is None:
             return await ctx.send_help(ctx.command)
 
-    @imgwelcome.command(name="toggle")
+    @imgwelcome.command(name="toggle", brief="Toggle the imgwelcome feature", usage="imgwelcome togle")
     @admin()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -69,7 +69,7 @@ class IMGWelcome(commands.Cog):
             await ctx.send("Welcome image is now disabled")
             edit_settings_img.delay(ctx.guild.id, 0)
 
-    @imgwelcome.command(name="img")
+    @imgwelcome.command(pass_context=True, name="img", brief="Sets the welcome image", usage="imgwelcome img")
     @mod()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -116,7 +116,7 @@ class IMGWelcome(commands.Cog):
                 os.remove(f"data/imgwelcome/{ctx.guild.id}.png")
             await ctx.send("Reset Image.")
 
-    @imgwelcome.command(name="text")
+    @imgwelcome.command(pass_context=True, name="text", brief="Sets the text of the img", usage="imgwelcome text")
     @mod()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -135,7 +135,7 @@ class IMGWelcome(commands.Cog):
         await ctx.send("Updated text!")
         edit_settings_img_text.delay(ctx.guild.id, text)
 
-    @imgwelcome.command(name="test")
+    @imgwelcome.command(pass_context=True, name="test", brief="Tests the imgwelcome command", usage="imgwelcome test")
     @mod()
     @check_args_datatyp
     @logging_to_channel_stdout

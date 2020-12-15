@@ -3,7 +3,7 @@ from discord.ext import commands
 import discord
 import platform
 
-from base_folder.config import success_embed, build_embed
+from base_folder.bot.utils.util_functions import success_embed, build_embed
 from base_folder.bot.utils.Permissions_checks import user, mod
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel
 
@@ -12,7 +12,7 @@ class UserCmds(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, name="profile", brief="Your Profile", usage="profile")
     @user()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -33,7 +33,7 @@ class UserCmds(commands.Cog):
         e.add_field(name="Warnings", value=f"You have {warnings} warning(s)!")
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, name="server_info", brief="Guild info", usage="server_info")
     @commands.guild_only()
     @user()
     @check_args_datatyp
@@ -59,7 +59,8 @@ class UserCmds(commands.Cog):
         e.add_field(name="Filesize limit", value=ctx.guild.filesize_limit)
         await ctx.send(embed=e)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, name="leaderboard", brief="Shows the leaderboard for text xp",
+                      usage="leaderboard")
     @user()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -69,8 +70,6 @@ class UserCmds(commands.Cog):
         xp = []
         userlist = []
         ranks = await self.client.sql.leaderboard(ctx.guild.id)
-        print(ranks)
-        print(ranks[0][0])
         for user in ranks:
             userlist.append(user[2])
             lvl.append(user[1])
@@ -89,8 +88,8 @@ class UserCmds(commands.Cog):
             )
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True,
-                      brief="Show the color of role and how many user's the role have ")
+    @commands.command(pass_context=True, name="roleinfo",
+                      brief="Info about a role", usage="roleinfo @role")
     @commands.guild_only()
     @mod()
     @check_args_datatyp
@@ -101,7 +100,7 @@ class UserCmds(commands.Cog):
         for members in self.client.get_all_members():
             for i in members.roles:
                 if role == i:
-                    counter = counter + 1
+                    counter += 1
         e = success_embed(self.client)
         e.description=f"Here are some important info's about {role.mention}"
         e.add_field(name="Members", value=f"Has {counter} members", inline=True)
@@ -112,7 +111,7 @@ class UserCmds(commands.Cog):
         e.add_field(name="Is mentionable", value=f"{role.mentionable}", inline=True)
         await ctx.send(embed=e)
 
-    @commands.command(name='stats', description='Sends some bot stats')
+    @commands.command(pass_context=True, name='stats', brief='Sends some bot stats', usage="stats")
     @user()
     @check_args_datatyp
     @logging_to_channel_stdout
@@ -120,27 +119,27 @@ class UserCmds(commands.Cog):
     async def stats(self, ctx):
         pythonVersion = platform.python_version()
         dpyVersion = discord.__version__
-        serverCount = len(self.client.guilds)
-        memberCount = len(list(self.client.get_all_members()))
+        serverCount = str(len(self.client.guilds))
+        memberCount = str(len(list(self.client.get_all_members())))
         embed = discord.Embed(title=f'{self.client.user.name} Stats', description='\uFEFF', colour=ctx.author.colour)
         embed.add_field(name='Bot Version:', value=self.client.Version)
         embed.add_field(name='Python Version:', value=pythonVersion)
         embed.add_field(name='Discord.Py Version', value=dpyVersion)
         embed.add_field(name='Total Guilds:', value=serverCount)
         embed.add_field(name='Total Users:', value=memberCount)
-        embed.add_field(name='Bot Developers:', value="<@322822954796974080>")
-        embed.add_field(name="Intetnts", value=self.client.intents)
+        embed.add_field(name='Bot Developer:', value="<@322822954796974080>")
+        embed.add_field(name="Intents", value=self.client.intents)
         embed.set_footer(text=f"11tuvork28 | {self.client.user.name}")
         embed.set_author(name=self.client.user, icon_url=self.client.user.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.command(name='ping', description='Gets and sends bot latency')
+    @commands.command(pass_context=True, name='ping', brief='Gets and sends bot latency', usage="ping")
     @user()
     @check_args_datatyp
     @logging_to_channel_stdout
     @purge_command_in_channel
     async def ping(self, ctx):
-        await ctx.send(f"Bot ping: **{round((self.client.latency) * 1000)}ms**")
+        await ctx.send(f"Bot ping: **{round(self.client.latency * 1000)}ms**")
 
 
 def setup(client):

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from base_folder.config import error_embed
+from base_folder.bot.utils.util_functions import error_embed
 from base_folder.celery.db import on_error
 from base_folder.bot.utils.checks import logging_to_channel_stdout, purge_command_in_channel
 

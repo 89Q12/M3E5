@@ -109,6 +109,18 @@ def edit_warns(guild_id, user_id, amount):
 
 
 @app.task(base=DatabaseTask, ignore_result=True)
+def edit_kickcount(guild_id, user_id, amount):
+    # sets warn with given amount
+    conn = edit_kickcount.db
+    c = conn.cursor()
+    c.execute(f"UPDATE profiles SET kickCount={str(amount)} WHERE user_id="
+              f"{str(user_id)} and guild_id={str(guild_id)}")
+    conn.commit()
+    c.close()
+    return
+
+
+@app.task(base=DatabaseTask, ignore_result=True)
 def edit_muted_at(guild_id, user_id, date):
     conn = edit_muted_at.db
     c = conn.cursor()
@@ -401,7 +413,6 @@ def insert_reaction(guild_id, message_id, roleid, emoji):
     """
 
     :param guild_id: id of the guild the data is for
-    :param channelid: the channel id the reaction message was sent in
     :param message_id: the id of the message
     :param roleid: the role a user should get if the user reacts
     :param emoji: the emoji the bot reacted with

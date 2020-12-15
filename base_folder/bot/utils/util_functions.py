@@ -1,8 +1,10 @@
+import datetime
 from copy import deepcopy
 from datetime import datetime
 from string import Template
 
 import discord
+from discord.embeds import EmptyEmbed
 
 """
 A short utility for random functions which don't fit into an object
@@ -241,3 +243,77 @@ async def send_to_obj(messageable_obj, message) -> discord.Message:
     if isinstance(message, discord.Embed):
         return await messageable_obj.send(embed=message)
     return await messageable_obj.send(message)
+
+
+def log_embed(msg):
+    e = discord.Embed(
+        color=discord.Color.blurple(),
+        title="DEBUG",
+        description=msg,
+    )
+    e.set_footer(text="Server time:" + str(datetime.now()))
+    e.set_author(name="M3E5", url="https://github.com/11tuvork28/m3e5")
+    return e
+
+
+def success_embed(client):
+    e = build_embed(
+        title="Success!",
+        author=client.user.name,
+        author_img=client.user.avatar_url,
+        timestamp=datetime.now(),
+        footer=client.user.name)
+    return e
+
+
+def error_embed(client):
+    e = build_embed(
+        title="Error!",
+        author=client.user.name,
+        author_img=client.user.avatar_url,
+        timestamp=datetime.now(),
+        color=discord.Color.red())
+    return e
+
+
+def build_embed(**params):
+    # Copyright 2017 Zack Rauen www.ZackRauen.com
+    title = params.get("title", EmptyEmbed)
+    description = params.get("description", EmptyEmbed)
+    color = params.get("color", discord.Color.blurple())
+    url = params.get("url", EmptyEmbed)
+    author = params.get("author", "")
+    author_url = params.get("author_url", EmptyEmbed)
+    author_img = params.get("author_img", EmptyEmbed)
+    footer = params.get("footer", "")
+    footer_img = params.get("footer_img", EmptyEmbed)
+    timestamp = params.get("timestamp", EmptyEmbed)
+    image = params.get("image", "")
+    thumbnail = params.get("thumbnail", "")
+    sections = params.get("sections", params.get("fields", []))
+    e = discord.Embed()
+    e.title = title
+    e.description = description
+    e.colour = color
+    e.url = url
+    if author:
+        e.set_author(name=author, url=author_url, icon_url=author_img)
+    if footer:
+        e.set_footer(text=footer, icon_url=footer_img)
+    e.timestamp = timestamp
+    e.set_image(url=image)
+    e.set_thumbnail(url=thumbnail)
+    if sections:
+        populate(e, sections)
+    return e
+
+
+def populate(embed: discord.Embed, sections: list):
+    # Copyright 2017 Zack Rauen www.ZackRauen.com
+    for section in sections:
+        name = section.get("name", "")
+        value = section.get("value", "")
+        inline = section.get("inline", True)
+        if not name or not value:
+            continue
+        embed.add_field(name=name, value=value, inline=inline)

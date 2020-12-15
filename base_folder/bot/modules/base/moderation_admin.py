@@ -5,7 +5,7 @@ from discord.ext import commands
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel, \
     logging_to_channel_cmd
 from base_folder.bot.utils.Permissions_checks import admin
-from base_folder.config import success_embed, build_embed
+from base_folder.bot.utils.util_functions import success_embed, build_embed
 from base_folder.celery.db import *
 
 
@@ -13,7 +13,7 @@ class ModerationAdmin(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(pass_context=True, brief="gives a member a role( @role, @member)")
+    @commands.command(pass_context=True, name="give_role", brief="Gives a member a role", usage="give_role @member @role")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -27,7 +27,7 @@ class ModerationAdmin(commands.Cog):
         await member.add_roles(role)
         return e
 
-    @commands.command(pass_context=True, brief="bans a given member")
+    @commands.command(pass_context=True, name="ban", brief="Bans a given member", usage="ban @member reason")
     @commands.guild_only()
     @admin()
     @check_args_datatyp
@@ -50,14 +50,14 @@ class ModerationAdmin(commands.Cog):
             await ctx.send(embed=e)
         return e
 
-    @commands.command(pass_context=True, brief="bans a given member for a time ( in hours), ban @member time e.g. 2 ")
+    @commands.command(pass_context=True, name="tempban", brief="NOT FOR USE BROKEN", enabled=True)
     @commands.guild_only()
     @admin()
     @check_args_datatyp
     @logging_to_channel_stdout
     @purge_command_in_channel
     @logging_to_channel_cmd
-    async def tempban(self, ctx, member: discord.Member = None, time: int=2):
+    async def tempban(self, ctx, member: discord.Member = None, time: int = 2):
         reason = "Tempban"
         e = success_embed(self.client)
         if member is not None:
@@ -73,7 +73,8 @@ class ModerationAdmin(commands.Cog):
             banned_until.delay(ctx.guild.id, member.id, banneduntil)
             return e
 
-    @commands.command(pass_context=True, aliases=["clear-all-infractions"], brief="clear all infractions of a user!!")
+    @commands.command(pass_context=True, name="clear_infractions", aliases=["clear-all-infractions"], brief="Clears all infractions of a user",
+                      usage="clear_infractions @member")
     @commands.guild_only()
     @admin()
     @check_args_datatyp

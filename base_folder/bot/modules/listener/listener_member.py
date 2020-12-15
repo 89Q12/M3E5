@@ -2,7 +2,7 @@ import datetime
 import discord
 from discord.ext import commands
 
-from base_folder.config import build_embed
+from base_folder.bot.utils.util_functions import build_embed
 from base_folder.celery.db import *
 
 

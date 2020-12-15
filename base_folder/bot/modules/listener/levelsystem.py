@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from base_folder.bot.utils.Permissions_checks import mod
-from base_folder.config import success_embed
+from base_folder.bot.utils.util_functions import success_embed
 from base_folder.celery.db import update_text_lvl, update_xp_text, edit_settings_levelsystem
 from base_folder.bot.utils.checks import check_args_datatyp, logging_to_channel_stdout, purge_command_in_channel
 
@@ -26,7 +26,8 @@ class Levelsystem(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name="levelsystemtoggle", aliases=["lvltoggle"])
+    @commands.command(name="levelsystemtoggle", aliases=["lvltoggle"], brief="toggles the levelsystem",
+                      usage="levelsystemtoggle")
     @mod()
     @check_args_datatyp
     @logging_to_channel_stdout

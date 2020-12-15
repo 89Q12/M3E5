@@ -76,7 +76,7 @@ class ReactionRoles(commands.Cog):
         await message.add_reaction(emoji)
         insert_reaction.delay(ctx.guild.id, messageid, role[0].id, emoji)
 
-    @commands.command(brief="deletes reactions from a message, cant be undone")
+    @commands.command(brief="deletes reaction roles from a msg")
     async def del_reaction(self, messageid: int, emoji: discord.emoji):
         """
 
