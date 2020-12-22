@@ -2,22 +2,23 @@ import mysql.connector
 from discord.embeds import EmptyEmbed
 import datetime
 import discord.embeds
+from os import environ as env
 
 '''
 Config
 '''
-BOT_TOKEN = "TOKEN"
+BOT_TOKEN = env['bot_token'] 
 
 # Sql config
-SQL_IP = ""
-SQL_USER = ""
-SQL_passwd = ""
+SQL_IP = env['sql_address']
+SQL_USER = env['sql_user']
+SQL_passwd = env['sql_pass']
 SQL_DB = "M3E5"
-SQL_AUTH_PLUGIN = ""
+SQL_AUTH_PLUGIN = env['sql_auth_pl']
 
 # Celery config
-broker_url = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/0'
-result_backend = 'redis://default:SoMsEcUrEpassword@172.17.0.1:6000/1'
+broker_url = 'redis://default:' + str(env['redis_pass']) + '@172.17.0.1:6000/0'
+result_backend = 'redis://default:' + str(env['redis_pass']) + '@172.17.0.1:6000/1'
 broker_connection_max_retries = True
 broker_connection_retry = 0
 imports = ('base_folder.celery.db',)
@@ -39,70 +40,5 @@ def sql():
       auth_plugin=SQL_AUTH_PLUGIN
     )
     return mydb
-
-
-'''
-Embeds
-'''
-
-
-def success_embed(client):
-    e = build_embed(
-        title="Success!",
-        author=client.user.name,
-        author_img=client.user.avatar_url,
-        timestamp=datetime.datetime.now())
-    return e
-
-
-def error_embed(client):
-    e = build_embed(
-        title="Error!",
-        author=client.user.name,
-        author_img=client.user.avatar_url,
-        timestamp=datetime.datetime.now(),
-        color=discord.Color.red())
-    return e
-
-
-def build_embed(**params):
-    # Copyright 2017 Zack Rauen www.ZackRauen.com
-    title = params.get("title", EmptyEmbed)
-    description = params.get("description", EmptyEmbed)
-    color = params.get("color", discord.Color.blurple())
-    url = params.get("url", EmptyEmbed)
-    author = params.get("author", "")
-    author_url = params.get("author_url", EmptyEmbed)
-    author_img = params.get("author_img", EmptyEmbed)
-    footer = params.get("footer", "")
-    footer_img = params.get("footer_img", EmptyEmbed)
-    timestamp = params.get("timestamp", EmptyEmbed)
-    image = params.get("image", "")
-    thumbnail = params.get("thumbnail", "")
-    sections = params.get("sections", params.get("fields", []))
-    e = discord.Embed()
-    e.title = title
-    e.description = description
-    e.colour = color
-    e.url = url
-    if author:
-        e.set_author(name=author, url=author_url, icon_url=author_img)
-    if footer:
-        e.set_footer(text=footer, icon_url=footer_img)
-    e.timestamp = timestamp
-    e.set_image(url=image)
-    e.set_thumbnail(url=thumbnail)
-    if sections:
-        populate(e, sections)
-    return e
-
-
-def populate(embed: discord.Embed, sections: list):
-    # Copyright 2017 Zack Rauen www.ZackRauen.com
-    for section in sections:
-        name = section.get("name", "")
-        value = section.get("value", "")
-        inline = section.get("inline", True)
-        if not name or not value:
-            continue
-        embed.add_field(name=name, value=value, inline=inline)
+engine = create_engine('mysql+mysqlconnector://'+SQL_USER+':'+SQL_passwd+'@'+SQL_IP+'/'+SQL_DB)
+Session = sessionmaker(bind=engine)
