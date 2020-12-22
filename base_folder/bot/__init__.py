@@ -6,7 +6,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pretty_help import PrettyHelp, Navigation
 
 from base_folder.bot.utils.util_functions import prefix, loadmodules
-from base_folder.config import MAIN_BOT_TOKEN
+from base_folder.config import BOT_TOKEN
 from base_folder.bot.modules.base.db_management import Db
 from base_folder.bot.utils.logger import Log
 from base_folder.bot.utils.checks import *
