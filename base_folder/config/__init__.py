@@ -1,7 +1,6 @@
 import mysql.connector
-from discord.embeds import EmptyEmbed
-import datetime
-import discord.embeds
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from os import environ as env
 
 '''
